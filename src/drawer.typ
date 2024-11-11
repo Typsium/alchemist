@@ -1,5 +1,5 @@
 #import "default.typ": default
-#import "@preview/cetz:0.2.2"
+#import "@preview/cetz:0.3.1"
 #import "utils.typ"
 #import cetz.draw: *
 

@@ -1,6 +1,6 @@
 #import "@preview/mantys:0.1.4": *
 #import "@preview/alchemist:0.1.1"
-#import "@preview/cetz:0.2.2"
+#import "@preview/cetz:0.3.1"
 
 #let infos = toml("../typst.toml")
 #show: mantys.with(
@@ -120,7 +120,7 @@ Th configuration dictionary that you can pass to skeletize defines a set of defa
 ]
 
 #argument("base-angle", default: default.base-angle, types: default.base-angle)[
-  Default angle at which the link with no angle defined will be.
+  Default angle at which a link with no angle defined will be.
 ]
 
 == Available commands
