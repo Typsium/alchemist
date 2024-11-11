@@ -107,30 +107,30 @@
 }
 
 /// Draw a triangle between two molecules
-#let cram(from, to, ctx, args) = {
-  let (ctx, (from-x, from-y, _)) = cetz.coordinate.resolve(ctx, from)
-  let (ctx, (to-x, to-y, _)) = cetz.coordinate.resolve(ctx, to)
+#let cram(from, to, ctx, cetz-ctx, args) = {
+  let (cetz-ctx, (from-x, from-y, _)) = cetz.coordinate.resolve(cetz-ctx, from)
+  let (cetz-ctx, (to-x, to-y, _)) = cetz.coordinate.resolve(cetz-ctx, to)
   let base-length = utils.convert-length(
-    ctx,
-    args.at("base-length", default: .8em),
+    cetz-ctx,
+    args.at("base-length", default: ctx.config.filled-cram.base-length),
   )
   line(
     (from-x, from-y - base-length / 2),
     (from-x, from-y + base-length / 2),
     (to-x, to-y),
     close: true,
-    stroke: args.at("stroke", default: none),
-    fill: args.at("fill", default: black),
+    stroke: args.at("stroke", default: ctx.config.filled-cram.stroke),
+    fill: args.at("fill", default: ctx.config.filled-cram.fill),
   )
 }
 
 /// Draw a dashed triangle between two molecules
-#let dashed-cram(from, to, length, ctx, args) = {
-  let (ctx, (from-x, from-y, _)) = cetz.coordinate.resolve(ctx, from)
-  let (ctx, (to-x, to-y, _)) = cetz.coordinate.resolve(ctx, to)
+#let dashed-cram(from, to, length, ctx, cetz-ctx, args) = {
+  let (cetz-ctx, (from-x, from-y, _)) = cetz.coordinate.resolve(cetz-ctx, from)
+  let (cetz-ctx, (to-x, to-y, _)) = cetz.coordinate.resolve(cetz-ctx, to)
   let base-length = utils.convert-length(
-    ctx,
-    args.at("base-length", default: .8em),
+    cetz-ctx,
+    args.at("base-length", default: ctx.config.dashed-cram.base-length),
   )
   hide({
     line(name: "top", (from-x, from-y - base-length / 2), (to-x, to-y - 0.05))
@@ -140,11 +140,11 @@
       (to-x, to-y + 0.05),
     )
   })
-  let stroke = args.at("stroke", default: black + .05em)
-  let dash-gap = utils.convert-length(ctx, args.at("dash-gap", default: .3em))
+  let stroke = args.at("stroke", default: ctx.config.dashed-cram.stroke)
+  let dash-gap = utils.convert-length(cetz-ctx, args.at("dash-gap", default: ctx.config.dashed-cram.dash-gap))
   let dash-width = stroke.thickness
-  let converted-dash-width = utils.convert-length(ctx, dash-width)
-  let length = utils.convert-length(ctx, length)
+  let converted-dash-width = utils.convert-length(cetz-ctx, dash-width)
+  let length = utils.convert-length(cetz-ctx, length)
 
   let dash-count = int(calc.ceil(length / (dash-gap + converted-dash-width)))
   let incr = 100% / dash-count
@@ -891,7 +891,7 @@
         group({
           set-origin(from)
           rotate(angle)
-          (link.draw)(length, cetz-ctx, override: link.override)
+          (link.draw)(length, ctx, cetz-ctx, override: link.override)
         })
       }
     }),
@@ -900,11 +900,7 @@
 }
 
 #let draw-skeleton(config: default, name: none, mol-anchor: none, body) = {
-  for (key, value) in default {
-    if key not in config {
-      config.insert(key, value)
-    }
-  }
+	let config = utils.merge-dictionaries(config, default)
   let ctx = default-ctx
   ctx.angle = config.base-angle
   ctx.config = config
