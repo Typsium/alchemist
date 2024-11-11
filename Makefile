@@ -4,7 +4,7 @@ check:
 
 link :
 	mkdir -p ~/.cache/typst/packages/preview/alchemist
-	ln -s "$(CURDIR)" ~/.cache/typst/packages/preview/alchemist/0.1.1
+	ln -s "$(CURDIR)" ~/.cache/typst/packages/preview/alchemist/0.1.2
 
 clean-link:
 	rm -rf ~/.cache/typst/packages/preview/alchemist
