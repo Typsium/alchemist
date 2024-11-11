@@ -1,5 +1,5 @@
 #import "@preview/mantys:0.1.4": *
-#import "@preview/alchemist:0.1.1"
+#import "@preview/alchemist:0.1.2"
 #import "@preview/cetz:0.3.1"
 
 #let infos = toml("../typst.toml")
@@ -85,29 +85,29 @@ The main argument is a block of code that contains the drawing instructions. The
 
 == Drawing a molecule directly in Cetz
 
-Sometimes, you may want to draw a molecule directly in cetz. To do so, you can use the #cmd[draw-skeleton] function. This function is what is used internally by the #cmd[skeletize] function. 
+Sometimes, you may want to draw a molecule directly in cetz. To do so, you can use the #cmd[draw-skeleton] function. This function is what is used internally by the #cmd[skeletize] function.
 
 #command("draw-skeleton", arg(config: (:)), arg("body"))[
-	#argument("config", types: ((:)))[
-		Configuration of the drawing environment. See @config.
-	]
-	#argument("body", types: ("drawable"))[
-		The module to draw or any cetz drawable object.
-	]
-	#argument("name", types: (""), default: none)[
-		If a name is provided, the molecule will be placed in a cetz group with this name.
-	]
-	#argument("mol-anchor", types: (""), default: none)[
-		Anchor of the group. It is working the same way as the `anchor` argument of the cetz `group` function. The `default` anchor
-		of the molecule is the east anchor of the first atom or the starting point of the first link.
-	]
+  #argument("config", types: ((:)))[
+    Configuration of the drawing environment. See @config.
+  ]
+  #argument("body", types: ("drawable"))[
+    The module to draw or any cetz drawable object.
+  ]
+  #argument("name", types: (""), default: none)[
+    If a name is provided, the molecule will be placed in a cetz group with this name.
+  ]
+  #argument("mol-anchor", types: (""), default: none)[
+    Anchor of the group. It is working the same way as the `anchor` argument of the cetz `group` function. The `default` anchor
+    of the molecule is the east anchor of the first atom or the starting point of the first link.
+  ]
 ]
 
 The usefulness of this function comes when you want to draw multiples molecules in the same cetz environment. See @exemple-cez.
 
 == Configuration <config>
 
-Th configuration dictionary that you can pass to skeletize defines a set of default values for a lot of parameters in alchemist.
+The configuration dictionary that you can pass to skeletize defines a set of default values for a lot of parameters in alchemist.
 
 #import "../src/default.typ": default
 
@@ -122,6 +122,36 @@ Th configuration dictionary that you can pass to skeletize defines a set of defa
 #argument("base-angle", default: default.base-angle, types: default.base-angle)[
   Default angle at which a link with no angle defined will be.
 ]
+
+#argument("delta", default: default.delta, types: default.delta)[
+  Default delta argument of the arcs
+]
+
+=== Link default style
+The default values also contains styling arguments for the links. You can specify default `stroke`, `fill`, `dash`, etc, depending on the link type. Each link default values are in a dictionary named after the link name.
+
+
+#grid(
+  columns: (1fr, 1fr),
+  align: center,
+	row-gutter: 2em,
+	column-gutter: 1em,
+  ..for (key, value) in default {
+    if type(value) != dictionary {
+      continue
+    }
+    (block(breakable: false)[
+      #key
+      #table(
+        columns: 2,
+        "Argument", "Default value",
+        ..for (k, v) in value {
+          (k, repr(v))
+        },
+      )
+    ],)
+  },
+)
 
 == Available commands
 
@@ -162,7 +192,7 @@ Links functions are used to draw links between molecules. They all have the same
 ]
 
 #argument("links", types: ((:)))[
-	Dictionary of links to other molecules or hooks. The key is the name of the molecule or the hook and the value is the link function.
+  Dictionary of links to other molecules or hooks. The key is the name of the molecule or the hook and the value is the link function.
 ]
 
 ==== Links
@@ -177,7 +207,7 @@ Links functions are used to draw links between molecules. They all have the same
 = Drawing molecules
 == Atoms
 
-In alchemist, the name of the function #cmd("molecule") is used to create a group of atom but here it is a little bit abusive as it do not necessarily represent real molecules. An atom is in our case something of the form: optional number + capital letter + optional lowercase letter  followed by indices or exponent.
+In alchemist, the name of the function #cmd("molecule") is used to create a group of atom but here it is a little bit abusive as it do not necessarily represent real molecules. An atom is in our case something of the form: optional number + capital letter + optional lowercase letter followed by indices or exponent.
 
 #info[
   For instance, $H_2O$ is a molecule of the atoms $H_2$ and $O$.
@@ -636,16 +666,16 @@ To fix that, you have to use the `from` and `to` arguments of the links to speci
 
 It is possible to draw arcs in cycles. The `arc` argument is a dictionary with the following entries:
 #argument("start", types: (0deg), default: 0deg)[
-	Angle at which the arc starts.
+  Angle at which the arc starts.
 ]
 #argument("end", types: (0deg), default: 360deg)[
-	Angle at which the arc ends.
+  Angle at which the arc ends.
 ]
 #argument("delta", types: (0deg), default: none)[
-	Angle of the arc in degrees.
+  Angle of the arc in degrees.
 ]
 #argument("radius", types: (0.1), default: none)[
-	Radius of the arc in percentage of the smallest distance between two opposite atoms in the cycle. By default, it is set to $0.7$ for cycle with more than $4$ faces and $0.5$ for cycle with $4$ or $3$ faces.
+  Radius of the arc in percentage of the smallest distance between two opposite atoms in the cycle. By default, it is set to $0.7$ for cycle with more than $4$ faces and $0.5$ for cycle with $4$ or $3$ faces.
 ]
 Any styling argument of the cetz `arc` function can be used.
 
@@ -830,44 +860,47 @@ Here, all the used coordinates for the arrows are computed using relative coordi
 
 The cycles centers can be accessed using the name of the cycle. If you name a cycle, an anchor will be placed at the center of the cycle. If the cycle is incomplete, the missing vertex will be approximated based on the last link and the `atom-sep` value. This will in most cases place the center correctly.
 
-#example(side-by-side: false, ```
-#skeletize({
-  import cetz.draw: *
-  molecule("A")
-  cycle(
-    5,
-    name: "cycle",
-    {
-      single()
-      molecule("B")
-      single()
-      molecule("C")
-      single()
-      molecule("D")
-      single()
-      molecule("E")
-      single()
-    },
-  )
-  content(
-    (to: "cycle", rel: (angle: 30deg, radius: 2)),
-    "Center",
-    name: "label",
-  )
-  line(
-    "cycle",
-    (to: "label.west", rel: (-1pt, -.5em)),
-    (to: "label.east", rel: (1pt, -.5em)),
-    stroke: red,
-  )
-  circle(
-    "cycle",
-    radius: .1em,
-    fill: red,
-    stroke: red,
-  )
-})
-```)
+#example(
+  side-by-side: false,
+  ```
+  #skeletize({
+    import cetz.draw: *
+    molecule("A")
+    cycle(
+      5,
+      name: "cycle",
+      {
+        single()
+        molecule("B")
+        single()
+        molecule("C")
+        single()
+        molecule("D")
+        single()
+        molecule("E")
+        single()
+      },
+    )
+    content(
+      (to: "cycle", rel: (angle: 30deg, radius: 2)),
+      "Center",
+      name: "label",
+    )
+    line(
+      "cycle",
+      (to: "label.west", rel: (-1pt, -.5em)),
+      (to: "label.east", rel: (1pt, -.5em)),
+      stroke: red,
+    )
+    circle(
+      "cycle",
+      radius: .1em,
+      fill: red,
+      stroke: red,
+    )
+  })
+  ```,
+)
 
 #example(```
 #skeletize({
@@ -902,35 +935,38 @@ The cycles centers can be accessed using the name of the cycle. If you name a cy
 
 Alchemist allows you to draw multiple molecules in the same cetz environment. This is useful when you want to draw things like reactions.
 
-#example(side-by-side: false, ```
-#cetz.canvas({
-	import cetz.draw: *
-	draw-skeleton(name: "mol1", {
-		cycle(6, {
-			single()
-			double()
-			single()
-			double()
-			single()
-			double()
-		})
-	})
-	line((to: "mol1.east", rel: (1em, 0)), (rel: (1, 0)), mark: (end: ">"))
-	set-origin((rel: (1em, 0)))
-	draw-skeleton(name: "mol2", mol-anchor: "west", {
-			molecule("X")
-			double(angle: 1)
-			molecule("Y")
-		})
-	line((to: "mol2.east", rel: (1em, 0)), (rel: (1, 0)), mark: (end: ">"))
-  set-origin((rel: (1em, 0)))
-	draw-skeleton(name: "mol3", {
-		molecule("S")
-		cram-filled-right()
-		molecule("T")
-	})
-})
-```)
+#example(
+  side-by-side: false,
+  ```
+  #cetz.canvas({
+  	import cetz.draw: *
+  	draw-skeleton(name: "mol1", {
+  		cycle(6, {
+  			single()
+  			double()
+  			single()
+  			double()
+  			single()
+  			double()
+  		})
+  	})
+  	line((to: "mol1.east", rel: (1em, 0)), (rel: (1, 0)), mark: (end: ">"))
+  	set-origin((rel: (1em, 0)))
+  	draw-skeleton(name: "mol2", mol-anchor: "west", {
+  			molecule("X")
+  			double(angle: 1)
+  			molecule("Y")
+  		})
+  	line((to: "mol2.east", rel: (1em, 0)), (rel: (1, 0)), mark: (end: ">"))
+    set-origin((rel: (1em, 0)))
+  	draw-skeleton(name: "mol3", {
+  		molecule("S")
+  		cram-filled-right()
+  		molecule("T")
+  	})
+  })
+  ```,
+)
 
 
 
@@ -971,7 +1007,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 #example(```
 #skeletize(
-	config: (angle-increment: 30deg), 
+	config: (angle-increment: 30deg),
 	{
 	single(angle:1)
 	single(angle:-1)
@@ -1000,41 +1036,44 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 === Glucose
 
-#example(side-by-side: false,```
-#skeletize(
-	config: (angle-increment: 30deg),
-	{
-	molecule("HO")
-	single(angle:-1)
-	single(angle:1)
-	branch({
-		cram-filled-left(angle: 3)
-		molecule("OH")
-	})
-	single(angle:-1)
-	branch({
-		cram-dashed-left(angle: -3)
-		molecule("OH")
-	})
-	single(angle:1)
-	branch({
-		cram-dashed-left(angle: 3)
-		molecule("OH")
-	})
-	single(angle:-1)
-	branch({
-		cram-dashed-left(angle: -3)
-		molecule("OH")
-	})
-	single(angle:1)
-	branch({
-		double(angle: 3)
-		molecule("O")
-	})
-	single(angle:-1)
-	molecule("H")
-})
-```)
+#example(
+  side-by-side: false,
+  ```
+  #skeletize(
+  	config: (angle-increment: 30deg),
+  	{
+  	molecule("HO")
+  	single(angle:-1)
+  	single(angle:1)
+  	branch({
+  		cram-filled-left(angle: 3)
+  		molecule("OH")
+  	})
+  	single(angle:-1)
+  	branch({
+  		cram-dashed-left(angle: -3)
+  		molecule("OH")
+  	})
+  	single(angle:1)
+  	branch({
+  		cram-dashed-left(angle: 3)
+  		molecule("OH")
+  	})
+  	single(angle:-1)
+  	branch({
+  		cram-dashed-left(angle: -3)
+  		molecule("OH")
+  	})
+  	single(angle:1)
+  	branch({
+  		double(angle: 3)
+  		molecule("O")
+  	})
+  	single(angle:-1)
+  	molecule("H")
+  })
+  ```,
+)
 
 #pagebreak()
 
@@ -1064,7 +1103,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	})
 }
 #skeletize(
-	config: (base-angle: 90deg), 
+	config: (base-angle: 90deg),
 	{
 	molecule("OH")
 	single(angle:3)
@@ -1074,7 +1113,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	fish-right
 	single()
 	double(angle: 1)
-	molecule("O")	
+	molecule("O")
 })
 ```)
 
@@ -1112,7 +1151,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	single(absolute: 190deg, links: ("start": single()))
 	branch({
 		single(
-			absolute: 150deg, 
+			absolute: 150deg,
 			atom-sep: 0.7
 		)
 		single(angle: 2, atom-sep: 0.7)
@@ -1136,7 +1175,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 		cycle(6,{
 			single(stroke:transparent)
 			single(
-				stroke:transparent, 
+				stroke:transparent,
 				to: 1
 			)
 			molecule("HN")
