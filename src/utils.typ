@@ -1,13 +1,11 @@
-#import "@preview/cetz:0.2.2"
+#import "@preview/cetz:0.3.1"
 
 #let convert-length(ctx, num) = {
   // This function come from the cetz module
-  if type(num) == length {
-    if repr(num).ends-with("em") {
-      float(repr(num).slice(0, -2)) * ctx.em-size.width / ctx.length
-    } else {
-      float(num / ctx.length)
-    }
+  return if type(num) == length {
+    float(num.to-absolute() / ctx.length)
+  } else if type(num) == ratio {
+    num
   } else {
     float(num)
   }
@@ -69,4 +67,18 @@
     2,
   ))
   distance
+}
+
+/// merge two imbricated dictionaries together
+/// The second dictionary is the default value if the key is not present in the first dictionary
+#let merge-dictionaries(dict1, default) = {
+	let result = default
+	for (key, value) in dict1 {
+		if type(value) == dictionary {
+			result.at(key) = merge-dictionaries(value, default.at(key))
+		} else {
+			result.at(key) = value
+		}
+	}
+	result
 }
