@@ -132,12 +132,16 @@
     cetz-ctx,
     args.at("base-length", default: ctx.config.dashed-cram.base-length),
   )
+	let tip-length = utils.convert-length(
+		cetz-ctx,
+		args.at("tip-length", default: ctx.config.dashed-cram.tip-length),
+	)
   hide({
-    line(name: "top", (from-x, from-y - base-length / 2), (to-x, to-y - 0.05))
+    line(name: "top", (from-x, from-y - base-length / 2), (to-x, to-y - tip-length / 2))
     line(
       name: "bottom",
       (from-x, from-y + base-length / 2),
-      (to-x, to-y + 0.05),
+      (to-x, to-y + tip-length / 2),
     )
   })
   let stroke = args.at("stroke", default: ctx.config.dashed-cram.stroke)
