@@ -11,13 +11,20 @@
 /// === Molecule function
 /// Build a molecule group based on mol
 /// Each molecule is represented as an optional count followed by a molecule name
-/// starting by a capital letter followed by an optional indice
+/// starting by a capital letter followed by an optional exponent followed by an optional indice.
 /// #example(```
 /// #skeletize({
 ///   molecule("H_2O")
 /// })
 ///```)
-/// It is possible to use an equation as a molecule. In this case, the spliting of the equation uses the same rules as in the string case. However, you can use parenthesis to group elements together.
+/// #example(```
+/// #skeletize({
+///  	molecule("H^A_EF^5_4")
+/// })
+/// ```)
+/// It is possible to use an equation as a molecule. In this case, the splitting of the equation uses the same rules as in the string case. However, you get some advantages over the string version:
+/// - You can use parenthesis to group elements together.
+/// - You have no restriction about what you can put in exponent or indice.
 /// #example(```
 /// #skeletize({
 ///   molecule($C(C H_3)_3$)
@@ -26,7 +33,7 @@
 /// - name (content): The name of the molecule. It is used as the cetz name of the molecule and to link other molecules to it.
 /// - links (dictionary): The links between this molecule and previous molecules or hooks. The key is the name of the molecule or hook and the value is the link function.
 ///
-/// Note that the antom-sep and angle arguments are ignored
+/// Note that the atom-sep and angle arguments are ignored
 /// - mol (string, equation): The string representing the molecule or an equation of the molecule
 /// - vertical (boolean): If true, the molecule is drawn vertically
 /// #example(```

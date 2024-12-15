@@ -85,6 +85,10 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 
 ## Changelog
 
+### 0.1.3
+
+- Added the possibility to add exponent in the string of a molecule.
+
 ### 0.1.2
 
 - Added default values for link style properties.
