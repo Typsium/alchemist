@@ -44,7 +44,7 @@
 
 #let split-string(mol) = {
   let aux(str) = {
-    let match = str.match(regex("^ *([0-9]*[A-Z][a-z]*)(_[0-9]+)?"))
+    let match = str.match(regex("^ *([0-9]*[A-Z][a-z]*)(\\^[0-9]+|\\^[A-Z])?(_[0-9]+)?"))
     if match == none {
       panic(str + " is not a valid atom")
     }
@@ -52,6 +52,9 @@
     if match.captures.len() >= 2 {
       eq += match.captures.at(1)
     }
+		if match.captures.len() >= 3 {
+			eq += match.captures.at(2)
+		}
     let eq = math.equation(eval(eq, mode: "math"))
     (eq, match.end)
   }
