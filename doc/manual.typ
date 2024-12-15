@@ -715,15 +715,16 @@ Any styling argument of the cetz `arc` function can be used.
 
 == Custom links
 
-Using the #cmd[build-link] function, you can create your own links. The function passed as argument to #cmd[build-link] must takes three arguments:
+Using the #cmd[build-link] function, you can create your own links. The function passed as argument to #cmd[build-link] must takes four arguments:
 - The length of the link
+- The alchemist context
 - The cetz context of the drawing environment
 - A dictionary of named arguments that can be used to configure the links
 You can then draw anything you want using the cetz functions. For instance, here is the code for the `single` link:
 ```typ
-#let single = build-link((length, _, args) => {
+#let single = build-link((length, ctx, _, args) => {
   import cetz.draw: *
-  line((0, 0), (length, 0), stroke: args.at("stroke", default: black))
+  line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.single.stroke))
 })
 ```
 
