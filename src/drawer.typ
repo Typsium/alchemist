@@ -1,6 +1,7 @@
 #import "default.typ": default
 #import "@preview/cetz:0.3.1"
 #import "utils.typ"
+#import "molecule.typ"
 #import cetz.draw: *
 
 #let default-anchor = (type: "coord", anchor: (0, 0))
@@ -193,6 +194,25 @@
   }
 }
 
+#let draw-molecule-lewis(ctx, group-name, count, lewis) = {
+	get-ctx(cetz-ctx => {
+		for (id, (angle, molecule-margin, draw)) in lewis.enumerate() {
+			let mol-id = if utils.angle-in-range(angle, 90deg, 270deg) {
+				0
+			} else {
+				count - 1
+			}
+			let anchor = molecule.molecule-anchor(ctx, cetz-ctx, angle, group-name, str(mol-id), margin: molecule-margin)
+			let angle = utils.angle-correction(angle)
+			group({
+				set-origin(anchor)
+				rotate(angle)
+				draw(ctx, cetz-ctx)
+			})
+		}
+	})
+}
+
 #let draw-molecule(mol, ctx) = {
   let name = mol.name
   if name != none {
@@ -244,6 +264,7 @@
           }
         },
       )
+			draw-molecule-lewis(ctx, name, mol.count, mol.at("lewis"))
     },
   )
 }
@@ -632,97 +653,6 @@
   )
 }
 
-#let anchor-north-east(cetz-ctx, (x, y, _), delta, molecule, id) = {
-  let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "north")),
-  )
-  let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "east")),
-  )
-  let a = (a - x) + delta
-  let b = (b - y) + delta
-  (a, b)
-}
-
-#let anchor-north-west(cetz-ctx, (x, y, _), delta, molecule, id) = {
-  let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "north")),
-  )
-  let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "west")),
-  )
-  let a = (x - a) + delta
-  let b = (b - y) + delta
-  (a, b)
-}
-
-#let anchor-south-west(cetz-ctx, (x, y, _), delta, molecule, id) = {
-  let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "south")),
-  )
-  let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "west")),
-  )
-  let a = (x - a) + delta
-  let b = (y - b) + delta
-  (a, b)
-}
-
-#let anchor-south-east(cetz-ctx, (x, y, _), delta, molecule, id) = {
-  let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "south")),
-  )
-  let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "east")),
-  )
-  let a = (a - x) + delta
-  let b = (y - b) + delta
-  (a, b)
-}
-
-#let molecule-anchor(ctx, cetz-ctx, angle, molecule, id) = {
-  let delta = utils.convert-length(cetz-ctx, ctx.config.delta)
-  let (cetz-ctx, center) = cetz.coordinate.resolve(
-    cetz-ctx,
-    (name: molecule, anchor: (id, "mid")),
-  )
-
-  let (a, b) = if utils.angle-in-range(angle, 0deg, 90deg) {
-    anchor-north-east(cetz-ctx, center, delta, molecule, id)
-  } else if utils.angle-in-range(angle, 90deg, 180deg) {
-    anchor-north-west(cetz-ctx, center, delta, molecule, id)
-  } else if utils.angle-in-range(angle, 180deg, 270deg) {
-    anchor-south-west(cetz-ctx, center, delta, molecule, id)
-  } else {
-    anchor-south-east(cetz-ctx, center, delta, molecule, id)
-  }
-
-  // https://www.petercollingridge.co.uk/tutorials/computational-geometry/finding-angle-around-ellipse/
-  let angle = if utils.angle-in-range-inclusive(angle, 0deg, 90deg) or utils.angle-in-range-strict(
-    angle,
-    270deg,
-    360deg,
-  ) {
-    calc.atan(calc.tan(angle) * a / b)
-  } else {
-    calc.atan(calc.tan(angle) * a / b) - 180deg
-  }
-
-
-  if a == 0 or b == 0 {
-    panic("Ellipse " + ellipse + " has no width or height")
-  }
-  (center.at(0) + a * calc.cos(angle), center.at(1) + b * calc.sin(angle))
-}
-
 #let calculate-mol-mol-link-anchors(ctx, cetz-ctx, link) = {
   let to-pos = (name: link.to-name, anchor: "mid")
   if link.to == none or link.from == none {
@@ -754,8 +684,8 @@
   if link.to == -1 {
     link.to = ctx.hooks.at(link.to-name).count - 1
   }
-  let start = molecule-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from))
-  let end = molecule-anchor(ctx, cetz-ctx, link.angle + 180deg, link.to-name, str(link.to))
+  let start = molecule.molecule-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from))
+  let end = molecule.molecule-anchor(ctx, cetz-ctx, link.angle + 180deg, link.to-name, str(link.to))
   ((start, end), utils.angle-between(cetz-ctx, start, end))
 }
 
@@ -784,8 +714,8 @@
       ),
     )
   }
-  let end-anchor = molecule-anchor(
-    ctx,
+  let end-anchor = molecule.molecule-anchor(
+		ctx,
     cetz-ctx,
     link.angle + 180deg,
     link.to-name,
@@ -803,7 +733,7 @@
 #let calculate-mol-link-anchors(ctx, cetz-ctx, link) = {
   (
     (
-      molecule-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from)),
+      molecule.molecule-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from)),
       link.name + "-end-anchor",
     ),
     link.angle,
@@ -821,7 +751,7 @@
     ctx.hooks.at(link.from-name).count - 1,
     ctx.hooks.at(link.from-name).vertical,
   )
-  let start-anchor = molecule-anchor(ctx, cetz-ctx, angle, link.from-name, str(from))
+  let start-anchor = molecule.molecule-anchor(ctx, cetz-ctx, angle, link.from-name, str(from))
   (
     (
       start-anchor,

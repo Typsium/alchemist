@@ -5,6 +5,7 @@
 #import "src/drawer.typ" : skeletize, draw-skeleton
 #import "src/links.typ" : *
 #import "src/molecule.typ" : *
+#import "src/lewis.typ": *
 
 #let transparent = color.rgb(100%,0,0,0)
 
@@ -31,9 +32,10 @@
 /// })
 ///```)
 /// - name (content): The name of the molecule. It is used as the cetz name of the molecule and to link other molecules to it.
-/// - links (dictionary): The links between this molecule and previous molecules or hooks. The key is the name of the molecule or hook and the value is the link function.
-///
+/// - links (dictionary): The links between this molecule and previous molecules or hooks. The key is the name of the molecule or hook and the value is the link function. See @links.
+/// 
 /// Note that the atom-sep and angle arguments are ignored
+/// - lewis (list): The list of lewis structures to draw around the molecules. See @lewis
 /// - mol (string, equation): The string representing the molecule or an equation of the molecule
 /// - vertical (boolean): If true, the molecule is drawn vertically
 /// #example(```
@@ -42,7 +44,7 @@
 /// })
 ///```)
 /// -> drawable
-#let molecule(name: none, links: (:), vertical: false, mol) = {
+#let molecule(name: none, links: (:), lewis: (), vertical: false, mol) = {
   let atoms = if type(mol) == str {
 		split-string(mol)
 	} else if mol.func() == math.equation {
@@ -50,12 +52,18 @@
 	} else {
 		panic("Invalid molecule content")
 	}
+
+	if type(lewis) != array {
+		panic("Lewis formulae elements must be in a list")
+	}
+	
   (
     (
       type: "molecule",
       name: name,
       atoms: atoms,
       links: links,
+			lewis: lewis,
 			vertical: vertical,
       count: atoms.len(),
     ),
@@ -63,7 +71,7 @@
 }
 
 /// === Hooks
-/// Create a hook in the molecule. It allows tu connect links to the place where the hook is.
+/// Create a hook in the molecule. It allows to connect links to the place where the hook is.
 /// Hooks are placed at the end of links or at the beginning of the molecule.
 /// - name (string): The name of the hook
 /// -> drawable
