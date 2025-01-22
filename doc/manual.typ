@@ -121,8 +121,8 @@ The configuration dictionary that you can pass to skeletize defines a set of def
   Default angle at which a link with no angle defined will be.
 ]
 
-#argument("delta", default: default.delta, types: default.delta)[
-  Default delta argument of the arcs
+#argument("molecule-margin", default: default.molecule-margin, types: default.molecule-margin)[
+  Default space between a molecule and all it's attachements (links and lewis formulae elements).
 ]
 
 === Link default style
@@ -203,6 +203,15 @@ Links functions are used to draw links between molecules. They all have the same
 )
 
 === Lewis structures <lewis>
+All the lewis elements have two common arguments to control their position:
+#argument("angle", types: (0deg), default: 0deg)[
+	Angle of the lewis element relative to the abscissa axis.
+]
+
+#argument("molecule-margin", types: (default.molecule-margin), default: default.molecule-margin)[
+	Space between the lewis element and the molecule.
+]
+
 #tidy-module(
 	read("../src/lewis.typ"),
 	name: infos.package.name,
@@ -1240,6 +1249,64 @@ The following examples are the same ones as in the Chemfig documentation. They a
 		single()
 		molecule("NH")
 		single(from: 1)
+	})
+})
+```)
+
+#pagebreak()
+
+=== Sulfuric Acid
+
+#example(```
+#skeletize({
+	molecule("H")
+	single()
+	molecule("O", lewis: (
+		lewis-line(angle: 90deg),
+		lewis-line(angle: -90deg)
+	))
+	single()
+	molecule("S")
+	branch(angle: 2, {
+		double()
+		molecule("O", lewis: (
+			lewis-line(angle: 45deg),
+			lewis-line(angle: 135deg)
+		))
+	})
+	branch(angle: -2, {
+		double()
+		molecule("O", lewis: (
+			lewis-line(angle: -45deg),
+			lewis-line(angle: -135deg)
+		))
+	})
+	single()
+	molecule("O", lewis: (
+		lewis-line(angle: 90deg),
+		lewis-line(angle: -90deg)
+	))
+	single()
+	molecule("H")
+})
+```)
+
+#pagebreak()
+=== $B H_3$
+#example(```
+#skeletize({
+	molecule("H")
+	single()
+	molecule("B", lewis: (
+		lewis-rectangle(molecule-margin: 5pt),
+	))
+	branch(angle:1, {
+		single()
+		molecule("H")
+	})
+	branch(angle:-1, {
+		single()
+		molecule("H")
 	})
 })
 ```)
