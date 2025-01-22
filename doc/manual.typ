@@ -1,5 +1,5 @@
 #import "@preview/mantys:0.1.4": *
-#import "@preview/alchemist:0.1.3"
+#import "@preview/alchemist:0.1.4"
 #import "@preview/cetz:0.3.1"
 
 #let infos = toml("../typst.toml")
@@ -200,6 +200,15 @@ Links functions are used to draw links between molecules. They all have the same
   show-outline: false,
   include-examples-scope: true,
   extract-headings: 3,
+)
+
+=== Lewis structures <lewis>
+#tidy-module(
+	read("../src/lewis.typ"),
+	name: infos.package.name,
+	show-outline: false,
+	include-examples-scope: true,
+	extract-headings: 3,
 )
 
 = Drawing molecules

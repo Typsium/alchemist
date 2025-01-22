@@ -5,7 +5,6 @@
 
 /// Create a link function that is then used to draw a link between two points
 ///
-///
 /// - draw-function (function): The function that will be used to draw the link. It should takes three arguments: the length of the link, the context, and a dictionary of named arguments that can be used to configure the links
 /// -> function
 #let build-link(draw-function) = {
