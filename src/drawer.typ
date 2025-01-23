@@ -8,27 +8,25 @@
 #let max-int = 9223372036854775807
 
 #let default-ctx = (
-	// general
+  // general
   last-anchor: default-anchor, // keep trace of the place to draw
-  group-id: 0,                 // id of the current group
-  link-id: 0,                  // id of the current link
-	links: (),                   // list of links to draw
-  hooks: (:),                  // list of hooks
-	hooks-links: (),						 // list of links to hooks
-  relative-angle: 0deg,        // current global relative angle
-  angle: 0deg,                 // current global angle
-
-	// branch
-	first-branch: false,         // true if the next element is the first in a branch
-
-	// cycle
-	first-molecule: none,        // name of the first molecule in the cycle
-  in-cycle: false,             // true if we are in a cycle
-  cycle-faces: 0,              // number of faces in the current cycle
-  faces-count: 0,              // number of faces already drawn
-  cycle-step-angle: 0deg,      // angle between two faces in the cycle
-	record-vertex: false,        // true if the cycle should keep track of its vertices
-	vertex-anchors: (),          // list of the cycle vertices
+  group-id: 0, // id of the current group
+  link-id: 0, // id of the current link
+  links: (), // list of links to draw
+  hooks: (:), // list of hooks
+  hooks-links: (), // list of links to hooks
+  relative-angle: 0deg, // current global relative angle
+  angle: 0deg, // current global angle
+  // branch
+  first-branch: false, // true if the next element is the first in a branch
+  // cycle
+  first-molecule: none, // name of the first molecule in the cycle
+  in-cycle: false, // true if we are in a cycle
+  cycle-faces: 0, // number of faces in the current cycle
+  faces-count: 0, // number of faces already drawn
+  cycle-step-angle: 0deg, // angle between two faces in the cycle
+  record-vertex: false, // true if the cycle should keep track of its vertices
+  vertex-anchors: (), // list of the cycle vertices
 )
 
 #let set-last-anchor(ctx, anchor) = {
@@ -133,10 +131,10 @@
     cetz-ctx,
     args.at("base-length", default: ctx.config.dashed-cram.base-length),
   )
-	let tip-length = utils.convert-length(
-		cetz-ctx,
-		args.at("tip-length", default: ctx.config.dashed-cram.tip-length),
-	)
+  let tip-length = utils.convert-length(
+    cetz-ctx,
+    args.at("tip-length", default: ctx.config.dashed-cram.tip-length),
+  )
   hide({
     line(name: "top", (from-x, from-y - base-length / 2), (to-x, to-y - tip-length / 2))
     line(
@@ -195,22 +193,29 @@
 }
 
 #let draw-molecule-lewis(ctx, group-name, count, lewis) = {
-	get-ctx(cetz-ctx => {
-		for (id, (angle: lewis-angle, molecule-margin, draw)) in lewis.enumerate() {
-			let lewis-angle = utils.angle-correction(lewis-angle)
-			let mol-id = if utils.angle-in-range-inclusive(lewis-angle, 90deg, 270deg) {
-				0
-			} else {
-				count - 1
-			}
-			let anchor = molecule.molecule-anchor(ctx, cetz-ctx, lewis-angle, group-name, str(mol-id), margin: molecule-margin)
-			group({
-				set-origin(anchor)
-				rotate(lewis-angle)
-				draw(ctx, cetz-ctx)
-			})
-		}
-	})
+  get-ctx(cetz-ctx => {
+    for (id, (angle: lewis-angle, molecule-margin, draw)) in lewis.enumerate() {
+      let lewis-angle = utils.angle-correction(lewis-angle)
+      let mol-id = if utils.angle-in-range-inclusive(lewis-angle, 90deg, 270deg) {
+        0
+      } else {
+        count - 1
+      }
+      let anchor = molecule.molecule-anchor(
+        ctx,
+        cetz-ctx,
+        lewis-angle,
+        group-name,
+        str(mol-id),
+        margin: molecule-margin,
+      )
+      group({
+        set-origin(anchor)
+        rotate(lewis-angle)
+        draw(ctx, cetz-ctx)
+      })
+    }
+  })
 }
 
 #let draw-molecule(mol, ctx) = {
@@ -264,7 +269,7 @@
           }
         },
       )
-			draw-molecule-lewis(ctx, name, mol.count, mol.at("lewis"))
+      draw-molecule-lewis(ctx, name, mol.count, mol.at("lewis"))
     },
   )
 }
@@ -452,7 +457,6 @@
       )
     }
   })
-
 }
 
 #let draw-hooks-links(links, name, ctx, from-mol) = {
@@ -583,9 +587,13 @@
               if ctx.faces-count != 0 {
                 angle += ctx.cycle-step-angle
               }
-            } else if ctx.relative-angle == 0deg and ctx.angle == 0deg and not element.args.at(
-              "align",
-              default: false,
+            } else if (
+              ctx.relative-angle == 0deg
+                and ctx.angle == 0deg
+                and not element.args.at(
+                  "align",
+                  default: false,
+                )
             ) {
               angle = cycle-step-angle - 90deg
             } else {
@@ -640,6 +648,44 @@
           } else {
             panic("A hook must placed after a link or at the beginning of the skeleton")
           }
+        } else if element.type == "parenthesis" {
+          let (drawing, parenthesis-ctx, cetz-rec) = draw-molecules-and-link(
+            ctx,
+            element.body,
+          )
+          let anchor = if element.body.at(0).type == "molecule" {
+            let name = element.body.at(0).name
+						if name == none {
+							name = "molecule" + str(ctx.group-id)
+						}
+            ctx.group-id += 1
+            element.body.at(0).name = name
+            (name: name, anchor: "west")
+          } else if element.body.at(0).type == "link" {
+            let name = element.body.at(0).at("name", default: "link" + str(ctx.link-id))
+            ctx.link-id += 1
+            element.body.at(0).name = name
+            (name: name, anchor: 100%)
+          } else {
+            panic("The first element of a parenthesis must be a molecule or a link")
+          }
+          ctx = parenthesis-ctx
+          cetz-drawing += cetz-rec
+          cetz-drawing += drawing
+          cetz-drawing += get-ctx(cetz-ctx => {
+            let (ctx: cetz-ctx, bounds, drawables) = cetz.process.many(cetz-ctx, drawing)
+            let height = calc.abs(bounds.high.at(1) - bounds.low.at(1)) * cetz-ctx.length
+            let width = calc.abs(bounds.high.at(0) - bounds.low.at(0)) * cetz-ctx.length
+            let parenthesis = math.attach(
+              math.lr($element.l #block(height: height, width: width) element.r$),
+              tr: element.tr,
+              br: element.br,
+            )
+						let parenthesis-bounds = cetz.process.element(cetz-ctx,content((0,0), parenthesis).at(0)).bounds
+						let offset = calc.abs(calc.abs(parenthesis-bounds.high.at(0) - parenthesis-bounds.low.at(0)) - calc.abs(bounds.high.at(0) - bounds.low.at(0))) / 2
+            content(anchor: "base-west", (rel: (-offset,0), to: anchor), { parenthesis })
+          })
+          drawing
         } else {
           panic("Unknown element type " + element.type)
         }
@@ -715,7 +761,7 @@
     )
   }
   let end-anchor = molecule.molecule-anchor(
-		ctx,
+    ctx,
     cetz-ctx,
     link.angle + 180deg,
     link.to-name,
@@ -742,9 +788,7 @@
 
 #let calculate-mol-hook-link-anchors(ctx, cetz-ctx, link) = {
   let hook = ctx.hooks.at(link.to-name)
-  let angle = utils.angle-correction(
-    utils.angle-between(cetz-ctx, link.from-pos, hook.hook),
-  )
+  let angle = utils.angle-correction(utils.angle-between(cetz-ctx, link.from-pos, hook.hook))
   let from = link-molecule-index(
     angle,
     false,
