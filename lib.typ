@@ -150,3 +150,17 @@
     ),
   )
 }
+
+
+#let parenthesis(body, l: "(", r: ")", tr: none, br: none) = {
+	(
+		(
+			type: "parenthesis",
+			body: body,
+			l: l,
+			r: r,
+			tr: tr,
+			br: br,
+		),
+	)
+}
