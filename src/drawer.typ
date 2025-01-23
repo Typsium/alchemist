@@ -196,17 +196,17 @@
 
 #let draw-molecule-lewis(ctx, group-name, count, lewis) = {
 	get-ctx(cetz-ctx => {
-		for (id, (angle, molecule-margin, draw)) in lewis.enumerate() {
-			let mol-id = if utils.angle-in-range(angle, 90deg, 270deg) {
+		for (id, (angle: lewis-angle, molecule-margin, draw)) in lewis.enumerate() {
+			let lewis-angle = utils.angle-correction(lewis-angle)
+			let mol-id = if utils.angle-in-range-inclusive(lewis-angle, 90deg, 270deg) {
 				0
 			} else {
 				count - 1
 			}
-			let anchor = molecule.molecule-anchor(ctx, cetz-ctx, angle, group-name, str(mol-id), margin: molecule-margin)
-			let angle = utils.angle-correction(angle)
+			let anchor = molecule.molecule-anchor(ctx, cetz-ctx, lewis-angle, group-name, str(mol-id), margin: molecule-margin)
 			group({
 				set-origin(anchor)
-				rotate(angle)
+				rotate(lewis-angle)
 				draw(ctx, cetz-ctx)
 			})
 		}

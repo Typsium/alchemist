@@ -24,13 +24,26 @@
 /// draw a sigle electron around the molecule
 /// 
 /// It is possible to change the distance from the center of
-/// the electron with the `gap` argument. The position of the electron is set by the `offset` argument.
+/// the electron with the `gap` argument. 
+/// 
+/// The position of the electron is set by the `offset` argument. Available values are:
+/// - "top": the electron is placed above the molecule center line
+/// - "bottom": the electron is placed below the molecule center line
+/// - "center": the electron is placed at the molecule center line
+/// 
 /// It is also possible to change the `radius`, `stroke` and `fill` arguments
 /// #example(```
 /// #skeletize({
 /// 	molecule("A", lewis:(
-/// 		lewis-single(),
-/// 		lewis-single(angle: 90deg, offset: "center")
+/// 		lewis-single(offset: "top"),
+/// 	))
+/// 	single(angle:-2)
+///   molecule("B", lewis:(
+/// 		lewis-single(offset: "bottom"),
+/// 	))
+/// 	single(angle:-2)
+///   molecule("C", lewis:(
+/// 		lewis-single(offset: "center"),
 /// 	))
 /// })
 /// ```)
