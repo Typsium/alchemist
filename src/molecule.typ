@@ -137,7 +137,8 @@
 /// - margin (length|none): the margin around the molecule
 /// -> anchor: the anchor position around the molecule
 #let molecule-anchor(ctx, cetz-ctx, angle, molecule, id, margin: none) = {
-  let molecule-margin = if margin == none {
+	let angle = utils.angle-correction(angle)
+	let molecule-margin = if margin == none {
 		ctx.config.molecule-margin
 	} else {
 		margin
