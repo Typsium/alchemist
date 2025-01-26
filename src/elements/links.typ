@@ -1,6 +1,6 @@
 #import "@preview/cetz:0.3.1"
-#import "drawer.typ"
-#import "utils.typ"
+#import "../drawer/cram.typ": *
+#import "../utils/utils.typ"
 
 
 /// Create a link function that is then used to draw a link between two points
@@ -176,7 +176,7 @@
 ///   molecule("B")
 /// })
 ///```)
-#let cram-filled-right = build-link((length, ctx, cetz-ctx, args) => drawer.cram(
+#let cram-filled-right = build-link((length, ctx, cetz-ctx, args) => cram(
   (0, 0),
   (length, 0),
   ctx,
@@ -205,7 +205,7 @@
 ///   molecule("B")
 /// })
 ///```)
-#let cram-filled-left = build-link((length, ctx, cetz-ctx, args) => drawer.cram(
+#let cram-filled-left = build-link((length, ctx, cetz-ctx, args) => cram(
   (length, 0),
   (0, 0),
   ctx,
@@ -218,7 +218,7 @@
 #let cram-hollow-right = build-link((length, ctx, cetz-ctx, args) => {
   args.fill = none
   args.stroke = args.at("stroke", default: black)
-  drawer.cram((0, 0), (length, 0), ctx, cetz-ctx, args)
+  cram((0, 0), (length, 0), ctx, cetz-ctx, args)
 })
 
 /// Draw a hollow cram between two molecules with the arrow pointing to the left
@@ -226,7 +226,7 @@
 #let cram-hollow-left = build-link((length, ctx, cetz-ctx, args) => {
   args.fill = none
   args.stroke = args.at("stroke", default: black)
-  drawer.cram((length, 0), (0, 0), ctx, cetz-ctx, args)
+  cram((length, 0), (0, 0), ctx, cetz-ctx, args)
 })
 
 /// Draw a dashed cram between two molecules with the arrow pointing to the right
@@ -252,7 +252,7 @@
 ///   molecule("B")
 /// })
 ///```)
-#let cram-dashed-right = build-link((length, ctx, cetz-ctx, args) => drawer.dashed-cram(
+#let cram-dashed-right = build-link((length, ctx, cetz-ctx, args) => dashed-cram(
   (0, 0),
   (length, 0),
   length,
@@ -282,7 +282,7 @@
 ///   molecule("B")
 /// })
 ///```)
-#let cram-dashed-left = build-link((length, ctx, cetz-ctx, args) => drawer.dashed-cram(
+#let cram-dashed-left = build-link((length, ctx, cetz-ctx, args) => dashed-cram(
   (length, 0),
   (0, 0),
   length,
