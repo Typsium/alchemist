@@ -1,11 +1,11 @@
 #import "@preview/cetz:0.3.1"
 #import "src/default.typ": default
-#import "src/utils.typ"
+#import "src/utils/utils.typ"
 #import "src/drawer.typ"
 #import "src/drawer.typ" : skeletize, draw-skeleton
-#import "src/links.typ" : *
-#import "src/molecule.typ" : *
-#import "src/lewis.typ": *
+#import "src/elements/links.typ" : *
+#import "src/elements/molecule.typ" : *
+#import "src/elements/lewis.typ": *
 
 #let transparent = color.rgb(100%,0,0,0)
 

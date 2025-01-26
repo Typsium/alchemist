@@ -195,7 +195,7 @@ Links functions are used to draw links between molecules. They all have the same
 
 ==== Links
 #tidy-module(
-  read("../src/links.typ"),
+  read("../src/elements/links.typ"),
   name: infos.package.name,
   show-outline: false,
   include-examples-scope: true,
@@ -213,7 +213,7 @@ All the lewis elements have two common arguments to control their position:
 ]
 
 #tidy-module(
-	read("../src/lewis.typ"),
+	read("../src/elements/lewis.typ"),
 	name: infos.package.name,
 	show-outline: false,
 	include-examples-scope: true,
