@@ -17,7 +17,7 @@
 
 /// Check if the angle is in the range [from, to[
 /// 
-/// - angle (float|int|angle): The angle to check
+/// - angle (float, int, angle): The angle to check
 /// - from (float): The start of the range
 /// - to (float): The end of the range
 /// -> true if the angle is in the range
@@ -31,7 +31,7 @@
 
 /// Check if the angle is in the range ]from, to[
 ///
-/// - angle (float|int|angle): The angle to check
+/// - angle (float, int, angle): The angle to check
 /// - from (float): The start of the range
 /// - to (float): The end of the range
 /// -> true if the angle is in the range
@@ -45,7 +45,7 @@
 
 /// Check if the angle is in the range [from, to]
 ///	
-/// - angle (float|int|angle): The angle to check
+/// - angle (float, int, angle): The angle to check
 /// - from (float): The start of the range
 /// - to (float): The end of the range
 /// -> true if the angle is in the range
