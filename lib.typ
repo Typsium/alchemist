@@ -152,15 +152,18 @@
 }
 
 
-#let parenthesis(body, l: "(", r: ")", tr: none, br: none) = {
+#let parenthesis(body, l: "(", r: ")", align: true, height: none, tr: none, br: none) = {
 	(
 		(
 			type: "parenthesis",
 			body: body,
+			calc: calc,
 			l: l,
 			r: r,
+			align: align,
 			tr: tr,
 			br: br,
+			height: height,
 		),
 	)
 }
