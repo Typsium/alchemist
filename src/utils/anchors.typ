@@ -66,10 +66,10 @@
 ///
 /// - ctx (alchemist-ctx): the alchemist context
 /// - cetz-ctx (cetz-ctx): the cetz context
-/// - angle (float|int|angle): the angle of the anchor
+/// - angle (float, int, angle): the angle of the anchor
 /// - molecule (string): the molecule name
 /// - id (string): the molecule subpart id
-/// - margin (length|none): the margin around the molecule
+/// - margin (length, none): the margin around the molecule
 /// -> anchor: the anchor position around the molecule
 #let molecule-anchor(ctx, cetz-ctx, angle, molecule, id, margin: none) = {
 	let angle = angles.angle-correction(angle)
