@@ -987,7 +987,7 @@ Alchemist allows you to draw multiple molecules in the same cetz environment. Th
 
 
 
-== Examples
+== Examples <examples>
 
 The following examples are the same ones as in the Chemfig documentation. They are here for two purposes: To show you how to draw the same structures with Alchemist and to show you how to use the package.
 

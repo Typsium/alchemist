@@ -133,11 +133,13 @@
 ///   })
 /// })
 ///```)
-#let cycle(..args) = {
-  if args.pos().len() != 2 {
+/// - faces (int): the number of faces of the cycle
+/// - body (drawable): the body of the cycle. It must start and end with a molecule or a link.
+/// -> drawable
+#let cycle(faces, body, ..args) = {
+  if args.pos().len() != 0 {
     panic("Cycle takes two positional arguments: number of faces and body")
   }
-	let faces = args.pos().at(0)
 	if faces < 3 {
 		panic("A cycle must have at least 3 faces")
 	}
@@ -145,14 +147,43 @@
     (
       type: "cycle",
       faces: faces,
-      draw: args.pos().at(1),
+      draw: body,
       args: args.named(),
     ),
   )
 }
 
-
-#let parenthesis(body, l: "(", r: ")", align: true, height: none, tr: none, br: none) = {
+/// === Parenthesis
+/// Encapsulate a drawable between two parenthesis. The left parenthesis is placed at the left of the first element of the body and the right parenthesis is placed at the right of the last element of the body. To get a good result, the molecule should be "linear" in the sense that the first element is on the left and the last element is on the right. Otherwise, it won't look good.
+///
+/// #example(```
+/// #skeletize(
+///   config: (
+/// 		angle-increment: 30deg
+/// 	), {
+/// 	parenthesis(
+/// 		l:"[", r:"]", 
+/// 		br: $n$, {
+/// 		single(angle: 1)
+/// 		single(angle: -1)
+/// 		single(angle: 1)
+/// 	})
+/// })
+/// ```)
+/// For more examples, see @examples
+/// 
+/// - body (drawable): the body of the parenthesis. It must start and end with a molecule or a link. 
+/// - l (string): the left parenthesis
+/// - r (string): the right parenthesis
+/// - align (true): if true, the parenthesis will have the same y position. They will also get sized and aligned according to the body height. If false, they are not aligned and the height argument must be specified.
+/// 
+/// - height (float, length): the height of the parenthesis. If align is true, this argument is optional.
+/// - roffset (float, length): the vertical offset of the right parenthesis
+/// - loffset (float, length): the vertical offset of the left parenthesis
+/// - tr (content): the exponent content of the right parenthesis
+/// - br (content): the indice content of the right parenthesis
+/// -> drawable
+#let parenthesis(body, l: "(", r: ")", align: true, height: none, roffset: none, loffset: none, tr: none, br: none) = {
 	(
 		(
 			type: "parenthesis",
@@ -164,6 +195,8 @@
 			tr: tr,
 			br: br,
 			height: height,
+			roffset: roffset,
+			loffset: loffset,
 		),
 	)
 }
