@@ -90,12 +90,14 @@
 
 #let draw-molecules-and-link(ctx, body) = {
 	let molecule-drawing = ()
+	let parenthesis-drawing = ()
   let cetz-drawing = ()
 	for element in body {
 		if ctx.in-cycle and ctx.faces-count >= ctx.cycle-faces {
 			continue
 		}
 		let drawing = ()
+		let parenthesis-drawing-rec = ()
 		let cetz-rec = ()
 		if type(element) == function {
 			cetz-drawing.push(element)
@@ -106,18 +108,19 @@
 		} else if element.type == "link" {
 			(ctx, drawing) = link.draw-link(element, ctx)
 		} else if element.type == "branch" {
-			(ctx, drawing, cetz-rec) = branch.draw-branch(element, ctx, draw-molecules-and-link)
+			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = branch.draw-branch(element, ctx, draw-molecules-and-link)
 		} else if element.type == "cycle" {
-			(ctx, drawing, cetz-rec) = cycle.draw-cycle(element, ctx, draw-molecules-and-link)
+			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = cycle.draw-cycle(element, ctx, draw-molecules-and-link)
 		} else if element.type == "hook" {
 			ctx = hook.draw-hook(element, ctx)
 		} else if element.type == "parenthesis" {
-			(ctx, drawing, cetz-rec) = parenthesis.draw-parenthesis(element, ctx, draw-molecules-and-link)
+			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = parenthesis.draw-parenthesis(element, ctx, draw-molecules-and-link)
 		} else {
 			panic("Unknown element type " + element.type)
 		}
 		molecule-drawing += drawing
 		cetz-drawing += cetz-rec
+		parenthesis-drawing += parenthesis-drawing-rec
 	}
 	if ctx.last-anchor.type == "link" and not ctx.last-anchor.at("drew", default: false) {
 		ctx.links.push(ctx.last-anchor)
@@ -125,6 +128,7 @@
   (
     ctx,
     molecule-drawing,
+		parenthesis-drawing,
     cetz-drawing,
   )
 }
@@ -156,7 +160,7 @@
   let ctx = default-ctx
   ctx.angle = config.base-angle
   ctx.config = config
-  let (ctx, atoms, cetz-drawing) = draw-molecules-and-link(ctx, body)
+  let (ctx, atoms, parenthesis, cetz-drawing) = draw-molecules-and-link(ctx, body)
   for (links, name, from-mol) in ctx.hooks-links {
     ctx = draw-hooks-links(links, name, ctx, from-mol)
   }
@@ -165,6 +169,7 @@
   if name == none {
     atoms
     links
+		parenthesis
     cetz-drawing
   } else {
     group(
@@ -174,6 +179,7 @@
         anchor("default", (0, 0))
         atoms
         links
+				parenthesis
         cetz-drawing
       },
     )

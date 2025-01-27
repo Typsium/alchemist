@@ -134,7 +134,7 @@
   } else if "arc" in cycle.args {
     record-vertex = true
   }
-  let (cycle-ctx, drawing, cetz-rec) = draw-molecules-and-link(
+  let (cycle-ctx, drawing, parenthesis-drawing-rec, cetz-rec) = draw-molecules-and-link(
     (
       ..ctx,
       in-cycle: true,
@@ -154,5 +154,5 @@
   if record-vertex {
     drawing += draw-cycle-center-arc(cycle-ctx, name, cycle.args.at("arc", default: none))
   }
-	(ctx, drawing, cetz-rec)
+	(ctx, drawing, parenthesis-drawing-rec, cetz-rec)
 }
