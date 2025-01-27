@@ -111,7 +111,6 @@
 			}
 			content((lx - hoffset , ly), anchor: "mid", left-parenthesis)
 			content((rx + hoffset + right-hoffset, ry - right-voffset), anchor: "mid", right-parenthesis-with-attach)
-			
 		})
 	}
   (ctx, drawing, parenthesis-rec, cetz-rec)
