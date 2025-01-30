@@ -25,9 +25,10 @@
   let center = (0, 0)
   let faces = ctx.cycle-faces
   let odd = calc.rem(faces, 2) == 1
+	let debug = ()
   for (i, v) in vertex.enumerate() {
     if (ctx.config.debug) {
-      circle(v, radius: .1em, fill: blue, stroke: blue)
+      debug += cetz.draw.circle(v, radius: .1em, fill: blue, stroke: blue)
     }
     let (x, y, _) = v
     center = (center.at(0) + x, center.at(1) + y)
@@ -49,7 +50,7 @@
       }
     }
   }
-  ((center.at(0) / vertex.len(), center.at(1) / vertex.len()), min-radius)
+  ((center.at(0) / vertex.len(), center.at(1) / vertex.len()), min-radius, debug)
 }
 
 #let draw-cycle-center-arc(ctx, name, center-arc) = {
@@ -61,7 +62,8 @@
     if vertex.len() < faces {
       vertex = missing-vertices(ctx, cetz-ctx)
     }
-    let (center, min-radius) = cycle-center-radius(ctx, cetz-ctx, vertex)
+    let (center, min-radius, debug) = cycle-center-radius(ctx, cetz-ctx, vertex)
+		debug
     if name != none {
       group(
         name: name,
@@ -148,7 +150,7 @@
       record-vertex: record-vertex,
       vertex-anchors: (),
     ),
-    cycle.draw,
+    cycle.body,
   )
   ctx = context_.update-parent-context(ctx, cycle-ctx)
   if record-vertex {

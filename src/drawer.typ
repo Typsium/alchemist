@@ -145,7 +145,7 @@
         }
         let length = distance-between(cetz-ctx, from, to)
         hide(line(from, to, name: link.name))
-        group({
+        scope({
           set-origin(from)
           rotate(angle)
           (link.draw)(length, ctx, cetz-ctx, override: link.override)
