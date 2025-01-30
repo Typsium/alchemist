@@ -141,13 +141,12 @@
 				rx += utils.convert-length(cetz-ctx, parenthesis.xoffset.at(1))
 			} else if parenthesis.xoffset != none {
 				let offset = utils.convert-length(cetz-ctx, parenthesis.xoffset)
-				lx += offset
+				lx -= offset
 				rx += offset
 			}
 
 			let right-bounds = cetz.process.many(cetz-ctx, content((0,0),right-parenthesis, auto-scale: false)).bounds
 			let right-with-attach-bounds = cetz.process.many(cetz-ctx, content((0,0),right-parenthesis-with-attach, auto-scale: false)).bounds
-			let right-hoffset = calc.abs(right-bounds.low.at(0) - right-with-attach-bounds.low.at(0))
 			let right-voffset = calc.abs(right-bounds.low.at(1) - right-with-attach-bounds.low.at(1))
 			if (parenthesis.tr != none and parenthesis.br != none) {
 				right-voffset /= 2
@@ -155,7 +154,7 @@
 				right-voffset *= -1
 			}
 			content((lx , ly), anchor: "mid-east", left-parenthesis, auto-scale: false)
-			content((rx + right-hoffset, ry - right-voffset), anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
+			content((rx, ry - right-voffset), anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
 		})
 	}
   (ctx, drawing, parenthesis-rec, cetz-rec)
