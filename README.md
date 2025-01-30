@@ -85,6 +85,11 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 
 ## Changelog
 
+### 0.1.4
+
+- Added the possibility to crate lewis formulae
+- Added parenthesis element to create groups and polymer
+
 ### 0.1.3
 
 - Added the possibility to add exponent in the string of a molecule.

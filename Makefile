@@ -16,7 +16,7 @@ module:
 	cp ./typst.toml ./alchemist/typst.toml
 	cp ./LICENSE ./alchemist/LICENSE
 	cp ./lib.typ ./alchemist/
-	cp ./src/*.typ ./alchemist/src/
+	cp -r ./src/* ./alchemist/src/
 	awk '/<!--EXCLUDE-->/, /<!--END-->/ {next} 1' ./README.md > ./alchemist/README.md
 
 manual:

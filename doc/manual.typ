@@ -607,6 +607,7 @@ It is possible to add branches in cycles. You can add a branch at any point of t
 	})
 ```)
 
+#pagebreak()
 === Cycles imbrication
 
 Like branches, you can add cycles in cycles. By default the cycle will be placed in a way that the two cycles share a common link.
@@ -1267,20 +1268,15 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	))
 	single()
 	molecule("S")
-	branch(angle: 2, {
+	let do(sign) = {
 		double()
 		molecule("O", lewis: (
-			lewis-line(angle: 45deg),
-			lewis-line(angle: 135deg)
+			lewis-line(angle: sign * 45deg),
+			lewis-line(angle: sign * 135deg)
 		))
-	})
-	branch(angle: -2, {
-		double()
-		molecule("O", lewis: (
-			lewis-line(angle: -45deg),
-			lewis-line(angle: -135deg)
-		))
-	})
+	}
+	branch(angle: 2, do(1))
+	branch(angle: -2, do(-1))
 	single()
 	molecule("O", lewis: (
 		lewis-line(angle: 90deg),
@@ -1307,6 +1303,112 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	branch(angle:-1, {
 		single()
 		molecule("H")
+	})
+})
+```)
+
+=== Carbonate ion
+#example(```
+#skeletize(
+  config: (
+    atom-sep: 2em,
+  ),
+  {
+    parenthesis(
+      l: "[",
+      r: "]",
+      tr: $2-$,
+      xoffset: .05,
+      {
+        molecule(
+          "O",
+          lewis: (
+            lewis-double(angle: 135),
+            lewis-double(angle: -45),
+            lewis-double(angle: -135),
+          ),
+        )
+
+        single(relative: 30deg)
+        molecule("C")
+        branch(
+          angle: 2,
+          {
+            double()
+            molecule(
+              "O",
+              lewis: (
+                lewis-double(angle: 45),
+                lewis-double(angle: 135),
+              ),
+            )
+          },
+        )
+        single(absolute: -30deg)
+        molecule(
+          "O",
+          lewis: (
+            lewis-double(angle: 45),
+            lewis-double(angle: -45),
+            lewis-double(angle: -135),
+          ),
+        )
+      },
+    )
+  },
+)
+```)
+
+
+=== Polphenyl sulfide<polySulfide>
+
+#example(```
+#skeletize({
+  single()
+  parenthesis(
+    br: $n$,
+    right: "end",
+    {
+      molecule("S")
+      single()
+      cycle(
+        6,
+        align: true,
+        arc: (:),
+        {
+          for i in range(3) {
+            single()
+          }
+          branch(single(name: "end"))
+          for i in range(3) {
+            single()
+          }
+        },
+      )
+    },
+  )
+})
+```)
+
+=== Nylon 6
+#example(```
+#skeletize({
+	parenthesis(xoffset: (.4, -.15), {
+		single()
+		molecule("N")
+		branch(angle: 2, {
+			single()
+			molecule("H")
+		})
+		single()
+		molecule("C")
+		branch(angle: 2, {
+			double()
+			molecule("O")
+		})
+		single()
+		molecule($(C H_2)_5$)
+		single()
 	})
 })
 ```)
