@@ -25,7 +25,7 @@
 			cycle-step-angle: 0,
 			angle: angle,
 		),
-		branch.draw,
+		branch.body,
 	)
 	ctx = context_.update-parent-context(ctx, branch-ctx)
 	(ctx, drawing, parenthesis-drawing-rec, cetz-rec)

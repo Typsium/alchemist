@@ -24,7 +24,9 @@
   let from-connection = none
   let from-name = none
 
+  let init-point = false
   let from-pos = if ctx.last-anchor.type == "coord" {
+    init-point = true
     ctx.last-anchor.anchor
   } else if ctx.last-anchor.type == "molecule" {
     from-connection = link-molecule-index(
@@ -74,6 +76,14 @@
   (
     ctx,
     {
+      if init-point {
+        hide(
+          {
+            circle(from-pos, radius: .25em)
+          },
+          bounds: true,
+        )
+      }
       let end-anchor = (to: from-pos, rel: (angle: link-angle, radius: length))
       if ctx.config.debug {
         line(from-pos, end-anchor, stroke: blue + .1em)
@@ -82,9 +92,12 @@
         name: link-name + "-end-anchor",
         {
           anchor("default", end-anchor)
-					hide({
-						circle(end-anchor, radius: .25em)
-					}, bounds: true)
+          hide(
+            {
+              circle(end-anchor, radius: .25em)
+            },
+            bounds: true,
+          )
         },
       )
     },
@@ -92,12 +105,12 @@
 }
 
 #let draw-link(link, ctx) = {
-	ctx.first-branch = false
-	let drawing
-	(ctx, drawing) = create-link-decorations-anchors(link, ctx)
-	ctx.faces-count += 1
-	if link.links.len() != 0 {
-		ctx.hooks-links.push((link.links, ctx.last-anchor.name, false))
-	}
-	(ctx, drawing)
+  ctx.first-branch = false
+  let drawing
+  (ctx, drawing) = create-link-decorations-anchors(link, ctx)
+  ctx.faces-count += 1
+  if link.links.len() != 0 {
+    ctx.hooks-links.push((link.links, ctx.last-anchor.name, false))
+  }
+  (ctx, drawing)
 }

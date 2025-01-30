@@ -54,7 +54,7 @@
         str(mol-id),
         margin: molecule-margin,
       )
-      group({
+      scope({
         set-origin(anchor)
         rotate(lewis-angle)
         draw(ctx, cetz-ctx)

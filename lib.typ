@@ -2,12 +2,12 @@
 #import "src/default.typ": default
 #import "src/utils/utils.typ"
 #import "src/drawer.typ"
-#import "src/drawer.typ" : skeletize, draw-skeleton
-#import "src/elements/links.typ" : *
-#import "src/elements/molecule.typ" : *
+#import "src/drawer.typ": skeletize, draw-skeleton
+#import "src/elements/links.typ": *
+#import "src/elements/molecule.typ": *
 #import "src/elements/lewis.typ": *
 
-#let transparent = color.rgb(100%,0,0,0)
+#let transparent = color.rgb(100%, 0, 0, 0)
 
 /// === Molecule function
 /// Build a molecule group based on mol
@@ -33,7 +33,7 @@
 ///```)
 /// - name (content): The name of the molecule. It is used as the cetz name of the molecule and to link other molecules to it.
 /// - links (dictionary): The links between this molecule and previous molecules or hooks. The key is the name of the molecule or hook and the value is the link function. See @links.
-/// 
+///
 /// Note that the atom-sep and angle arguments are ignored
 /// - lewis (list): The list of lewis structures to draw around the molecules. See @lewis
 /// - mol (string, equation): The string representing the molecule or an equation of the molecule
@@ -46,25 +46,25 @@
 /// -> drawable
 #let molecule(name: none, links: (:), lewis: (), vertical: false, mol) = {
   let atoms = if type(mol) == str {
-		split-string(mol)
-	} else if mol.func() == math.equation {
-		split-equation(mol, equation: true)
-	} else {
-		panic("Invalid molecule content")
-	}
+    split-string(mol)
+  } else if mol.func() == math.equation {
+    split-equation(mol, equation: true)
+  } else {
+    panic("Invalid molecule content")
+  }
 
-	if type(lewis) != array {
-		panic("Lewis formulae elements must be in a list")
-	}
-	
+  if type(lewis) != array {
+    panic("Lewis formulae elements must be in a list")
+  }
+
   (
     (
       type: "molecule",
       name: name,
       atoms: atoms,
       links: links,
-			lewis: lewis,
-			vertical: vertical,
+      lewis: lewis,
+      vertical: vertical,
       count: atoms.len(),
     ),
   )
@@ -76,18 +76,18 @@
 /// - name (string): The name of the hook
 /// -> drawable
 #let hook(name) = {
-	(
-		(
-			type: "hook",
-			name: name,
-		),
-	)
+  (
+    (
+      type: "hook",
+      name: name,
+    ),
+  )
 }
 
 /// === Branch and cycles
 /// Create a branch from the current molecule, the first element
 /// of the branch has to be a link.
-/// 
+///
 /// You can specify an angle argument like for links. This angle will be then
 /// used as the `base-angle` for the branch.
 ///
@@ -108,11 +108,13 @@
 ///   molecule("C")
 /// })
 ///```)
-#let branch(..args) = {
-	if args.pos().len() != 1 {
-		panic("Branch takes one positional argument: the body of the branch")
-	}
-  ((type: "branch", draw: args.pos().at(0), args: args.named()),)
+/// - body (drawable): the body of the branch. It must start with a link.
+/// -> drawable
+#let branch(body, ..args) = {
+  if args.pos().len() != 0 {
+    panic("Branch takes one positional argument: the body of the branch")
+  }
+  ((type: "branch", body: body, args: args.named()),)
 }
 
 /// Create a regular cycle of molecules
@@ -140,14 +142,14 @@
   if args.pos().len() != 0 {
     panic("Cycle takes two positional arguments: number of faces and body")
   }
-	if faces < 3 {
-		panic("A cycle must have at least 3 faces")
-	}
+  if faces < 3 {
+    panic("A cycle must have at least 3 faces")
+  }
   (
     (
       type: "cycle",
       faces: faces,
-      draw: body,
+      body: body,
       args: args.named(),
     ),
   )
