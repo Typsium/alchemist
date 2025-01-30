@@ -156,7 +156,7 @@
 }
 
 /// === Parenthesis
-/// Encapsulate a drawable between two parenthesis. The left parenthesis is placed at the left of the first element of the body and the right parenthesis is placed at the right of the last element of the body. To get a good result, the molecule should be "linear" in the sense that the first element is on the left and the last element is on the right. Otherwise, it won't look good.
+/// Encapsulate a drawable between two parenthesis. The left parenthesis is placed at the left of the first element of the body and by default the right parenthesis is placed at the right of the last element of the body.
 ///
 /// #example(```
 /// #skeletize(
@@ -164,7 +164,7 @@
 /// 		angle-increment: 30deg
 /// 	), {
 /// 	parenthesis(
-/// 		l:"[", r:"]", 
+/// 		l:"[", r:"]",
 /// 		br: $n$, {
 /// 		single(angle: 1)
 /// 		single(angle: -1)
@@ -173,32 +173,34 @@
 /// })
 /// ```)
 /// For more examples, see @examples
-/// 
-/// - body (drawable): the body of the parenthesis. It must start and end with a molecule or a link. 
+///
+/// - body (drawable): the body of the parenthesis. It must start and end with a molecule or a link.
 /// - l (string): the left parenthesis
 /// - r (string): the right parenthesis
 /// - align (true): if true, the parenthesis will have the same y position. They will also get sized and aligned according to the body height. If false, they are not aligned and the height argument must be specified.
-/// 
+///
 /// - height (float, length): the height of the parenthesis. If align is true, this argument is optional.
-/// - roffset (float, length): the vertical offset of the right parenthesis
-/// - loffset (float, length): the vertical offset of the left parenthesis
+/// - yoffset (float, length, list): the vertical offset of parenthesis. You can also provide a tuple for left and right parenthesis
+/// - xoffset (float, length, list): the horizontal offset of parenthesis. You can also provide a tuple for left and right parenthesis
+/// - right (string): Sometime, it is not convenient to place the right parenthesis at the end of the body. In this case, you can specify the name of the molecule or link where the right parenthesis should be placed. It is especially useful when the body end by a cycle.
 /// - tr (content): the exponent content of the right parenthesis
 /// - br (content): the indice content of the right parenthesis
 /// -> drawable
-#let parenthesis(body, l: "(", r: ")", align: true, height: none, roffset: none, loffset: none, tr: none, br: none) = {
-	(
-		(
-			type: "parenthesis",
-			body: body,
-			calc: calc,
-			l: l,
-			r: r,
-			align: align,
-			tr: tr,
-			br: br,
-			height: height,
-			roffset: roffset,
-			loffset: loffset,
-		),
-	)
+#let parenthesis(body, l: "(", r: ")", align: true, height: none, yoffset: none, xoffset: none, right: none, tr: none, br: none) = {
+  (
+    (
+      type: "parenthesis",
+      body: body,
+      calc: calc,
+      l: l,
+      r: r,
+      align: align,
+      tr: tr,
+      br: br,
+      height: height,
+      xoffset: xoffset,
+			yoffset: yoffset,
+			right: right,
+    ),
+  )
 }

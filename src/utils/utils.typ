@@ -35,3 +35,27 @@
 	}
 	result
 }
+
+
+///	get the type of an element by its name
+///
+/// - body (drawable): the chemfig body of a molecule 
+/// - name (string): the name of the element to get the type
+/// -> string
+#let get-element-type(body, name) = {
+	for element in body {
+		if type(element) != dictionary {
+			continue
+		}
+		if "name" in element and element.name == name {
+			return element.type
+		}
+		if element.type == "branch" or element.type == "cycle" or element.type == "parenthesis" {
+			let type = get-element-type(element.body, name)
+			if type != none {
+				return type
+			}
+		}
+	}
+	none
+}
