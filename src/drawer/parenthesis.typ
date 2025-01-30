@@ -122,7 +122,7 @@
 				ry += calc.abs(ry - sub-v-mid)
 				ry = ly
 			} else if type(parenthesis.yoffset) == array {
-				if parenthesis.offset.len() != 2 {
+				if parenthesis.yoffset.len() != 2 {
 					panic("The parenthesis yoffset must be a list of length 2 or a number")
 				}
 				ly += utils.convert-length(cetz-ctx, parenthesis.yoffset.at(0))
@@ -134,7 +134,7 @@
 			}
 
 			if type(parenthesis.xoffset) == array {
-				if parenthesis.offset.len() != 2 {
+				if parenthesis.xoffset.len() != 2 {
 					panic("The parenthesis xoffset must be a list of length 2 or a number")
 				}
 				lx += utils.convert-length(cetz-ctx, parenthesis.xoffset.at(0))

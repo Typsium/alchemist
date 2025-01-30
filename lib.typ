@@ -182,7 +182,7 @@
 /// - height (float, length): the height of the parenthesis. If align is true, this argument is optional.
 /// - yoffset (float, length, list): the vertical offset of parenthesis. You can also provide a tuple for left and right parenthesis
 /// - xoffset (float, length, list): the horizontal offset of parenthesis. You can also provide a tuple for left and right parenthesis
-/// - right (string): Sometime, it is not convenient to place the right parenthesis at the end of the body. In this case, you can specify the name of the molecule or link where the right parenthesis should be placed. It is especially useful when the body end by a cycle.
+/// - right (string): Sometime, it is not convenient to place the right parenthesis at the end of the body. In this case, you can specify the name of the molecule or link where the right parenthesis should be placed. It is especially useful when the body end by a cycle. See @polySulfide
 /// - tr (content): the exponent content of the right parenthesis
 /// - br (content): the indice content of the right parenthesis
 /// -> drawable
