@@ -167,10 +167,10 @@
   let links = draw-link-decoration(ctx).at(1)
 
   if name == none {
-    atoms
-    links
+		atoms
+		links
 		parenthesis
-    cetz-drawing
+		cetz-drawing
   } else {
     group(
       name: name,
