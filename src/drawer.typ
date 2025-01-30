@@ -124,6 +124,7 @@
 	}
 	if ctx.last-anchor.type == "link" and not ctx.last-anchor.at("drew", default: false) {
 		ctx.links.push(ctx.last-anchor)
+		ctx.last-anchor.drew = true
 	}
   (
     ctx,
