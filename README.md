@@ -45,7 +45,7 @@ Alchemist is a typst package to draw skeletal formulae. It is based on the [chem
   )
 })
 ````
-![links](https://raw.githubusercontent.com/Robotechnic/alchemist/master/tests/README-graphic1/ref/1.png)
+![links](https://raw.githubusercontent.com/Typsium/alchemist/master/tests/README-graphic1/ref/1.png)
 
 Alchemist uses cetz to draw the molecules. This means that you can draw cetz shapes in the same canvas as the molecules. Like this:
 
@@ -71,7 +71,7 @@ Alchemist uses cetz to draw the molecules. This means that you can draw cetz sha
   )
 })
 ````
-![cetz](https://raw.githubusercontent.com/Robotechnic/alchemist/master/tests/README-graphic2/ref/1.png)
+![cetz](https://raw.githubusercontent.com/Typsium/alchemist/master/tests/README-graphic2/ref/1.png)
 
 ## Usage
 
