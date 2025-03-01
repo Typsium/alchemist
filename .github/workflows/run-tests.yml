@@ -2,6 +2,11 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths:
+      - src/**
+      - lib.typ
+      - tests/**
+      - .github/**
   pull_request:
     branches: [ main ]
 
