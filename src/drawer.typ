@@ -1,5 +1,5 @@
 #import "default.typ": default
-#import "@preview/cetz:0.3.1"
+#import "@preview/cetz:0.3.2"
 #import "utils/utils.typ": *
 #import "utils/anchors.typ": *
 #import "drawer/molecule.typ" as molecule
