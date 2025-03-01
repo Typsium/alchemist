@@ -10,14 +10,13 @@ clean-link:
 	rm -rf ~/.cache/typst/packages/preview/alchemist
 
 module:
-	sh ./generate_images.sh
 	mkdir -p ./alchemist
 	mkdir -p ./alchemist/src
 	cp ./typst.toml ./alchemist/typst.toml
 	cp ./LICENSE ./alchemist/LICENSE
 	cp ./lib.typ ./alchemist/
 	cp -r ./src/* ./alchemist/src/
-	awk '/<!--EXCLUDE-->/, /<!--END-->/ {next} 1' ./README.md > ./alchemist/README.md
+	awk '{gsub("https://typst.app/universe/package/alchemist", "https://github.com/Typsium/alchemist");print}' ./README.md > ./alchemist/README.md
 
 manual:
 	typst compile ./doc/manual.typ --root .
