@@ -27,3 +27,9 @@ manual:
 
 watch:
 	typst watch ./doc/manual.typ --root .
+
+# Target to bump the version in lib.typ and all files in /src
+CETZ_VERSION ?= 0.3.4
+bump-cetz:
+	perl -pi -e 's/cetz:[0-9]+\.[0-9]+\.[0-9]+/cetz:$(CETZ_VERSION)/g' ./lib.typ
+	find ./src -type f -exec perl -pi -e 's/cetz:[0-9]+\.[0-9]+\.[0-9]+/cetz:$(CETZ_VERSION)/g' {} +
