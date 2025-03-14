@@ -1,5 +1,5 @@
 #import "../utils/utils.typ"
-#import "@preview/cetz:0.3.2"
+#import "@preview/cetz:0.3.4"
 
 #let bounding-box-height(bounds) = {
 	calc.abs(bounds.high.at(1) - bounds.low.at(1))

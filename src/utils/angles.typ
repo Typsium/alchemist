@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.3.2"
+#import "@preview/cetz:0.3.4"
 
 /// Convert any angle to an angle between 0deg and 360deg
 #let angle-correction(a) = {

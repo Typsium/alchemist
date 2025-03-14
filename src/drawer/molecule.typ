@@ -1,6 +1,6 @@
 #import "../utils/context.typ": *
 #import "../utils/anchors.typ": *
-#import "@preview/cetz:0.3.2"
+#import "@preview/cetz:0.3.4"
 
 #let draw-molecule-text(mol) = {
 	import cetz.draw: *
