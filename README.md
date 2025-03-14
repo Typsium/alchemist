@@ -89,6 +89,10 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 
 ## Changelog
 
+### 0.1.5
+
+- Update to compiler 0.13.1 and Cetz 0.3.4
+
 ### 0.1.4
 
 - Added the possibility to create Lewis formulae
