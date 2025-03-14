@@ -28,7 +28,7 @@
   let from-pos = if ctx.last-anchor.type == "coord" {
     init-point = true
     ctx.last-anchor.anchor
-  } else if ctx.last-anchor.type == "molecule" {
+  } else if ctx.last-anchor.type == "fragment" {
     from-connection = link-molecule-index(
       link-angle,
       false,

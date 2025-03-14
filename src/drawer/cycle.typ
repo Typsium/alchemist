@@ -122,7 +122,7 @@
     }
   }
   let first-molecule = none
-  if ctx.last-anchor.type == "molecule" {
+  if ctx.last-anchor.type == "fragment" {
     first-molecule = ctx.last-anchor.name
     if first-molecule not in ctx.hooks {
       ctx.hooks.insert(first-molecule, ctx.last-anchor)
