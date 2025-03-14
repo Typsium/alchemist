@@ -67,11 +67,11 @@
   let name = mol.name
   if name != none {
     if name in ctx.hooks {
-      panic("Molecule with name " + name + " already exists")
+      panic("Molecule fragment with name " + name + " already exists")
     }
     ctx.hooks.insert(name, mol)
   } else {
-    name = "molecule" + str(ctx.group-id)
+    name = "fragment" + str(ctx.group-id)
   }
   let (group-anchor, side, coord) = if ctx.last-anchor.type == "coord" {
     ("west", true, ctx.last-anchor.anchor)
@@ -88,11 +88,11 @@
     ctx.last-anchor.to-name = name
     (group-anchor, false, ctx.last-anchor.name + "-end-anchor")
   } else {
-    panic("A molecule must be linked to a coord or a link")
+    panic("A molecule fragment must be linked to a coord or a link")
   }
   ctx = context_.set-last-anchor(
     ctx,
-    (type: "molecule", name: name, count: mol.at("count"), vertical: mol.vertical),
+    (type: "fragment", name: name, count: mol.at("count"), vertical: mol.vertical),
   )
   ctx.group-id += 1
   (
@@ -122,7 +122,7 @@
 
 #let draw-molecule(element, ctx) = {
 	if ctx.first-branch {
-		panic("A molecule can not be the first element in a cycle")
+		panic("A molecule fragment can not be the first element in a cycle")
 	}
 	let (ctx, drawing) = draw-molecule-elements(element, ctx)
 	if element.links.len() != 0 {

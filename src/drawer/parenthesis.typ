@@ -10,10 +10,10 @@
 }
 
 #let left-parenthesis-anchor(parenthesis, ctx) = {
-	let anchor = if parenthesis.body.at(0).type == "molecule" {
+	let anchor = if parenthesis.body.at(0).type == "fragment" {
     let name = parenthesis.body.at(0).name
     if name == none {
-      name = "molecule" + str(ctx.group-id)
+      name = "fragment" + str(ctx.group-id)
     }
     ctx.group-id += 1
     parenthesis.body.at(0).name = name
@@ -24,7 +24,7 @@
     parenthesis.body.at(0).name = name
     (name: name, anchor: 50%)
   } else {
-    panic("The first element of a parenthesis must be a molecule or a link")
+    panic("The first element of a parenthesis must be a molecule fragment or a link")
   }
 	(ctx, parenthesis, anchor)
 }
@@ -39,8 +39,8 @@
 		}
 	} else {
 		right-type = parenthesis.body.at(-1).type
-		if right-type == "molecule" {
-			right-name = "molecule" + str(ctx.group-id)
+		if right-type == "fragment" {
+			right-name = "fragment" + str(ctx.group-id)
 			ctx.group-id += 1
 			parenthesis.body.at(-1).name = right-name
 		} else if right-type == "link" {
@@ -50,12 +50,12 @@
 		}
  	}
 
-	let anchor = if right-type == "molecule" {
+	let anchor = if right-type == "fragment" {
 		(name: right-name, anchor: "east")
 	} else if right-type == "link" {
 		(name: right-name, anchor: 50%)
 	} else {
-		panic("The last element of a parenthesis must be a molecule or a link but got " + right-type)
+		panic("The last element of a parenthesis must be a molecule fragment or a link but got " + right-type)
 	}
 	(ctx, parenthesis, anchor)
 }

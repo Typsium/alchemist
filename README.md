@@ -9,25 +9,25 @@ Alchemist is a typst package to draw skeletal formulae. It is based on the [chem
 <!--EXAMPLE(links)-->
 ````typ
 #skeletize({
-  molecule(name: "A", "A")
+  fragment(name: "A", "A")
   single()
-  molecule("B")
+  fragment("B")
   branch({
     single(angle: 1)
-    molecule(
+    fragment(
       "W",
       links: (
         "A": double(stroke: red),
       ),
     )
     single()
-    molecule(name: "X", "X")
+    fragment(name: "X", "X")
   })
   branch({
     single(angle: -1)
-    molecule("Y")
+    fragment("Y")
     single()
-    molecule(
+    fragment(
       name: "Z",
       "Z",
       links: (
@@ -36,7 +36,7 @@ Alchemist is a typst package to draw skeletal formulae. It is based on the [chem
     )
   })
   single()
-  molecule(
+  fragment(
     "C",
     links: (
       "X": cram-filled-left(fill: blue),
@@ -55,7 +55,7 @@ Alchemist uses cetz to draw the molecules. This means that you can draw cetz sha
   import cetz.draw: *
   double(absolute: 30deg, name: "l1")
   single(absolute: -30deg, name: "l2")
-  molecule("X", name: "X")
+  fragment("X", name: "X")
   hobby(
     "l1.50%",
     ("l1.start", 0.5, 90deg, "l1.end"),

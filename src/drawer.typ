@@ -41,7 +41,7 @@
       panic("Molecule " + to-name + " does not exist")
     }
     let to-hook = ctx.hooks.at(to-name)
-    if to-hook.type == "molecule" {
+    if to-hook.type == "fragment" {
       ctx.links.push((
         type: "link",
         name: link.at("name", default: "link" + str(ctx.link-id)),
@@ -103,7 +103,7 @@
 			cetz-drawing.push(element)
 		} else if "type" not in element {
 			panic("Element " + str(element) + " has no type")
-		} else if element.type == "molecule" {
+		} else if element.type == "fragment" {
 			(ctx, drawing) = molecule.draw-molecule(element, ctx)
 		} else if element.type == "link" {
 			(ctx, drawing) = link.draw-link(element, ctx)

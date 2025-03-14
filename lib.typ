@@ -50,7 +50,7 @@
   } else if mol.func() == math.equation {
     split-equation(mol, equation: true)
   } else {
-    panic("Invalid molecule content")
+    panic("Invalid fragment content")
   }
 
   if type(lewis) != array {
@@ -59,7 +59,7 @@
 
   (
     (
-      type: "molecule",
+      type: "fragment",
       name: name,
       atoms: atoms,
       links: links,
@@ -69,6 +69,7 @@
     ),
   )
 }
+#let fragment(name: none, links: (:), lewis: (), vertical: false, mol) = molecule(name: name, links: links, lewis: lewis, vertical: vertical, mol)
 
 /// === Hooks
 /// Create a hook in the molecule. It allows to connect links to the place where the hook is.
