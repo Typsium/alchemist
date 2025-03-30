@@ -1,7 +1,7 @@
 #import "angles.typ"
 #import "context.typ" as context_
 #import "utils.typ": *
-#import "@preview/cetz:0.3.2"
+#import "@preview/cetz:0.3.4"
 #import cetz.draw: *
 
 #let anchor-north-east(cetz-ctx, (x, y, _), delta, molecule, id) = {

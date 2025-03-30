@@ -1,5 +1,5 @@
 #import "default.typ": default
-#import "@preview/cetz:0.3.1"
+#import "@preview/cetz:0.3.4"
 #import "utils/utils.typ": *
 #import "utils/anchors.typ": *
 #import "drawer/molecule.typ" as molecule
@@ -135,6 +135,8 @@
 }
 
 #let draw-link-decoration(ctx) = {
+  (
+    ctx,
     get-ctx(cetz-ctx => {
       for link in ctx.links {
         let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link)
@@ -150,7 +152,8 @@
           (link.draw)(length, ctx, cetz-ctx, override: link.override)
         })
       }
-    })
+    }),
+  )
 }
 
 #let draw-skeleton(config: default, name: none, mol-anchor: none, body) = {
@@ -162,7 +165,8 @@
   for (links, name, from-mol) in ctx.hooks-links {
     ctx = draw-hooks-links(links, name, ctx, from-mol)
   }
-  let links = draw-link-decoration(ctx)
+  let links = draw-link-decoration(ctx).at(1)
+
   if name == none {
 		atoms
 		links

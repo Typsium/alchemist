@@ -1,5 +1,5 @@
 #import "../utils/utils.typ"
-#import "@preview/cetz:0.3.2"
+#import "@preview/cetz:0.3.4"
 
 #let bounding-box-height(bounds) = {
 	calc.abs(bounds.high.at(1) - bounds.low.at(1))
@@ -64,10 +64,11 @@
   let (ctx, parenthesis, left-anchor) = left-parenthesis-anchor(parenthesis, ctx)
 	let (ctx, parenthesis, right-anchor) = right-parenthesis-anchor(parenthesis, ctx)
 
-  let (ctx, drawing, parenthesis-rec, cetz-rec) = draw-molecules-and-link(
+  let (parenthesis-ctx, drawing, parenthesis-rec, cetz-rec) = draw-molecules-and-link(
     ctx,
     parenthesis.body,
   )
+  ctx = parenthesis-ctx
 	parenthesis-rec += {
 		import cetz.draw: *
 		get-ctx(cetz-ctx => {

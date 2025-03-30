@@ -1,6 +1,6 @@
 #import "@preview/mantys:0.1.4": *
 #import "@preview/alchemist:0.1.4"
-#import "@preview/cetz:0.3.1"
+#import "@preview/cetz:0.3.2"
 
 #let infos = toml("../typst.toml")
 #show: mantys.with(
