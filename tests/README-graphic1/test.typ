@@ -3,19 +3,19 @@
 #set page(width: auto, height: auto, margin: 0.5em)
 
 #skeletize({
-  molecule(name: "A", "A")
+  fragment(name: "A", "A")
   single()
-  molecule("B")
+  fragment("B")
   branch({
     single(angle: 1)
-    molecule(
+    fragment(
       "W",
       links: (
         "A": double(stroke: red),
       ),
     )
     single()
-    molecule(name: "X", "X")
+    fragment(name: "X", "X")
   })
   branch({
     single(angle: -1)
@@ -30,7 +30,7 @@
     )
   })
   single()
-  molecule(
+  fragment(
     "C",
     links: (
       "X": cram-filled-left(fill: blue),
