@@ -64,11 +64,10 @@
   let (ctx, parenthesis, left-anchor) = left-parenthesis-anchor(parenthesis, ctx)
 	let (ctx, parenthesis, right-anchor) = right-parenthesis-anchor(parenthesis, ctx)
 
-  let (parenthesis-ctx, drawing, parenthesis-rec, cetz-rec) = draw-molecules-and-link(
+  let (ctx, drawing, parenthesis-rec, cetz-rec) = draw-molecules-and-link(
     ctx,
     parenthesis.body,
   )
-  ctx = parenthesis-ctx
 	parenthesis-rec += {
 		import cetz.draw: *
 		get-ctx(cetz-ctx => {

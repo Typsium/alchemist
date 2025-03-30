@@ -135,8 +135,6 @@
 }
 
 #let draw-link-decoration(ctx) = {
-  (
-    ctx,
     get-ctx(cetz-ctx => {
       for link in ctx.links {
         let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link)
@@ -152,8 +150,7 @@
           (link.draw)(length, ctx, cetz-ctx, override: link.override)
         })
       }
-    }),
-  )
+    })
 }
 
 #let draw-skeleton(config: default, name: none, mol-anchor: none, body) = {
@@ -165,8 +162,7 @@
   for (links, name, from-mol) in ctx.hooks-links {
     ctx = draw-hooks-links(links, name, ctx, from-mol)
   }
-  let links = draw-link-decoration(ctx).at(1)
-
+  let links = draw-link-decoration(ctx)
   if name == none {
 		atoms
 		links
