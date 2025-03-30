@@ -92,6 +92,7 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 ### 0.1.5
 
 - Update to compiler 0.13.1 and Cetz 0.3.4
+- Fixed the parenthesis height to work with the new typst version
 
 ### 0.1.4
 
