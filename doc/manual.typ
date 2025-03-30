@@ -1,14 +1,21 @@
-#import "@preview/mantys:0.1.4": *
-#import "@preview/alchemist:0.1.5"
+#import "@preview/mantys:1.0.1": *
+#import "@preview/alchemist:0.1.6"
 #import "@preview/cetz:0.3.4"
 
 #let infos = toml("../typst.toml")
-#show: mantys.with(
+#show: mantys(
   ..infos,
   abstract: [
     Alchemist is a package used to draw chemical structures with skeletal formulas using Cetz. It is heavily inspired by the Chemfig package for LaTeX. This package is meant to be easy to use and customizable. It can also be used alongside the cetz package to draw more complex structures.
   ],
-  examples-scope: (dictionary(alchemist)),
+  examples-scope: (
+    scope: (
+      alchemist: alchemist,
+    ),
+    imports: (
+      alchemist: "*",
+    ),
+  ),
 )
 
 #let example = example.with(side-by-side: true)
@@ -39,12 +46,12 @@
 #show "LaTeX": LaTeX
 #show "@version": infos.package.version
 
-#let info(body) = mty.alert(
-  color: rgb("#0074d9"),
+#let info(body) = alert(
+  "info",
   body,
 )
 
-#add-type("drawable", color: lime)
+#custom-type("drawable", color: lime)
 
 = Usage
 
@@ -67,16 +74,16 @@ To start drawing molecules, you first need to initialise the drawing environment
 The main argument is a block of code that contains the drawing instructions. The block can also contain any cetz code to draw more complex structures, see @exemple-cez.
 
 #command("skeletize", arg(debug: false), arg(background: none), arg(config: (:)), arg("body"))[
-  #argument("debug", types: (true))[
+  #argument("debug", types: true)[
     Display bounding boxes of the objects in the drawing environment.
   ]
   #argument("background", types: (red, none))[
     Background color of the drawing environment
   ]
-  #argument("config", types: ((:)))[
+  #argument("config", types: (:))[
     Configuration of the drawing environment. See @config.
   ]
-  #argument("body", types: ("drawable"))[
+  #argument("body", types: "drawable")[
     The module to draw or any cetz drawable object.
   ]
 ]
@@ -86,16 +93,16 @@ The main argument is a block of code that contains the drawing instructions. The
 Sometimes, you may want to draw a molecule directly in cetz. To do so, you can use the #cmd[draw-skeleton] function. This function is what is used internally by the #cmd[skeletize] function.
 
 #command("draw-skeleton", arg(config: (:)), arg("body"))[
-  #argument("config", types: ((:)))[
+  #argument("config", types: (:))[
     Configuration of the drawing environment. See @config.
   ]
-  #argument("body", types: ("drawable"))[
+  #argument("body", types: "drawable")[
     The module to draw or any cetz drawable object.
   ]
-  #argument("name", types: (""), default: none)[
+  #argument("name", types: "", default: none)[
     If a name is provided, the molecule will be placed in a cetz group with this name.
   ]
-  #argument("mol-anchor", types: (""), default: none)[
+  #argument("mol-anchor", types: "", default: none)[
     Anchor of the group. It is working the same way as the `anchor` argument of the cetz `group` function. The `default` anchor
     of the molecule is the east anchor of the first atom or the starting point of the first link.
   ]
@@ -132,92 +139,94 @@ The default values also contains styling arguments for the links. You can specif
 #grid(
   columns: (1fr, 1fr),
   align: center,
-	row-gutter: 2em,
-	column-gutter: 1em,
+  row-gutter: 2em,
+  column-gutter: 1em,
   ..for (key, value) in default {
     if type(value) != dictionary {
       continue
     }
-    (block(breakable: false)[
-      #key
-      #table(
-        columns: 2,
-        "Argument", "Default value",
-        ..for (k, v) in value {
-          (k, repr(v))
-        },
-      )
-    ],)
+    (
+      block(breakable: false)[
+        #key
+        #table(
+          columns: 2,
+          "Argument", "Default value",
+          ..for (k, v) in value {
+            (k, repr(v))
+          },
+        )
+      ],
+    )
   },
 )
 
 == Available commands
 
 #tidy-module(
+  "alchemist",
   read("../lib.typ"),
-  name: infos.package.name,
   show-outline: false,
-  include-examples-scope: true,
-  extract-headings: 3,
+  first-heading-level: 3,
+  legacy-parser: true,
 )
 
 === Link functions <links>
 ==== Common arguments
 Links functions are used to draw links between molecules. They all have the same base arguments but can be customized with additional arguments.
 
-#argument("angle", types: (1), default: 0)[
+#argument("angle", types: 1, default: 0)[
   Multiplier of the `angle-increment` argument of the drawing environment. The final angle is relative to the abscissa axis.
 ]
 
-#argument("relative", types: (0deg), default: none)[
+#argument("relative", types: 0deg, default: none)[
   Relative angle to the previous link. This argument override all other angle arguments.
 ]
 
-#argument("absolute", types: (0deg), default: none)[
+#argument("absolute", types: 0deg, default: none)[
   Absolute angle of the link. This argument override `angle` argument.
 ]
 
-#argument("antom-sep", types: (1em), default: default.atom-sep)[
+#argument("antom-sep", types: 1em, default: default.atom-sep)[
   Distance between the two connected atom of the link. Default to the `atom-sep` entry of the configuration dictionary.
 ]
 
-#argument("from", types: (0))[
+#argument("from", types: 0)[
   Index of the molecule in the group to start the link from. By default, it is computed depending on the angle of the link.
 ]
 
-#argument("to", types: (0))[
+#argument("to", types: 0)[
   Index of the molecule in the group to end the link to. By default, it is computed depending on the angle of the link.
 ]
 
-#argument("links", types: ((:)))[
+#argument("links", types: (:))[
   Dictionary of links to other molecules or hooks. The key is the name of the molecule or the hook and the value is the link function.
 ]
 
 ==== Links
 #tidy-module(
+  "alchemist-links",
   read("../src/elements/links.typ"),
-  name: infos.package.name,
   show-outline: false,
-  include-examples-scope: true,
-  extract-headings: 3,
+  first-heading-level: 3,
+  legacy-parser: true,
 )
 
 === Lewis structures <lewis>
 All the lewis elements have two common arguments to control their position:
-#argument("angle", types: (0deg), default: 0deg)[
-	Angle of the lewis element relative to the abscissa axis.
+#argument("angle", types: 0deg, default: 0deg)[
+  Angle of the lewis element relative to the abscissa axis.
 ]
 
 #argument("molecule-margin", types: (default.molecule-margin), default: default.molecule-margin)[
-	Space between the lewis element and the molecule.
+  Space between the lewis element and the molecule.
 ]
 
 #tidy-module(
-	read("../src/elements/lewis.typ"),
-	name: infos.package.name,
-	show-outline: false,
-	include-examples-scope: true,
-	extract-headings: 3,
+  "alchemist-lewis",
+  read("../src/elements/lewis.typ"),
+  show-outline: false,
+  first-heading-level: 3,
+  legacy-parser: true,
 )
 
 = Drawing molecules
@@ -308,7 +317,8 @@ By default, the starting and ending points of the links are computed depending o
 
 If the angle is in $]-90deg;90deg]$, the starting point is the last atom of the previous molecule and the ending point is the first atom of the next molecule. If the angle is in $]90deg;270deg]$, the starting point is the first atom of the previous molecule and the ending point is the last atom of the next molecule.
 
-#grid(columns: (1fr, 1fr, 1fr, 1fr),
+#grid(
+  columns: (1fr, 1fr, 1fr, 1fr),
   align: center + horizon,
   row-gutter: 1em,
   ..for i in range(0, 8) {
@@ -319,11 +329,13 @@ If the angle is in $]-90deg;90deg]$, the starting point is the last atom of the 
         molecule("EFGH")
       }),
     )
-  })
+  }
+)
 
 If you choose to override the starting and ending points, you can use the `from` and `to` arguments. The only constraint is that the index must be in the range $[0, n-1]$ where $n$ is the number of atoms in the molecule.
 
-#grid(columns: (1fr, 1fr, 1fr, 1fr),
+#grid(
+  columns: (1fr, 1fr, 1fr, 1fr),
   align: center,
   row-gutter: 1em,
   ..for i in range(0, 4) {
@@ -334,7 +346,8 @@ If you choose to override the starting and ending points, you can use the `from`
         molecule("EFGH")
       }),
     )
-  })
+  }
+)
 
 #info[
   The fact that you can chose any index for the `from` and `to` arguments can lead to some weird results. Alchemist can't check if he result is beautiful or not.
@@ -607,7 +620,7 @@ It is possible to add branches in cycles. You can add a branch at any point of t
 	})
 ```)
 
-#pagebreak()
+
 === Cycles imbrication
 
 Like branches, you can add cycles in cycles. By default the cycle will be placed in a way that the two cycles share a common link.
@@ -682,16 +695,16 @@ To fix that, you have to use the `from` and `to` arguments of the links to speci
 === Arcs
 
 It is possible to draw arcs in cycles. The `arc` argument is a dictionary with the following entries:
-#argument("start", types: (0deg), default: 0deg)[
+#argument("start", types: 0deg, default: 0deg)[
   Angle at which the arc starts.
 ]
-#argument("end", types: (0deg), default: 360deg)[
+#argument("end", types: 0deg, default: 360deg)[
   Angle at which the arc ends.
 ]
-#argument("delta", types: (0deg), default: none)[
+#argument("delta", types: 0deg, default: none)[
   Angle of the arc in degrees.
 ]
-#argument("radius", types: (0.1), default: none)[
+#argument("radius", types: 0.1, default: none)[
   Radius of the arc in percentage of the smallest distance between two opposite atoms in the cycle. By default, it is set to $0.7$ for cycle with more than $4$ faces and $0.5$ for cycle with $4$ or $3$ faces.
 ]
 Any styling argument of the cetz `arc` function can be used.
@@ -948,7 +961,7 @@ The cycles centers can be accessed using the name of the cycle. If you name a cy
 })
 ```)
 
-#pagebreak()
+
 === Multiple molecules
 
 Alchemist allows you to draw multiple molecules in the same cetz environment. This is useful when you want to draw things like reactions.
@@ -1020,7 +1033,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 })
 ```)
 
-#pagebreak()
+
 === 2-Amino-4-oxohexanoic acid
 
 #example(```
@@ -1049,7 +1062,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 })
 ```)
 
-#pagebreak()
+
 
 
 === Glucose
@@ -1093,7 +1106,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
   ```,
 )
 
-#pagebreak()
+
 
 === Fisher projection
 
@@ -1135,7 +1148,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 })
 ```)
 
-#pagebreak()
+
 
 === $alpha$-D-glucose
 
@@ -1178,7 +1191,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 })
 ```)
 
-#pagebreak()
+
 === Adrenaline
 
 #example(```
@@ -1221,7 +1234,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 })
 ```)
 
-#pagebreak()
+
 
 === Guanine
 
@@ -1254,7 +1267,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 })
 ```)
 
-#pagebreak()
+
 
 === Sulfuric Acid
 
@@ -1287,7 +1300,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 })
 ```)
 
-#pagebreak()
+
 === $B H_3$
 #example(```
 #skeletize({
