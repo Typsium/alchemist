@@ -187,6 +187,14 @@
 /// - br (content): the indice content of the right parenthesis
 /// -> drawable
 #let parenthesis(body, l: "(", r: ")", align: true, height: none, yoffset: none, xoffset: none, right: none, tr: none, br: none) = {
+	if l.len() > 2 {
+		panic("Left can be at most 2 characters")
+	}
+	let l = eval(l, mode: "math")
+	if r.len() > 2 {
+		panic("Right can be at most 2 characters")
+	}
+	let r = eval(r, mode: "math")
   (
     (
       type: "parenthesis",
