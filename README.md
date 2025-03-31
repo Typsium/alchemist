@@ -93,6 +93,7 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 
 - Fixed the parenthesis height to work with the new typst version
 - Renamed `molecule` into `fragment`
+- Added support for charges and apostrophes in the string of a molecule
 
 ### 0.1.5
 
