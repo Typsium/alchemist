@@ -232,7 +232,7 @@ All the lewis elements have two common arguments to control their position:
 = Drawing molecules
 == Atoms
 
-In alchemist, the name of the function #cmd("molecule") is used to create a group of atom but here it is a little bit abusive as it do not necessarily represent real molecules. An atom is in our case something of the form: optional number + capital letter + optional lowercase letter followed by indices or exponent.
+In alchemist, the name of the function #cmd("fragment") is used to create a group of atom in a molecule. A fragment is in our case something of the form: optional number + capital letter + optional lowercase letter optionally followed by a charge, an exponent or a subscript.
 
 #info[
   For instance, $H_2O$ is a molecule of the atoms $H_2$ and $O$.
@@ -246,6 +246,7 @@ In alchemist, the name of the function #cmd("molecule") is used to create a grou
       $H_2O$, skeletize(debug: true, molecule($H_2O$)),
       $C H_4$, skeletize(debug: true, molecule($C H_4$)),
       $C_2 H_6$, skeletize(debug: true, molecule($C_2H_6$)),
+			$R'^2$, skeletize(debug: true, molecule($R'^2$)),
     ),
   )
 ]
