@@ -73,12 +73,16 @@
 		import cetz.draw: *
 		get-ctx(cetz-ctx => {
 			let sub-bounds = cetz.process.many(cetz-ctx, {
-				set-transform(none)
 				drawing
 			}).bounds
+			sub-bounds = cetz.util.revert-transform(cetz-ctx.transform, sub-bounds.low, sub-bounds.high)
+			sub-bounds = (
+				low: sub-bounds.at(0),
+				high: sub-bounds.at(1),
+			)
 			
 			let sub-height = bounding-box-height(sub-bounds)
-			let sub-v-mid = sub-bounds.low.at(1) + sub-height / 2
+			let sub-v-mid = sub-bounds.low.at(1) - sub-height / 2
 
 			let sub-width = bounding-box-width(sub-bounds)
 
@@ -113,13 +117,13 @@
 				circle((lx, ly), radius: 1pt, fill: orange, stroke: orange)
 				circle((rx, ry), radius: 1pt, fill: orange, stroke: orange)
 				rect(sub-bounds.low, sub-bounds.high, stroke: orange)
+				line((lx, sub-v-mid), (rx, sub-v-mid), stroke: orange)
 			}
 			
 			let hoffset = calc.abs(sub-width - calc.abs(rx - lx))
 
 			if parenthesis.align {
-				ly += calc.abs(ly - sub-v-mid)
-				ry += calc.abs(ry - sub-v-mid)
+				ly -= ly - sub-v-mid
 				ry = ly
 			} else if type(parenthesis.yoffset) == array {
 				if parenthesis.yoffset.len() != 2 {
