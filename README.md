@@ -94,6 +94,7 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 - Fixed the parenthesis height to work with the new typst version
 - Renamed `molecule` into `fragment`
 - Added support for charges and apostrophes in the string of a molecule
+- Fixed the parenthesis auto positioning and alignment
 
 ### 0.1.5
 
@@ -112,7 +113,7 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 
 - Added default values for link style properties.
 - Updated `cetz` to version 0.3.1.
-- Added a `tip-lenght` argument to dashed cram links.
+- Added a `tip-length` argument to dashed cram links.
 
 ### 0.1.1
 
