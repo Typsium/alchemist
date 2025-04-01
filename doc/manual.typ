@@ -1010,27 +1010,33 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 #example(```
 #skeletize({
-	molecule("H")
-	single()
-	molecule("C")
-	branch({
-		single(angle:2)
-		molecule("H")
-	})
-	branch({
-		single(angle:-2)
-		molecule("H")
-	})
-	single()
-	molecule("C")
-	branch({
-		single(angle:-1)
-		molecule("H")
-	})
-	branch({
-		double(angle:1)
-		molecule("O")
-	})
+    molecule("H")
+    single()
+    molecule("C")
+    branch({
+        single(angle:2)
+        molecule("H")
+    })
+    branch({
+        single(angle:-2)
+        molecule("H")
+    })
+    single()
+    molecule("C")
+    branch({
+        single(angle:-2)
+        molecule("H")
+    })
+    branch({
+        single(angle:2)
+        molecule("H")
+    })
+    branch({
+        single()
+        molecule("O")
+        single(angle: 1)
+        molecule("H")
+    })
 })
 ```)
 
@@ -1066,44 +1072,42 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 
 
-=== Glucose
+=== #smallcaps[d]-Glucose
 
 #example(
   side-by-side: false,
   ```
   #skeletize(
-  	config: (angle-increment: 30deg),
-  	{
-  	molecule("HO")
-  	single(angle:-1)
-  	single(angle:1)
-  	branch({
-  		cram-filled-left(angle: 3)
-  		molecule("OH")
-  	})
-  	single(angle:-1)
-  	branch({
-  		cram-dashed-left(angle: -3)
-  		molecule("OH")
-  	})
-  	single(angle:1)
-  	branch({
-  		cram-dashed-left(angle: 3)
-  		molecule("OH")
-  	})
-  	single(angle:-1)
-  	branch({
-  		cram-dashed-left(angle: -3)
-  		molecule("OH")
-  	})
-  	single(angle:1)
-  	branch({
-  		double(angle: 3)
-  		molecule("O")
-  	})
-  	single(angle:-1)
-  	molecule("H")
+  config: (angle-increment: 30deg),
+  {
+  molecule("HO")
+  single(angle:-1)
+  single(angle:1)
+  branch({
+      cram-filled-left(angle: 3)
+      molecule("OH")
   })
+  single(angle:-1)
+  branch({
+      cram-dashed-left(angle: -3)
+      molecule("OH")
+  })
+  single(angle:1)
+  branch({
+      cram-dashed-left(angle: 3)
+      molecule("OH")
+  })
+  single(angle:-1)
+  branch({
+      cram-dashed-left(angle: -3)
+      molecule("OH")
+  })
+  single(angle:1)
+  branch({
+      double(angle: -1)
+      molecule("O")
+  })
+})
   ```,
 )
 

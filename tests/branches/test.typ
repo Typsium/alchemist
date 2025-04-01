@@ -1,5 +1,9 @@
-#import "../../lib.typ": *
+/// [ppi:100]
+#import "../../lib.typ" : *
 
+#set page(width: auto, height: auto, margin: 0.5em)
+
+// simple branch
 #skeletize({
 	molecule("A")
 	single()
@@ -13,7 +17,7 @@
 	single()
 	molecule("C")
 })
-
+// branch with same starting point
 #skeletize({
 	molecule("A")
 	branch({
@@ -37,7 +41,8 @@
 	single()
 	molecule("D")
 })
-
+#v(-5em)
+//branch with specified link angles
 #skeletize({
 	molecule("A")
 	single()

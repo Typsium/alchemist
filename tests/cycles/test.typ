@@ -1,149 +1,48 @@
-#import "../../lib.typ": *
+
+#import "../../lib.typ" : *
+
+#set page(width: auto, height: auto, margin: 0.5em)
 
 #skeletize({
-  molecule("A")
-  cycle(
-    5,
-    {
-      single()
-      molecule("B")
-      double()
-      molecule("C")
-      single()
-      molecule("D")
-      single()
-      molecule("E")
-      double()
-    },
-  )
-})
-
-#skeletize({
-  single()
-  molecule("A")
-  cycle(
-    5,
-    align: true,
-    {
-      single()
-      molecule("B")
-      double()
-      molecule("C")
-      single()
-      molecule("D")
-      single()
-      molecule("E")
-      double()
-    },
-  )
-})
-
-#skeletize({
-  cycle(
-    4,
-    {
-      single()
-      molecule("A")
-      single()
-      molecule("B")
-      single()
-      molecule("C")
-      single()
-      molecule("D")
-    },
-  )
-})
-
-#skeletize({
-  cycle(
-    5,
-    {
-      branch({
+    molecule("A")
+    cycle(5, {
         single()
-        molecule("A")
-        double()
         molecule("B")
-        single()
+        double()
         molecule("C")
-      })
-      single()
-      branch({
         single()
         molecule("D")
         single()
         molecule("E")
-      })
-      single()
-      branch({
         double()
-      })
-      single()
-      branch({
+    })
+})
+#v(-2em)
+#skeletize({
+    single()
+    molecule("A")
+    cycle(5, align: true, {
         single()
-        molecule("F")
-      })
-      single()
-      branch({
-        single()
-        molecule("G")
+        molecule("B")
         double()
-      })
-      single()
-      single()
-      single()
-      single()
-    },
-  )
+        molecule("C")
+        single()
+        molecule("D")
+        single()
+        molecule("E")
+        double()
+    })
 })
-
+#v(-2em)
 #skeletize({
-  molecule("A")
-  cycle(
-    7,
-    {
-      single()
-      molecule("B")
-      cycle(
-        5,
-        {
-          single()
-          single()
-          single()
-          single()
-        },
-      )
-      double()
-      single()
-      double()
-      cycle(
-        4,
-        {
-          single()
-          single()
-          single()
-        },
-      )
-      single()
-      double()
-      single()
-    },
-  )
-})
-
-#skeletize({
-  molecule("AB")
-  cycle(
-    5,
-    {
-      single(from: 1, to: 0)
-      molecule("CDE")
-      single(from: 0)
-      molecule("F")
-      single(to: 0)
-      molecule("GH")
-      single(from: 0)
-      molecule("I")
-      single(to: 1)
-    },
-  )
+    cycle(4,{
+        single()
+        molecule("A")
+        single()
+        molecule("B")
+        single()
+        molecule("C")
+        single()
+        molecule("D")
+    })
 })
