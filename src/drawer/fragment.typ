@@ -6,6 +6,15 @@
 	import cetz.draw: *
   for (id, eq) in mol.atoms.enumerate() {
     let name = str(id)
+    let color = if mol.colors != none {
+      if type(mol.colors) == color {
+        mol.colors
+      } else {
+        mol.colors.at(calc.min(id, mol.colors.len() - 1))
+      }
+    } else {
+      none
+    }
     // draw atoms of the group one after the other from left to right
     content(
       name: name,
@@ -26,6 +35,7 @@
 			auto-scale: false,
       {
         show math.equation: math.upright
+        set text(fill: color) if color != none
         eq
       },
     )

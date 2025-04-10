@@ -37,14 +37,22 @@
 /// Note that the atom-sep and angle arguments are ignored
 /// - lewis (list): The list of lewis structures to draw around the fragments. See @lewis
 /// - mol (string, equation): The string representing the fragment or an equation of the fragment
-/// - vertical (boolean): If true, the molecule is drawn vertically
+/// - vertical (boolean): If true, the fragment is drawn vertically
 /// #example(```
 /// #skeletize({
 ///   fragment("ABCD", vertical: true)
 /// })
 ///```)
+/// - colors (color|list): The color of the fragment. If a list is provided, it colors each group of the fragment with the corresponding color from right to left. If the number of colors is less than the number of groups, the last color is used for the remaining groups. If the number of colors is greater than the number of groups, the extra colors are ignored.
+/// #example(```
+/// #skeletize({
+///   fragment("ABCD", colors: (red, green, blue))
+///   single()
+///   fragment("EFGH", colors: (orange))
+/// })
+/// ```)
 /// -> drawable
-#let fragment(name: none, links: (:), lewis: (), vertical: false, mol) = {
+#let fragment(name: none, links: (:), lewis: (), vertical: false, colors: none, mol) = {
   let atoms = if type(mol) == str {
     split-string(mol)
   } else if mol.func() == math.equation {
@@ -62,6 +70,7 @@
       type: "fragment",
       name: name,
       atoms: atoms,
+      colors: colors,
       links: links,
       lewis: lewis,
       vertical: vertical,
