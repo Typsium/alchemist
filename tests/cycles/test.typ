@@ -1,149 +1,48 @@
-#import "../../lib.typ": *
+
+#import "../../lib.typ" : *
+
+#set page(width: auto, height: auto, margin: 0.5em)
 
 #skeletize({
-  fragment("A")
-  cycle(
-    5,
-    {
-      single()
-      fragment("B")
-      double()
-      fragment("C")
-      single()
-      fragment("D")
-      single()
-      fragment("E")
-      double()
-    },
-  )
-})
-
-#skeletize({
-  single()
-  fragment("A")
-  cycle(
-    5,
-    align: true,
-    {
-      single()
-      fragment("B")
-      double()
-      fragment("C")
-      single()
-      fragment("D")
-      single()
-      fragment("E")
-      double()
-    },
-  )
-})
-
-#skeletize({
-  cycle(
-    4,
-    {
-      single()
-      fragment("A")
-      single()
-      fragment("B")
-      single()
-      fragment("C")
-      single()
-      fragment("D")
-    },
-  )
-})
-
-#skeletize({
-  cycle(
-    5,
-    {
-      branch({
+    fragment("A")
+    cycle(5, {
         single()
-        fragment("A")
-        double()
         fragment("B")
-        single()
+        double()
         fragment("C")
-      })
-      single()
-      branch({
         single()
         fragment("D")
         single()
         fragment("E")
-      })
-      single()
-      branch({
         double()
-      })
-      single()
-      branch({
+    })
+})
+#v(-2em)
+#skeletize({
+    single()
+    fragment("A")
+    cycle(5, align: true, {
         single()
-        fragment("F")
-      })
-      single()
-      branch({
-        single()
-        fragment("G")
+        fragment("B")
         double()
-      })
-      single()
-      single()
-      single()
-      single()
-    },
-  )
+        fragment("C")
+        single()
+        fragment("D")
+        single()
+        fragment("E")
+        double()
+    })
 })
-
+#v(-2em)
 #skeletize({
-  fragment("A")
-  cycle(
-    7,
-    {
-      single()
-      fragment("B")
-      cycle(
-        5,
-        {
-          single()
-          single()
-          single()
-          single()
-        },
-      )
-      double()
-      single()
-      double()
-      cycle(
-        4,
-        {
-          single()
-          single()
-          single()
-        },
-      )
-      single()
-      double()
-      single()
-    },
-  )
-})
-
-#skeletize({
-  fragment("AB")
-  cycle(
-    5,
-    {
-      single(from: 1, to: 0)
-      fragment("CDE")
-      single(from: 0)
-      fragment("F")
-      single(to: 0)
-      fragment("GH")
-      single(from: 0)
-      fragment("I")
-      single(to: 1)
-    },
-  )
+    cycle(4,{
+        single()
+        fragment("A")
+        single()
+        fragment("B")
+        single()
+        fragment("C")
+        single()
+        fragment("D")
+    })
 })

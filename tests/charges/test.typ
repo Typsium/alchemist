@@ -1,4 +1,7 @@
+/// [ppi:100]
 #import "../../lib.typ": *
+
+#set page(width: auto, height: auto, margin: 0.5em)
 
 #skeletize({
 	fragment("A'")

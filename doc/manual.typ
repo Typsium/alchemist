@@ -1010,27 +1010,33 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 #example(```
 #skeletize({
-	fragment("H")
-	single()
-	fragment("C")
-	branch({
-		single(angle:2)
-		fragment("H")
-	})
-	branch({
-		single(angle:-2)
-		fragment("H")
-	})
-	single()
-	fragment("C")
-	branch({
-		single(angle:-1)
-		fragment("H")
-	})
-	branch({
-		double(angle:1)
-		fragment("O")
-	})
+    fragment("H")
+    single()
+    fragment("C")
+    branch({
+        single(angle:2)
+        fragment("H")
+    })
+    branch({
+        single(angle:-2)
+        fragment("H")
+    })
+    single()
+    fragment("C")
+    branch({
+        single(angle:-2)
+        fragment("H")
+    })
+    branch({
+        single(angle:2)
+        fragment("H")
+    })
+    branch({
+        single()
+        fragment("O")
+        single(angle: 1)
+        fragment("H")
+    })
 })
 ```)
 
@@ -1066,7 +1072,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 
 
-=== Glucose
+=== #smallcaps[d]-Glucose
 
 #example(
   side-by-side: false,
@@ -1098,11 +1104,9 @@ The following examples are the same ones as in the Chemfig documentation. They a
   	})
   	single(angle:1)
   	branch({
-  		double(angle: 3)
+  		double(angle: -1)
   		fragment("O")
   	})
-  	single(angle:-1)
-  	fragment("H")
   })
   ```,
 )

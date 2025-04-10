@@ -1,5 +1,9 @@
-#import "../../lib.typ": *
+/// [ppi:100]
+#import "../../lib.typ" : *
 
+#set page(width: auto, height: auto, margin: 0.5em)
+
+// simple branch
 #skeletize({
 	fragment("A")
 	single()
@@ -13,7 +17,7 @@
 	single()
 	fragment("C")
 })
-
+// branch with same starting point
 #skeletize({
 	fragment("A")
 	branch({
@@ -37,7 +41,8 @@
 	single()
 	fragment("D")
 })
-
+#v(-5em)
+//branch with specified link angles
 #skeletize({
 	fragment("A")
 	single()
