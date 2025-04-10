@@ -4,14 +4,14 @@
 #import "@preview/cetz:0.3.4"
 #import cetz.draw: *
 
-#let anchor-north-east(cetz-ctx, (x, y, _), delta, molecule, id) = {
+#let anchor-north-east(cetz-ctx, (x, y, _), delta, fragment, id) = {
   let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "north")),
+    (name: fragment, anchor: (id, "north")),
   )
   let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "east")),
+    (name: fragment, anchor: (id, "east")),
   )
 
   let a = (a - x) + delta
@@ -19,78 +19,78 @@
   (a, b)
 }
 
-#let anchor-north-west(cetz-ctx, (x, y, _), delta, molecule, id) = {
+#let anchor-north-west(cetz-ctx, (x, y, _), delta, fragment, id) = {
   let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "north")),
+    (name: fragment, anchor: (id, "north")),
   )
   let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "west")),
+    (name: fragment, anchor: (id, "west")),
   )
   let a = (x - a) + delta
   let b = (b - y) + delta
   (a, b)
 }
 
-#let anchor-south-west(cetz-ctx, (x, y, _), delta, molecule, id) = {
+#let anchor-south-west(cetz-ctx, (x, y, _), delta, fragment, id) = {
   let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "south")),
+    (name: fragment, anchor: (id, "south")),
   )
   let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "west")),
+    (name: fragment, anchor: (id, "west")),
   )
   let a = (x - a) + delta
   let b = (y - b) + delta
   (a, b)
 }
 
-#let anchor-south-east(cetz-ctx, (x, y, _), delta, molecule, id) = {
+#let anchor-south-east(cetz-ctx, (x, y, _), delta, fragment, id) = {
   let (cetz-ctx, (_, b, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "south")),
+    (name: fragment, anchor: (id, "south")),
   )
   let (cetz-ctx, (a, _, _)) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "east")),
+    (name: fragment, anchor: (id, "east")),
   )
   let a = (a - x) + delta
   let b = (y - b) + delta
   (a, b)
 }
 
-/// Calculate an anchor position around a molecule using an ellipse
+/// Calculate an anchor position around a fragment using an ellipse
 /// at a given angle
 ///
 /// - ctx (alchemist-ctx): the alchemist context
 /// - cetz-ctx (cetz-ctx): the cetz context
 /// - angle (float, int, angle): the angle of the anchor
-/// - molecule (string): the molecule name
-/// - id (string): the molecule subpart id
-/// - margin (length, none): the margin around the molecule
-/// -> anchor: the anchor position around the molecule
-#let molecule-anchor(ctx, cetz-ctx, angle, molecule, id, margin: none) = {
+/// - fragment (string): the fragment name
+/// - id (string): the fragment subpart id
+/// - margin (length, none): the margin around the fragment
+/// -> anchor: the anchor position around the fragment
+#let fragment-anchor(ctx, cetz-ctx, angle, fragment, id, margin: none) = {
 	let angle = angles.angle-correction(angle)
-	let molecule-margin = if margin == none {
-		ctx.config.molecule-margin
+	let fragment-margin = if margin == none {
+		ctx.config.fragment-margin
 	} else {
 		margin
 	}
-	molecule-margin = convert-length(cetz-ctx, molecule-margin)
+	fragment-margin = convert-length(cetz-ctx, fragment-margin)
   let (cetz-ctx, center) = cetz.coordinate.resolve(
     cetz-ctx,
-    (name: molecule, anchor: (id, "mid")),
+    (name: fragment, anchor: (id, "mid")),
   )
   let (a, b) = if angles.angle-in-range(angle, 0deg, 90deg) {
-    anchor-north-east(cetz-ctx, center, molecule-margin, molecule, id)
+    anchor-north-east(cetz-ctx, center, fragment-margin, fragment, id)
   } else if angles.angle-in-range(angle, 90deg, 180deg) {
-    anchor-north-west(cetz-ctx, center, molecule-margin, molecule, id)
+    anchor-north-west(cetz-ctx, center, fragment-margin, fragment, id)
   } else if angles.angle-in-range(angle, 180deg, 270deg) {
-    anchor-south-west(cetz-ctx, center, molecule-margin, molecule, id)
+    anchor-south-west(cetz-ctx, center, fragment-margin, fragment, id)
   } else {
-    anchor-south-east(cetz-ctx, center, molecule-margin, molecule, id)
+    anchor-south-east(cetz-ctx, center, fragment-margin, fragment, id)
   }
 
   // https://www.petercollingridge.co.uk/tutorials/computational-geometry/finding-angle-around-ellipse/
@@ -112,7 +112,7 @@
 }
 
 /// Return the index to choose if the link connection is not overridden
-#let link-molecule-index(angle, end, count, vertical) = {
+#let link-fragment-index(angle, end, count, vertical) = {
   if not end {
     if vertical and angles.angle-in-range-strict(angle, 0deg, 180deg) {
       0
@@ -132,9 +132,9 @@
   }
 }
 
-#let molecule-link-anchor(name, id, count) = {
+#let fragment-link-anchor(name, id, count) = {
   if count <= id {
-    panic("The last molecule only has " + str(count) + " connections")
+    panic("The last fragment only has " + str(count) + " connections")
   }
   if id == -1 {
     id = count - 1
@@ -142,12 +142,12 @@
   (name: name, anchor: (str(id), "mid"))
 }
 
-#let link-molecule-anchor(name: none, id, count) = {
+#let link-fragment-anchor(name: none, id, count) = {
   if id >= count {
-    panic("This molecule only has " + str(count) + " anchors")
+    panic("This fragment only has " + str(count) + " anchors")
   }
   if id == -1 {
-    panic("The index of the molecule to link to must be defined")
+    panic("The index of the fragment to link to must be defined")
   }
   if name == none {
     (name: str(id), anchor: "mid")
@@ -166,7 +166,7 @@
     )
     link.angle = angle
     if link.from == none {
-      link.from = link-molecule-index(
+      link.from = link-fragment-index(
         angle,
         false,
         ctx.hooks.at(link.from-name).count - 1,
@@ -174,7 +174,7 @@
       )
     }
     if link.to == none {
-      link.to = link-molecule-index(
+      link.to = link-fragment-index(
         angle,
         true,
         ctx.hooks.at(link.to-name).count - 1,
@@ -188,8 +188,8 @@
   if link.to == -1 {
     link.to = ctx.hooks.at(link.to-name).count - 1
   }
-  let start = molecule-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from))
-  let end = molecule-anchor(ctx, cetz-ctx, link.angle + 180deg, link.to-name, str(link.to))
+  let start = fragment-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from))
+  let end = fragment-anchor(ctx, cetz-ctx, link.angle + 180deg, link.to-name, str(link.to))
   ((start, end), angles.angle-between(cetz-ctx, start, end))
 }
 
@@ -202,7 +202,7 @@
         (name: link.to-name, anchor: "mid"),
       ),
     )
-    link.to = link-molecule-index(
+    link.to = link-fragment-index(
       angle,
       true,
       ctx.hooks.at(link.to-name).count - 1,
@@ -218,7 +218,7 @@
       ),
     )
   }
-  let end-anchor = molecule-anchor(
+  let end-anchor = fragment-anchor(
     ctx,
     cetz-ctx,
     link.angle + 180deg,
@@ -237,7 +237,7 @@
 #let calculate-mol-link-anchors(ctx, cetz-ctx, link) = {
   (
     (
-      molecule-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from)),
+      fragment-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from)),
       link.name + "-end-anchor",
     ),
     link.angle,
@@ -247,13 +247,13 @@
 #let calculate-mol-hook-link-anchors(ctx, cetz-ctx, link) = {
   let hook = ctx.hooks.at(link.to-name)
   let angle = angles.angle-correction(angles.angle-between(cetz-ctx, link.from-pos, hook.hook))
-  let from = link-molecule-index(
+  let from = link-fragment-index(
     angle,
     false,
     ctx.hooks.at(link.from-name).count - 1,
     ctx.hooks.at(link.from-name).vertical,
   )
-  let start-anchor = molecule-anchor(ctx, cetz-ctx, angle, link.from-name, str(from))
+  let start-anchor = fragment-anchor(ctx, cetz-ctx, angle, link.from-name, str(from))
   (
     (
       start-anchor,

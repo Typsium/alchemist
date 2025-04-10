@@ -3,9 +3,9 @@
 
 #skeletize({
   import cetz.draw: *
-  molecule("ABCD", name: "A")
+  fragment("ABCD", name: "A")
   single()
-  molecule("EFGH", name: "B")
+  fragment("EFGH", name: "B")
   line(
     "A.0.south",
     (rel: (0, -0.5)),
@@ -28,7 +28,7 @@
   import cetz.draw: *
   double(absolute: 30deg, name: "l1")
   single(absolute: -30deg, name: "l2")
-  molecule("X", name: "X")
+  fragment("X", name: "X")
   hobby(
     "l1.50%",
     ("l1.start", 0.5, 90deg, "l1.end"),
@@ -51,7 +51,7 @@
     import cetz.draw: *
     double(absolute: 45deg, name: "l1")
     single(absolute: -80deg, name: "l2")
-    molecule("X", name: "X")
+    fragment("X", name: "X")
     hobby(
       "l1.50%",
       ("l1.start", 0.5, 90deg, "l1.end"),
@@ -70,7 +70,7 @@
     import cetz.draw: *
     double(absolute: 30deg, name: "l1")
     single(absolute: 30deg, name: "l2")
-    molecule("X", name: "X")
+    fragment("X", name: "X")
     hobby(
       "l1.50%",
       ("l1.start", 0.5, 90deg, "l1.end"),
@@ -89,7 +89,7 @@
     import cetz.draw: *
     double(absolute: 90deg, name: "l1")
     single(absolute: 0deg, name: "l2")
-    molecule("X", name: "X")
+    fragment("X", name: "X")
     hobby(
       "l1.50%",
       ("l1.start", 0.5, 90deg, "l1.end"),
@@ -108,19 +108,19 @@
 
 #skeletize({
   import cetz.draw: *
-  molecule("A")
+  fragment("A")
   cycle(
     5,
     name: "cycle",
     {
       single()
-      molecule("B")
+      fragment("B")
       single()
-      molecule("C")
+      fragment("C")
       single()
-      molecule("D")
+      fragment("D")
       single()
-      molecule("E")
+      fragment("E")
       single()
     },
   )
@@ -202,9 +202,9 @@
     name: "mol2",
     mol-anchor: "west",
     {
-      molecule("X")
+      fragment("X")
       double(angle: 1)
-      molecule("Y")
+      fragment("Y")
     },
   )
   line((to: "mol2.east", rel: (1em, 0)), (rel: (1, 0)), mark: (end: ">"))
@@ -212,9 +212,9 @@
   draw-skeleton(
     name: "mol3",
     {
-      molecule("S")
+      fragment("S")
       cram-filled-right()
-      molecule("T")
+      fragment("T")
     },
   )
 })

@@ -99,7 +99,7 @@
   })
 }
 
-#let draw-cycle(cycle, ctx, draw-molecules-and-link) = {
+#let draw-cycle(cycle, ctx, draw-fragments-and-link) = {
   let cycle-step-angle = 360deg / cycle.faces
   let angle = angles.angle-from-ctx(ctx, cycle.args, none)
   if angle == none {
@@ -121,11 +121,11 @@
       angle = ctx.relative-angle - (180deg - cycle-step-angle) / 2
     }
   }
-  let first-molecule = none
+  let first-fragment = none
   if ctx.last-anchor.type == "fragment" {
-    first-molecule = ctx.last-anchor.name
-    if first-molecule not in ctx.hooks {
-      ctx.hooks.insert(first-molecule, ctx.last-anchor)
+    first-fragment = ctx.last-anchor.name
+    if first-fragment not in ctx.hooks {
+      ctx.hooks.insert(first-fragment, ctx.last-anchor)
     }
   }
   let name = none
@@ -136,7 +136,7 @@
   } else if "arc" in cycle.args {
     record-vertex = true
   }
-  let (cycle-ctx, drawing, parenthesis-drawing-rec, cetz-rec) = draw-molecules-and-link(
+  let (cycle-ctx, drawing, parenthesis-drawing-rec, cetz-rec) = draw-fragments-and-link(
     (
       ..ctx,
       in-cycle: true,
@@ -145,7 +145,7 @@
       first-branch: true,
       cycle-step-angle: cycle-step-angle,
       relative-angle: angle,
-      first-molecule: first-molecule,
+      first-fragment: first-fragment,
       angle: angle,
       record-vertex: record-vertex,
       vertex-anchors: (),

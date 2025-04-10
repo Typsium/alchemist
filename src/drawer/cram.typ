@@ -1,7 +1,7 @@
 #import "@preview/cetz:0.3.4"
 #import "../utils/utils.typ"
 
-/// Draw a triangle between two molecules
+/// Draw a triangle between two fragments
 #let cram(from, to, ctx, cetz-ctx, args) = {
   let (cetz-ctx, (from-x, from-y, _)) = cetz.coordinate.resolve(cetz-ctx, from)
   let (cetz-ctx, (to-x, to-y, _)) = cetz.coordinate.resolve(cetz-ctx, to)
@@ -19,7 +19,7 @@
   )
 }
 
-/// Draw a dashed triangle between two molecules
+/// Draw a dashed triangle between two molecules fragments
 #let dashed-cram(from, to, length, ctx, cetz-ctx, args) = {
 	import cetz.draw: *
   let (cetz-ctx, (from-x, from-y, _)) = cetz.coordinate.resolve(cetz-ctx, from)

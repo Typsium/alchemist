@@ -4,41 +4,41 @@
 
 #skeletize({
   import cetz.draw: *
-  molecule("C", name: "C1")
+  fragment("C", name: "C1")
   branch({
       single(angle:1)
-      molecule("H")
+      fragment("H")
   })
   branch({
       single(angle:2)
-      molecule("H")
+      fragment("H")
   })
   branch({
       single(angle:3)
-      molecule("H")
+      fragment("H")
   })
   single(absolute: -45deg)
-  molecule("C", name: "C2")
+  fragment("C", name: "C2")
   double(absolute: 0deg)
-  molecule("C")
+  fragment("C")
   double(offset: "right")
-  molecule("C")
+  fragment("C")
   
   branch({
     single(absolute:45deg)
-    molecule("C", name: "C3")
+    fragment("C", name: "C3")
     
     branch({
           single(angle:1, stroke: red + 5pt)
-          molecule("H")
+          fragment("H")
       })
       branch({
           single(angle:2)
-          molecule("H")
+          fragment("H")
       })
       branch({
           single(angle:3)
-          molecule("H")
+          fragment("H")
       })
   })  
 })

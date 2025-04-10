@@ -4,17 +4,17 @@
 	cycle(6, {
 		branch({
 			single()
-			molecule("H_2N")
+			fragment("H_2N")
 		})
 		double()
-		molecule("N")
+		fragment("N")
 		single()
 		cycle(6, {
 			single()
-			molecule("NH", vertical: true)
+			fragment("NH", vertical: true)
 			single()
 			double()
-			molecule("N", links: (
+			fragment("N", links: (
 				"N-horizon": single()
 			))
 		})
@@ -22,7 +22,7 @@
 		hook("N-horizon")
 		single()
 		single()
-		molecule("NH")
+		fragment("NH")
 		single(from: 1)
 	})
 })

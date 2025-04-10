@@ -128,7 +128,7 @@ The configuration dictionary that you can pass to skeletize defines a set of def
   Default angle at which a link with no angle defined will be.
 ]
 
-#argument("molecule-margin", default: default.molecule-margin, types: default.molecule-margin)[
+#argument("fragment-margin", default: default.fragment-margin, types: default.fragment-margin)[
   Default space between a molecule and all it's attachements (links and lewis formulae elements).
 ]
 
@@ -217,7 +217,7 @@ All the lewis elements have two common arguments to control their position:
   Angle of the lewis element relative to the abscissa axis.
 ]
 
-#argument("molecule-margin", types: (default.molecule-margin), default: default.molecule-margin)[
+#argument("fragment-margin", types: (default.fragment-margin), default: default.fragment-margin)[
   Space between the lewis element and the molecule.
 ]
 
@@ -243,10 +243,10 @@ In alchemist, the name of the function #cmd("fragment") is used to create a grou
       columns: 2,
       column-gutter: 1em,
       row-gutter: .65em,
-      $H_2O$, skeletize(debug: true, molecule($H_2O$)),
-      $C H_4$, skeletize(debug: true, molecule($C H_4$)),
-      $C_2 H_6$, skeletize(debug: true, molecule($C_2H_6$)),
-			$R'^2$, skeletize(debug: true, molecule($R'^2$)),
+      $H_2O$, skeletize(debug: true, fragment($H_2O$)),
+      $C H_4$, skeletize(debug: true, fragment($C H_4$)),
+      $C_2 H_6$, skeletize(debug: true, fragment($C_2H_6$)),
+			$R'^2$, skeletize(debug: true, fragment($R'^2$)),
     ),
   )
 ]
@@ -325,9 +325,9 @@ If the angle is in $]-90deg;90deg]$, the starting point is the last atom of the 
   ..for i in range(0, 8) {
     (
       skeletize({
-        molecule("ABCD")
+        fragment("ABCD")
         single(angle: i)
-        molecule("EFGH")
+        fragment("EFGH")
       }),
     )
   }
@@ -342,9 +342,9 @@ If you choose to override the starting and ending points, you can use the `from`
   ..for i in range(0, 4) {
     (
       skeletize({
-        molecule("ABCD")
+        fragment("ABCD")
         single(from: i, to: 3 - i, absolute: 70deg)
-        molecule("EFGH")
+        fragment("EFGH")
       }),
     )
   }
@@ -361,17 +361,17 @@ The principle is simple. When you draw normal molecules, each time an element is
 
 #example(```
 #skeletize({
-	molecule("A")
+	fragment("A")
 	single()
-	molecule("B")
+	fragment("B")
 	branch({
 		single(angle:1)
-		molecule("W")
+		fragment("W")
 		single()
-		molecule("X")
+		fragment("X")
 	})
 	single()
-	molecule("C")
+	fragment("C")
 })
 ```)
 
@@ -379,27 +379,27 @@ It is of course possible to have nested branches or branches with the same start
 
 #example(```
 #skeletize({
-	molecule("A")
+	fragment("A")
 	branch({
 		single(angle:1)
-		molecule("B")
+		fragment("B")
 		branch({
 			single(angle:1)
-			molecule("W")
+			fragment("W")
 			single()
-			molecule("X")
+			fragment("X")
 		})
 		single()
-		molecule("C")
+		fragment("C")
 	})
 	branch({
 		single(angle:-2)
-		molecule("Y")
+		fragment("Y")
 		single(angle:-1)
-		molecule("Z")
+		fragment("Z")
 	})
 	single()
-	molecule("D")
+	fragment("D")
 })
 ```)
 
@@ -407,23 +407,23 @@ You can also specify an angle argument like for links. This angle will be then u
 
 #example(```
 #skeletize({
-	molecule("A")
+	fragment("A")
 	single()
-	molecule("B")
+	fragment("B")
 	branch(relative:60deg,{
 		single()
-		molecule("D")
+		fragment("D")
 		single()
-		molecule("E")
+		fragment("E")
   })
 	branch(relative:-30deg,{
 		single()
-		molecule("F")
+		fragment("F")
 		single()
-		molecule("G")
+		fragment("G")
 	})
 	single()
-	molecule("C")
+	fragment("C")
 })
 ```)
 
@@ -434,25 +434,25 @@ From then, the only way to link atoms is to use links functions and putting them
 
 #example(```
 	#skeletize({
-  molecule(name: "A", "A")
+  fragment(name: "A", "A")
   single()
-  molecule("B")
+  fragment("B")
   branch({
     single(angle: 1)
-    molecule(
+    fragment(
       "W",
       links: (
         "A": single(),
       ),
     )
     single()
-    molecule(name: "X", "X")
+    fragment(name: "X", "X")
   })
   branch({
     single(angle: -1)
-    molecule("Y")
+    fragment("Y")
     single()
-    molecule(
+    fragment(
       name: "Z",
       "Z",
       links: (
@@ -461,7 +461,7 @@ From then, the only way to link atoms is to use links functions and putting them
     )
   })
   single()
-  molecule(
+  fragment(
     "C",
     links: (
       "X": single(),
@@ -478,25 +478,25 @@ If you look at the previous example, you can see that the links used in the `lin
 
 #example(```
 #skeletize({
-  molecule(name: "A", "A")
+  fragment(name: "A", "A")
   single()
-  molecule("B")
+  fragment("B")
   branch({
     single(angle: 1)
-    molecule(
+    fragment(
       "W",
       links: (
         "A": double(stroke: red),
       ),
     )
     single()
-    molecule(name: "X", "X")
+    fragment(name: "X", "X")
   })
   branch({
     single(angle: -1)
-    molecule("Y")
+    fragment("Y")
     single()
-    molecule(
+    fragment(
       name: "Z",
       "Z",
       links: (
@@ -505,7 +505,7 @@ If you look at the previous example, you can see that the links used in the `lin
     )
   })
   single()
-  molecule(
+  fragment(
     "C",
     links: (
       "X": cram-filled-left(fill: blue),
@@ -524,16 +524,16 @@ Using branches and `links` arguments, you can draw cycles. However, depending on
 The default behavior if the angle is $0deg$ is to be placed in a way that the last link is vertical.
 #example(```
 	#skeletize({
-		molecule("A")
+		fragment("A")
 		cycle(5, {
 			single()
-			molecule("B")
+			fragment("B")
 			double()
-			molecule("C")
+			fragment("C")
 			single()
-			molecule("D")
+			fragment("D")
 			single()
-			molecule("E")
+			fragment("E")
 			double()
 		})
 	})
@@ -544,16 +544,16 @@ If the angle is not $0deg$ or if the `align` argument is set, the cycle will be 
 #example(```
 	#skeletize({
 		single()
-		molecule("A")
+		fragment("A")
 		cycle(5, align: true, {
 			single()
-			molecule("B")
+			fragment("B")
 			double()
-			molecule("C")
+			fragment("C")
 			single()
-			molecule("D")
+			fragment("D")
 			single()
-			molecule("E")
+			fragment("E")
 			double()
 		})
 	})
@@ -565,13 +565,13 @@ A cycle must start by a link and if there is more links than the number of faces
 	#skeletize({
 		cycle(4,{
 			single()
-			molecule("A")
+			fragment("A")
 			single()
-			molecule("B")
+			fragment("B")
 			single()
-			molecule("C")
+			fragment("C")
 			single()
-			molecule("D")
+			fragment("D")
 		})
 	})
 ```)
@@ -585,18 +585,18 @@ It is possible to add branches in cycles. You can add a branch at any point of t
 		cycle(5,{
 			branch({
 				single()
-				molecule("A")
+				fragment("A")
 				double()
-				molecule("B")
+				fragment("B")
 				single()
-				molecule("C")
+				fragment("C")
 			})
 			single()
 			branch({
 				single()
-				molecule("D")
+				fragment("D")
 				single()
-				molecule("E")
+				fragment("E")
 			})
 			single()
 			branch({
@@ -605,12 +605,12 @@ It is possible to add branches in cycles. You can add a branch at any point of t
 			single()
 			branch({
 				single()
-				molecule("F")
+				fragment("F")
 			})
 			single()
 			branch({
 				single()
-				molecule("G")
+				fragment("G")
 				double()
 			})
 			single()
@@ -628,10 +628,10 @@ Like branches, you can add cycles in cycles. By default the cycle will be placed
 
 #example(```
 	#skeletize({
-		molecule("A")
+		fragment("A")
 		cycle(7,{
 			single()
-			molecule("B")
+			fragment("B")
 			cycle(5,{
 				single()
 				single()
@@ -659,16 +659,16 @@ Cycles by default have an issue with atom groups with multiples atoms. The links
 
 #example(```
 	#skeletize({
-		molecule("AB")
+		fragment("AB")
 		cycle(5,{
 			single()
-			molecule("CDE")
+			fragment("CDE")
 			single()
-			molecule("F")
+			fragment("F")
 			single()
-			molecule("GH")
+			fragment("GH")
 			single()
-			molecule("I")
+			fragment("I")
 			single()
 		})
 	})
@@ -678,16 +678,16 @@ To fix that, you have to use the `from` and `to` arguments of the links to speci
 
 #example(```
 	#skeletize({
-		molecule("AB")
+		fragment("AB")
 		cycle(5,{
 			single(from: 1, to: 0)
-			molecule("CDE")
+			fragment("CDE")
 			single(from: 0)
-			molecule("F")
+			fragment("F")
 			single(to: 0)
-			molecule("GH")
+			fragment("GH")
 			single(from: 0)
-			molecule("I")
+			fragment("I")
 			single(to: 1)
 		})
 	})
@@ -772,9 +772,9 @@ If you name your molecules with the `name` argument, you can use them in cetz co
   ```
   #skeletize({
     import cetz.draw: *
-    molecule("ABCD", name: "A")
+    fragment("ABCD", name: "A")
     single()
-    molecule("EFGH", name: "B")
+    fragment("EFGH", name: "B")
     line(
       "A.0.south",
       (rel: (0, -0.5)),
@@ -806,7 +806,7 @@ If you name your links with the `name` argument, you can use them in cetz code. 
     import cetz.draw: *
     double(absolute: 30deg, name: "l1")
     single(absolute: -30deg, name: "l2")
-    molecule("X", name: "X")
+    fragment("X", name: "X")
     hobby(
       "l1.50%",
       ("l1.start", 0.5, 90deg, "l1.end"),
@@ -833,7 +833,7 @@ Here, all the used coordinates for the arrows are computed using relative coordi
     import cetz.draw: *
     double(absolute: 45deg, name: "l1")
     single(absolute: -80deg, name: "l2")
-    molecule("X", name: "X")
+    fragment("X", name: "X")
     hobby(
       "l1.50%",
       ("l1.start", 0.5, 90deg, "l1.end"),
@@ -852,7 +852,7 @@ Here, all the used coordinates for the arrows are computed using relative coordi
     import cetz.draw: *
     double(absolute: 30deg, name: "l1")
     single(absolute: 30deg, name: "l2")
-    molecule("X", name: "X")
+    fragment("X", name: "X")
     hobby(
       "l1.50%",
       ("l1.start", 0.5, 90deg, "l1.end"),
@@ -871,7 +871,7 @@ Here, all the used coordinates for the arrows are computed using relative coordi
     import cetz.draw: *
     double(absolute: 90deg, name: "l1")
     single(absolute: 0deg, name: "l2")
-    molecule("X", name: "X")
+    fragment("X", name: "X")
     hobby(
       "l1.50%",
       ("l1.start", 0.5, 90deg, "l1.end"),
@@ -897,19 +897,19 @@ The cycles centers can be accessed using the name of the cycle. If you name a cy
   ```
   #skeletize({
     import cetz.draw: *
-    molecule("A")
+    fragment("A")
     cycle(
       5,
       name: "cycle",
       {
         single()
-        molecule("B")
+        fragment("B")
         single()
-        molecule("C")
+        fragment("C")
         single()
-        molecule("D")
+        fragment("D")
         single()
-        molecule("E")
+        fragment("E")
         single()
       },
     )
@@ -985,16 +985,16 @@ Alchemist allows you to draw multiple molecules in the same cetz environment. Th
   	line((to: "mol1.east", rel: (1em, 0)), (rel: (1, 0)), mark: (end: ">"))
   	set-origin((rel: (1em, 0)))
   	draw-skeleton(name: "mol2", mol-anchor: "west", {
-  			molecule("X")
+  			fragment("X")
   			double(angle: 1)
-  			molecule("Y")
+  			fragment("Y")
   		})
   	line((to: "mol2.east", rel: (1em, 0)), (rel: (1, 0)), mark: (end: ">"))
     set-origin((rel: (1em, 0)))
   	draw-skeleton(name: "mol3", {
-  		molecule("S")
+  		fragment("S")
   		cram-filled-right()
-  		molecule("T")
+  		fragment("T")
   	})
   })
   ```,
@@ -1010,26 +1010,26 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 #example(```
 #skeletize({
-	molecule("H")
+	fragment("H")
 	single()
-	molecule("C")
+	fragment("C")
 	branch({
 		single(angle:2)
-		molecule("H")
+		fragment("H")
 	})
 	branch({
 		single(angle:-2)
-		molecule("H")
+		fragment("H")
 	})
 	single()
-	molecule("C")
+	fragment("C")
 	branch({
 		single(angle:-1)
-		molecule("H")
+		fragment("H")
 	})
 	branch({
 		double(angle:1)
-		molecule("O")
+		fragment("O")
 	})
 })
 ```)
@@ -1045,21 +1045,21 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	single(angle:-1)
 	branch({
 		double(angle:-3)
-		molecule("O")
+		fragment("O")
 	})
 	single(angle:1)
 	single(angle:-1)
 	branch({
 		single(angle:-3)
-		molecule("NH_2")
+		fragment("NH_2")
 	})
 	single(angle:1)
 	branch({
 		double(angle:3)
-		molecule("O")
+		fragment("O")
 	})
 	single(angle:-1)
-	molecule("OH")
+	fragment("OH")
 })
 ```)
 
@@ -1074,35 +1074,35 @@ The following examples are the same ones as in the Chemfig documentation. They a
   #skeletize(
   	config: (angle-increment: 30deg),
   	{
-  	molecule("HO")
+  	fragment("HO")
   	single(angle:-1)
   	single(angle:1)
   	branch({
   		cram-filled-left(angle: 3)
-  		molecule("OH")
+  		fragment("OH")
   	})
   	single(angle:-1)
   	branch({
   		cram-dashed-left(angle: -3)
-  		molecule("OH")
+  		fragment("OH")
   	})
   	single(angle:1)
   	branch({
   		cram-dashed-left(angle: 3)
-  		molecule("OH")
+  		fragment("OH")
   	})
   	single(angle:-1)
   	branch({
   		cram-dashed-left(angle: -3)
-  		molecule("OH")
+  		fragment("OH")
   	})
   	single(angle:1)
   	branch({
   		double(angle: 3)
-  		molecule("O")
+  		fragment("O")
   	})
   	single(angle:-1)
-  	molecule("H")
+  	fragment("H")
   })
   ```,
 )
@@ -1116,28 +1116,28 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	single()
 	branch({
 		single(angle:4)
-		molecule("H")
+		fragment("H")
 	})
 	branch({
 		single(angle:0)
-		molecule("OH")
+		fragment("OH")
 	})
 }
 #let fish-right = {
 	single()
 	branch({
 		single(angle:4)
-		molecule("OH")
+		fragment("OH")
 	})
 	branch({
 		single(angle:0)
-		molecule("H")
+		fragment("H")
 	})
 }
 #skeletize(
 	config: (base-angle: 90deg),
 	{
-	molecule("OH")
+	fragment("OH")
 	single(angle:3)
 	fish-right
 	fish-right
@@ -1145,7 +1145,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	fish-right
 	single()
 	double(angle: 1)
-	molecule("O")
+	fragment("O")
 })
 ```)
 
@@ -1158,12 +1158,12 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	hook("start")
 	branch({
 		single(absolute: 190deg)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: -50deg)
 	branch({
 		single(absolute: 170deg)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: 10deg)
 	branch({
@@ -1171,15 +1171,15 @@ The following examples are the same ones as in the Chemfig documentation. They a
 			absolute: -55deg,
 			atom-sep: 0.7
 		)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: -10deg)
 	branch({
 		single(angle: -2, atom-sep: 0.7)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: 130deg)
-	molecule("O")
+	fragment("O")
 	single(absolute: 190deg, links: ("start": single()))
 	branch({
 		single(
@@ -1187,7 +1187,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 			atom-sep: 0.7
 		)
 		single(angle: 2, atom-sep: 0.7)
-		molecule("OH")
+		fragment("OH")
 	})
 })
 ```)
@@ -1200,7 +1200,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	cycle(6, {
 		branch({
 			single()
-			molecule("HO")
+			fragment("HO")
 		})
 		single()
 		double()
@@ -1210,16 +1210,16 @@ The following examples are the same ones as in the Chemfig documentation. They a
 				stroke:transparent,
 				to: 1
 			)
-			molecule("HN")
+			fragment("HN")
 			branch({
 				single(angle:-1)
-				molecule("CH_3")
+				fragment("CH_3")
 			})
 			single(from:1)
 			single()
 			branch({
 				cram-filled-left(angle: 2)
-				molecule("OH")
+				fragment("OH")
 			})
 			single()
 		})
@@ -1228,7 +1228,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 		single()
 		branch({
 			single()
-			molecule("HO")
+			fragment("HO")
 		})
 		double()
 	})
@@ -1244,17 +1244,17 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	cycle(6, {
 		branch({
 			single()
-			molecule("H_2N")
+			fragment("H_2N")
 		})
 		double()
-		molecule("N")
+		fragment("N")
 		single()
 		cycle(6, {
 			single()
-			molecule("NH", vertical: true)
+			fragment("NH", vertical: true)
 			single()
 			double()
-			molecule("N", links: (
+			fragment("N", links: (
 				"N-horizon": single()
 			))
 		})
@@ -1262,7 +1262,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 		hook("N-horizon")
 		single()
 		single()
-		molecule("NH")
+		fragment("NH")
 		single(from: 1)
 	})
 })
@@ -1274,17 +1274,17 @@ The following examples are the same ones as in the Chemfig documentation. They a
 
 #example(```
 #skeletize({
-	molecule("H")
+	fragment("H")
 	single()
-	molecule("O", lewis: (
+	fragment("O", lewis: (
 		lewis-line(angle: 90deg),
 		lewis-line(angle: -90deg)
 	))
 	single()
-	molecule("S")
+	fragment("S")
 	let do(sign) = {
 		double()
-		molecule("O", lewis: (
+		fragment("O", lewis: (
 			lewis-line(angle: sign * 45deg),
 			lewis-line(angle: sign * 135deg)
 		))
@@ -1292,12 +1292,12 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	branch(angle: 2, do(1))
 	branch(angle: -2, do(-1))
 	single()
-	molecule("O", lewis: (
+	fragment("O", lewis: (
 		lewis-line(angle: 90deg),
 		lewis-line(angle: -90deg)
 	))
 	single()
-	molecule("H")
+	fragment("H")
 })
 ```)
 
@@ -1305,18 +1305,18 @@ The following examples are the same ones as in the Chemfig documentation. They a
 === $B H_3$
 #example(```
 #skeletize({
-	molecule("H")
+	fragment("H")
 	single()
-	molecule("B", lewis: (
-		lewis-rectangle(molecule-margin: 5pt),
+	fragment("B", lewis: (
+		lewis-rectangle(fragment-margin: 5pt),
 	))
 	branch(angle:1, {
 		single()
-		molecule("H")
+		fragment("H")
 	})
 	branch(angle:-1, {
 		single()
-		molecule("H")
+		fragment("H")
 	})
 })
 ```)
@@ -1334,7 +1334,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
       tr: $2-$,
       xoffset: .05,
       {
-        molecule(
+        fragment(
           "O",
           lewis: (
             lewis-double(angle: 135),
@@ -1344,12 +1344,12 @@ The following examples are the same ones as in the Chemfig documentation. They a
         )
 
         single(relative: 30deg)
-        molecule("C")
+        fragment("C")
         branch(
           angle: 2,
           {
             double()
-            molecule(
+            fragment(
               "O",
               lewis: (
                 lewis-double(angle: 45),
@@ -1359,7 +1359,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
           },
         )
         single(absolute: -30deg)
-        molecule(
+        fragment(
           "O",
           lewis: (
             lewis-double(angle: 45),
@@ -1383,7 +1383,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
     br: $n$,
     right: "end",
     {
-      molecule("S")
+      fragment("S")
       single()
       cycle(
         6,
@@ -1409,19 +1409,19 @@ The following examples are the same ones as in the Chemfig documentation. They a
 #skeletize({
 	parenthesis(xoffset: (.4, -.15), {
 		single()
-		molecule("N")
+		fragment("N")
 		branch(angle: 2, {
 			single()
-			molecule("H")
+			fragment("H")
 		})
 		single()
-		molecule("C")
+		fragment("C")
 		branch(angle: 2, {
 			double()
-			molecule("O")
+			fragment("O")
 		})
 		single()
-		molecule($(C H_2)_5$)
+		fragment($(C H_2)_5$)
 		single()
 	})
 })

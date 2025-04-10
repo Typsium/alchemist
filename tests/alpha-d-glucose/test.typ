@@ -4,12 +4,12 @@
 	hook("start")
 	branch({
 		single(absolute: 190deg)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: -50deg)
 	branch({
 		single(absolute: 170deg)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: 10deg)
 	branch({
@@ -17,15 +17,15 @@
 			absolute: -55deg,
 			atom-sep: 0.7
 		)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: -10deg)
 	branch({
 		single(angle: -2, atom-sep: 0.7)
-		molecule("OH")
+		fragment("OH")
 	})
 	single(absolute: 130deg)
-	molecule("O")
+	fragment("O")
 	single(absolute: 190deg, links: ("start": single()))
 	branch({
 		single(
@@ -33,6 +33,6 @@
 			atom-sep: 0.7
 		)
 		single(angle: 2, atom-sep: 0.7)
-		molecule("OH")
+		fragment("OH")
 	})
 })

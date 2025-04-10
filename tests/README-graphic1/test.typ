@@ -19,9 +19,9 @@
   })
   branch({
     single(angle: -1)
-    molecule("Y")
+    fragment("Y")
     single()
-    molecule(
+    fragment(
       name: "Z",
       "Z",
       links: (

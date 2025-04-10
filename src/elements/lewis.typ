@@ -1,7 +1,7 @@
 #import "@preview/cetz:0.3.4"
 
 /// Create a lewis function that is then used to draw a lewis
-/// formulae element around the molecule
+/// formulae element around the fragment
 ///
 /// - draw-function (function): The function that will be used to draw the lewis element. It should takes three arguments: the alchemist context, the cetz context, and a dictionary of named arguments that can be used to configure the links
 /// -> function
@@ -12,37 +12,37 @@
     }
     let args = args.named()
     let angle = args.at("angle", default: 0)
-		let molecule-margin = args.at("molecule-margin", default: none)
+		let fragment-margin = args.at("fragment-margin", default: none)
     (
       angle: angle,
-			molecule-margin: molecule-margin,
+			fragment-margin: fragment-margin,
       draw: (ctx, cetz-ctx) => draw-function(ctx, cetz-ctx, args)
     )
   }
 }
 
-/// draw a sigle electron around the molecule
+/// draw a sigle electron around the fragment
 /// 
 /// It is possible to change the distance from the center of
 /// the electron with the `gap` argument. 
 /// 
 /// The position of the electron is set by the `offset` argument. Available values are:
-/// - "top": the electron is placed above the molecule center line
-/// - "bottom": the electron is placed below the molecule center line
-/// - "center": the electron is placed at the molecule center line
+/// - "top": the electron is placed above the fragment center line
+/// - "bottom": the electron is placed below the fragment center line
+/// - "center": the electron is placed at the fragment center line
 /// 
 /// It is also possible to change the `radius`, `stroke` and `fill` arguments
 /// #example(```
 /// #skeletize({
-/// 	molecule("A", lewis:(
+/// 	fragment("A", lewis:(
 /// 		lewis-single(offset: "top"),
 /// 	))
 /// 	single(angle:-2)
-///   molecule("B", lewis:(
+///   fragment("B", lewis:(
 /// 		lewis-single(offset: "bottom"),
 /// 	))
 /// 	single(angle:-2)
-///   molecule("C", lewis:(
+///   fragment("C", lewis:(
 /// 		lewis-single(offset: "center"),
 /// 	))
 /// })
@@ -64,14 +64,14 @@
   circle((0, 0), radius: radius, fill: fill, stroke: stroke)
 })
 
-/// Draw a pair of electron around the molecule
+/// Draw a pair of electron around the fragment
 /// 
 /// It is possible to change the distance from the center of
 /// the electron with the `gap` argument.
 /// It is also possible to change the `radius`, `stroke` and `fill` arguments
 /// #example(```
 /// #skeletize({
-/// 	molecule("A", lewis:(
+/// 	fragment("A", lewis:(
 /// 		lewis-double(),
 /// 		lewis-double(angle: 90deg),
 /// 		lewis-double(angle: 180deg),
@@ -95,7 +95,7 @@
 /// It is also possible to change the `stroke` agument
 /// #example(```
 /// #skeletize({
-/// 	molecule("B", lewis:(
+/// 	fragment("B", lewis:(
 /// 		lewis-line(angle: 45deg),
 /// 		lewis-line(angle: 135deg),
 /// 		lewis-line(angle: -45deg),
@@ -117,7 +117,7 @@
 /// It is also possible to change the `fill` and `stroke` arguments
 /// #example(```
 /// #skeletize({
-/// 	molecule("C", lewis:(
+/// 	fragment("C", lewis:(
 /// 		lewis-rectangle(),
 /// 		lewis-rectangle(angle: 180deg)
 /// 	))

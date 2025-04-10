@@ -4,28 +4,28 @@
 	single()
 	branch({
 		single(angle:4)
-		molecule("H")
+		fragment("H")
 	})
 	branch({
 		single(angle:0)
-		molecule("OH")
+		fragment("OH")
 	})
 }
 #let fish-right = {
 	single()
 	branch({
 		single(angle:4)
-		molecule("OH")
+		fragment("OH")
 	})
 	branch({
 		single(angle:0)
-		molecule("H")
+		fragment("H")
 	})
 }
 #skeletize(
 	config: (base-angle: 90deg),
 	{
-	molecule("OH")
+	fragment("OH")
 	single(angle:3)
 	fish-right
 	fish-right
@@ -33,5 +33,5 @@
 	fish-right
 	single()
 	double(angle: 1)
-	molecule("O")
+	fragment("O")
 })

@@ -1,83 +1,83 @@
 #import "../../lib.typ": *
 
 #skeletize({
-	molecule("A")
+	fragment("A")
 	single()
-	molecule("B")
+	fragment("B")
 	branch({
 		single(angle:1)
-		molecule("W")
+		fragment("W")
 		single()
-		molecule("X")
+		fragment("X")
 	})
 	single()
-	molecule("C")
+	fragment("C")
 })
 
 #skeletize({
-	molecule("A")
+	fragment("A")
 	branch({
 		single(angle:1)
-		molecule("B")
+		fragment("B")
 		branch({
 			single(angle:1)
-			molecule("W")
+			fragment("W")
 			single()
-			molecule("X")
+			fragment("X")
 		})
 		single()
-		molecule("C")
+		fragment("C")
 	})
 	branch({
 		single(angle:-2)
-		molecule("Y")
+		fragment("Y")
 		single(angle:-1)
-		molecule("Z")
+		fragment("Z")
 	})
 	single()
-	molecule("D")
+	fragment("D")
 })
 
 #skeletize({
-	molecule("A")
+	fragment("A")
 	single()
-	molecule("B")
+	fragment("B")
 	branch(relative:60deg,{
 		single()
-		molecule("D")
+		fragment("D")
 		single()
-		molecule("E")
+		fragment("E")
   })
 	branch(relative:-30deg,{
 		single()
-		molecule("F")
+		fragment("F")
 		single()
-		molecule("G")
+		fragment("G")
 	})
 	single()
-	molecule("C")
+	fragment("C")
 })
 
 	#skeletize({
-  molecule(name: "A", "A")
+  fragment(name: "A", "A")
   single()
-  molecule("B")
+  fragment("B")
   branch({
     single(angle: 1)
-    molecule(
+    fragment(
       "W",
       links: (
         "A": single(),
       ),
     )
     single()
-    molecule(name: "X", "X")
+    fragment(name: "X", "X")
   })
   branch({
     single(angle: -1)
-    molecule("Y")
+    fragment("Y")
     single()
-    molecule(
+    fragment(
       name: "Z",
       "Z",
       links: (
@@ -86,7 +86,7 @@
     )
   })
   single()
-  molecule(
+  fragment(
     "C",
     links: (
       "X": single(),

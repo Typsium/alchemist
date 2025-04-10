@@ -3,19 +3,19 @@
 #skeletize({
 	parenthesis(xoffset: (.4, -.15), {
 		single()
-		molecule("N")
+		fragment("N")
 		branch(angle: 2, {
 			single()
-			molecule("H")
+			fragment("H")
 		})
 		single()
-		molecule("C")
+		fragment("C")
 		branch(angle: 2, {
 			double()
-			molecule("O")
+			fragment("O")
 		})
 		single()
-		molecule($(C H_2)_5$)
+		fragment($(C H_2)_5$)
 		single()
 	})
 })

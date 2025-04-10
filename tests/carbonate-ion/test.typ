@@ -11,7 +11,7 @@
       tr: $2-$,
       xoffset: .05,
       {
-        molecule(
+        fragment(
           "O",
           lewis: (
             lewis-double(angle: 135),
@@ -21,12 +21,12 @@
         )
 
         single(relative: 30deg)
-        molecule("C")
+        fragment("C")
         branch(
           angle: 2,
           {
             double()
-            molecule(
+            fragment(
               "O",
               lewis: (
                 lewis-double(angle: 45),
@@ -36,7 +36,7 @@
           },
         )
         single(absolute: -30deg)
-        molecule(
+        fragment(
           "O",
           lewis: (
             lewis-double(angle: 45),

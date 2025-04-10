@@ -1,45 +1,45 @@
 #import "../../lib.typ": *
 
 #skeletize({
-	molecule("A'")
+	fragment("A'")
 })
 
 #skeletize({
-	molecule("A'B")
+	fragment("A'B")
 })
 
 #skeletize({
-	molecule("A'B'''")
+	fragment("A'B'''")
 })
 
 #skeletize({
-	molecule("A^+")
+	fragment("A^+")
 })
 
 #skeletize({
-	molecule("A^-B")
+	fragment("A^-B")
 })
 
 #skeletize({
-	molecule("A^5+")
+	fragment("A^5+")
 })
 
 #skeletize({
-	molecule("A^5-")
+	fragment("A^5-")
 })
 
 #skeletize({
-	molecule("A^5+_1")
+	fragment("A^5+_1")
 })
 
 #skeletize({
-	molecule("A^5+_1E''^5")
+	fragment("A^5+_1E''^5")
 })
 
 #skeletize({
-	molecule("A_B")
+	fragment("A_B")
 })
 
 #skeletize({
-	molecule("A_10")
+	fragment("A_10")
 })

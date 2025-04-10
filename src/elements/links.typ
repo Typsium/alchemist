@@ -30,21 +30,21 @@
   }
 }
 
-/// Draw a single line between two molecules
+/// Draw a single line between two fragments
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   single()
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// It is possible to change the color and width of the line
 /// with the `stroke` argument
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   single(stroke: red + 5pt)
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 #let single = build-link((length, ctx, _, args) => {
@@ -52,12 +52,12 @@
   line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.single.stroke))
 })
 
-/// Draw a double line between two molecules
+/// Draw a double line between two fragments
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   double()
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// It is possible to change the color and width of the line
@@ -65,25 +65,25 @@
 /// with the `gap` argument
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   double(
 ///     stroke: orange + 2pt,
 ///     gap: .8em
 ///   )
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// This link also supports an `offset` argument that can be set to `left`, `right` or `center`.
 ///It allows to make either the let side, right side or the center of the double line to be aligned with the link point.
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   double(offset: "right")
-///   molecule("B")
+///   fragment("B")
 ///   double(offset: "left")
-///   molecule("C")
+///   fragment("C")
 ///   double(offset: "center")
-///   molecule("D")
+///   fragment("D")
 /// })
 ///```)
 #let double = build-link((length, ctx, cetz-ctx, args) => {
@@ -124,12 +124,12 @@
   )
 })
 
-/// Draw a triple line between two molecules
+/// Draw a triple line between two fragments
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   triple()
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// It is possible to change the color and width of the line
@@ -137,12 +137,12 @@
 /// with the `gap` argument
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   triple(
 ///     stroke: blue + .5pt,
 ///     gap: .15em
 ///   )
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 #let triple = build-link((length, ctx, cetz-ctx, args) => {
@@ -155,25 +155,25 @@
   line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.triple.stroke))
 })
 
-/// Draw a filled cram between two molecules with the arrow pointing to the right
+/// Draw a filled cram between two fragments with the arrow pointing to the right
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-filled-right()
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// It is possible to change the stroke and fill color of the arrow
 /// with the `stroke` and `fill` arguments. You can also change the base length of the arrow with the `base-length` argument
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-filled-right(
 ///     stroke: red + 2pt,
 ///     fill: green,
 ///     base-length: 2em
 ///   )
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 #let cram-filled-right = build-link((length, ctx, cetz-ctx, args) => cram(
@@ -184,25 +184,25 @@
   args,
 ))
 
-/// Draw a filled cram between two molecules with the arrow pointing to the left
+/// Draw a filled cram between two fragments with the arrow pointing to the left
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-filled-left()
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// It is possible to change the stroke and fill color of the arrow
 /// with the `stroke` and `fill` arguments. You can also change the base length of the arrow with the `base-length` argument
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-filled-left(
 ///     stroke: red + 2pt,
 ///     fill: green,
 ///     base-length: 2em
 ///   )
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 #let cram-filled-left = build-link((length, ctx, cetz-ctx, args) => cram(
@@ -213,7 +213,7 @@
   args,
 ))
 
-/// Draw a hollow cram between two molecules with the arrow pointing to the right
+/// Draw a hollow cram between two fragments with the arrow pointing to the right
 /// It is a shorthand for `cram-filled-right(fill: none)`
 #let cram-hollow-right = build-link((length, ctx, cetz-ctx, args) => {
   args.fill = none
@@ -221,7 +221,7 @@
   cram((0, 0), (length, 0), ctx, cetz-ctx, args)
 })
 
-/// Draw a hollow cram between two molecules with the arrow pointing to the left
+/// Draw a hollow cram between two fragments with the arrow pointing to the left
 /// It is a shorthand for `cram-filled-left(fill: none)`
 #let cram-hollow-left = build-link((length, ctx, cetz-ctx, args) => {
   args.fill = none
@@ -229,12 +229,12 @@
   cram((length, 0), (0, 0), ctx, cetz-ctx, args)
 })
 
-/// Draw a dashed cram between two molecules with the arrow pointing to the right
+/// Draw a dashed cram between two fragments with the arrow pointing to the right
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-dashed-right()
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// It is possible to change the stroke of the lines in the arrow
@@ -242,14 +242,14 @@
 // You can also change distance between the dashes with the `dash-gap` argument
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-dashed-right(
 ///     stroke: red + 2pt,
 ///     base-length: 2em,
 ///     tip-length: 1em,
 ///     dash-gap: .5em
 ///   )
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 #let cram-dashed-right = build-link((length, ctx, cetz-ctx, args) => dashed-cram(
@@ -261,25 +261,25 @@
   args,
 ))
 
-/// Draw a dashed cram between two molecules with the arrow pointing to the left
+/// Draw a dashed cram between two fragments with the arrow pointing to the left
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-dashed-left()
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 /// It is possible to change the stroke of the lines in the arrow
 /// with the `stroke` argument. You can also change the base length of the arrow with the `base-length` argument and distance between the dashes with the `dash-gap` argument
 /// #example(```
 /// #skeletize({
-///   molecule("A")
+///   fragment("A")
 ///   cram-dashed-left(
 ///     stroke: red + 2pt,
 ///     base-length: 2em,
 ///     dash-gap: .5em
 ///   )
-///   molecule("B")
+///   fragment("B")
 /// })
 ///```)
 #let cram-dashed-left = build-link((length, ctx, cetz-ctx, args) => dashed-cram(

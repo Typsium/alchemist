@@ -7,19 +7,19 @@
 	single(angle:-1)
 	branch({
 		double(angle:-3)
-		molecule("O")
+		fragment("O")
 	})
 	single(angle:1)
 	single(angle:-1)
 	branch({
 		single(angle:-3)
-		molecule("NH_2")
+		fragment("NH_2")
 	})
 	single(angle:1)
 	branch({
 		double(angle:3)
-		molecule("O")
+		fragment("O")
 	})
 	single(angle:-1)
-	molecule("OH")
+	fragment("OH")
 })

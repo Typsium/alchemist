@@ -2,7 +2,7 @@
 #import "@preview/cetz:0.3.4"
 #import "utils/utils.typ": *
 #import "utils/anchors.typ": *
-#import "drawer/molecule.typ" as molecule
+#import "drawer/fragment.typ" as fragment
 #import "drawer/link.typ" as link
 #import "drawer/branch.typ" as branch
 #import "drawer/cycle.typ" as cycle
@@ -26,7 +26,7 @@
   // branch
   first-branch: false, // true if the next element is the first in a branch
   // cycle
-  first-molecule: none, // name of the first molecule in the cycle
+  first-fragment: none, // name of the first fragment in the cycle
   in-cycle: false, // true if we are in a cycle
   cycle-faces: 0, // number of faces in the current cycle
   faces-count: 0, // number of faces already drawn
@@ -88,8 +88,8 @@
   ctx
 }
 
-#let draw-molecules-and-link(ctx, body) = {
-	let molecule-drawing = ()
+#let draw-fragments-and-link(ctx, body) = {
+	let fragment-drawing = ()
 	let parenthesis-drawing = ()
   let cetz-drawing = ()
 	for element in body {
@@ -104,21 +104,21 @@
 		} else if "type" not in element {
 			panic("Element " + str(element) + " has no type")
 		} else if element.type == "fragment" {
-			(ctx, drawing) = molecule.draw-molecule(element, ctx)
+			(ctx, drawing) = fragment.draw-fragment(element, ctx)
 		} else if element.type == "link" {
 			(ctx, drawing) = link.draw-link(element, ctx)
 		} else if element.type == "branch" {
-			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = branch.draw-branch(element, ctx, draw-molecules-and-link)
+			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = branch.draw-branch(element, ctx, draw-fragments-and-link)
 		} else if element.type == "cycle" {
-			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = cycle.draw-cycle(element, ctx, draw-molecules-and-link)
+			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = cycle.draw-cycle(element, ctx, draw-fragments-and-link)
 		} else if element.type == "hook" {
 			ctx = hook.draw-hook(element, ctx)
 		} else if element.type == "parenthesis" {
-			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = parenthesis.draw-parenthesis(element, ctx, draw-molecules-and-link)
+			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = parenthesis.draw-parenthesis(element, ctx, draw-fragments-and-link)
 		} else {
 			panic("Unknown element type " + element.type)
 		}
-		molecule-drawing += drawing
+		fragment-drawing += drawing
 		cetz-drawing += cetz-rec
 		parenthesis-drawing += parenthesis-drawing-rec
 	}
@@ -128,7 +128,7 @@
 	}
   (
     ctx,
-    molecule-drawing,
+    fragment-drawing,
 		parenthesis-drawing,
     cetz-drawing,
   )
@@ -161,7 +161,7 @@
   let ctx = default-ctx
   ctx.angle = config.base-angle
   ctx.config = config
-  let (ctx, atoms, parenthesis, cetz-drawing) = draw-molecules-and-link(ctx, body)
+  let (ctx, atoms, parenthesis, cetz-drawing) = draw-fragments-and-link(ctx, body)
   for (links, name, from-mol) in ctx.hooks-links {
     ctx = draw-hooks-links(links, name, ctx, from-mol)
   }

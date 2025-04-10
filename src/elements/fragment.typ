@@ -19,19 +19,19 @@
         result.push(m)
       } else if str.match(text, regex("^[0-9]+$")) != none {
         if last-number {
-          panic("Consecutive numbers in molecule fragment")
+          panic("Consecutive numbers in fragment fragment")
         }
         last-number = true
         result.push(m)
       } else {
-        panic("Invalid molecule fragment content")
+        panic("Invalid fragment fragment content")
       }
     } else if m.func() == math.attach or m.func() == math.lr {
       result.push(m)
     } else if m == [ ] {
       continue
     } else {
-      panic("Invalid molecule fragment content")
+      panic("Invalid fragment fragment content")
     }
     if last-number-hold {
       result.at(-2) = result.at(-2) + result.at(-1)

@@ -1,25 +1,25 @@
 #import "../../lib.typ": *
 
 #skeletize({
-	molecule("H")
+	fragment("H")
 	single()
-	molecule("C")
+	fragment("C")
 	branch({
 		single(angle:2)
-		molecule("H")
+		fragment("H")
 	})
 	branch({
 		single(angle:-2)
-		molecule("H")
+		fragment("H")
 	})
 	single()
-	molecule("C")
+	fragment("C")
 	branch({
 		single(angle:-1)
-		molecule("H")
+		fragment("H")
 	})
 	branch({
 		double(angle:1)
-		molecule("O")
+		fragment("O")
 	})
 })

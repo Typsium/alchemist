@@ -6,7 +6,7 @@
     br: $n$,
     right: "end",
     {
-      molecule("S")
+      fragment("S")
       single()
       cycle(
         6,

@@ -6,7 +6,7 @@
   import cetz.draw: *
   double(absolute: 30deg, name: "l1")
   single(absolute: -30deg, name: "l2")
-  molecule("X", name: "X")
+  fragment("X", name: "X")
   hobby(
     "l1.50%",
     ("l1.start", 0.5, 90deg, "l1.end"),

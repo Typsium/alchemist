@@ -4,7 +4,7 @@
 	cycle(6, {
 		branch({
 			single()
-			molecule("HO")
+			fragment("HO")
 		})
 		single()
 		double()
@@ -14,16 +14,16 @@
 				stroke:transparent,
 				to: 1
 			)
-			molecule("HN")
+			fragment("HN")
 			branch({
 				single(angle:-1)
-				molecule("CH_3")
+				fragment("CH_3")
 			})
 			single(from:1)
 			single()
 			branch({
 				cram-filled-left(angle: 2)
-				molecule("OH")
+				fragment("OH")
 			})
 			single()
 		})
@@ -32,7 +32,7 @@
 		single()
 		branch({
 			single()
-			molecule("HO")
+			fragment("HO")
 		})
 		double()
 	})

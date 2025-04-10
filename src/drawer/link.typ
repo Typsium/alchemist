@@ -5,8 +5,8 @@
   let link-angle = 0deg
   let to-name = none
   if ctx.in-cycle {
-    if ctx.faces-count == ctx.cycle-faces - 1 and ctx.first-molecule != none {
-      to-name = ctx.first-molecule
+    if ctx.faces-count == ctx.cycle-faces - 1 and ctx.first-fragment != none {
+      to-name = ctx.first-fragment
     }
     if ctx.faces-count == 0 {
       link-angle = ctx.relative-angle
@@ -29,7 +29,7 @@
     init-point = true
     ctx.last-anchor.anchor
   } else if ctx.last-anchor.type == "fragment" {
-    from-connection = link-molecule-index(
+    from-connection = link-fragment-index(
       link-angle,
       false,
       ctx.last-anchor.count - 1,
@@ -37,7 +37,7 @@
     )
     from-connection = link.at("from", default: from-connection)
     from-name = ctx.last-anchor.name
-    molecule-link-anchor(
+    fragment-link-anchor(
       ctx.last-anchor.name,
       from-connection,
       ctx.last-anchor.count,

@@ -2,7 +2,7 @@
 #import "../utils/anchors.typ": *
 #import "@preview/cetz:0.3.4"
 
-#let draw-molecule-text(mol) = {
+#let draw-fragment-text(mol) = {
 	import cetz.draw: *
   for (id, eq) in mol.atoms.enumerate() {
     let name = str(id)
@@ -33,26 +33,26 @@
   }
 }
 
-#let draw-molecule-lewis(ctx, group-name, count, lewis) = {
+#let draw-fragment-lewis(ctx, group-name, count, lewis) = {
 	if lewis.len() == 0 {
 		return ()
 	}
 	import cetz.draw: *
   get-ctx(cetz-ctx => {
-    for (id, (angle: lewis-angle, molecule-margin, draw)) in lewis.enumerate() {
+    for (id, (angle: lewis-angle, fragment-margin, draw)) in lewis.enumerate() {
       let lewis-angle = angles.angle-correction(lewis-angle)
       let mol-id = if angles.angle-in-range-inclusive(lewis-angle, 90deg, 270deg) {
         0
       } else {
         count - 1
       }
-      let anchor = molecule-anchor(
+      let anchor = fragment-anchor(
         ctx,
         cetz-ctx,
         lewis-angle,
         group-name,
         str(mol-id),
-        margin: molecule-margin,
+        margin: fragment-margin,
       )
       scope({
         set-origin(anchor)
@@ -63,7 +63,7 @@
   })
 }
 
-#let draw-molecule-elements(mol, ctx) = {
+#let draw-fragment-elements(mol, ctx) = {
   let name = mol.name
   if name != none {
     if name in ctx.hooks {
@@ -77,14 +77,14 @@
     ("west", true, ctx.last-anchor.anchor)
   } else if ctx.last-anchor.type == "link" {
     if ctx.last-anchor.to == none {
-      ctx.last-anchor.to = link-molecule-index(
+      ctx.last-anchor.to = link-fragment-index(
         ctx.last-anchor.angle,
         true,
         mol.count - 1,
         mol.vertical,
       )
     }
-    let group-anchor = link-molecule-anchor(ctx.last-anchor.to, mol.count)
+    let group-anchor = link-fragment-anchor(ctx.last-anchor.to, mol.count)
     ctx.last-anchor.to-name = name
     (group-anchor, false, ctx.last-anchor.name + "-end-anchor")
   } else {
@@ -109,22 +109,22 @@
         {
           set-origin(coord)
           anchor("default", (0, 0))
-          draw-molecule-text(mol)
+          draw-fragment-text(mol)
           if not side {
             anchor("from" + str(ctx.group-id), group-anchor)
           }
         },
       )
-      draw-molecule-lewis(ctx, name, mol.count, mol.at("lewis"))
+      draw-fragment-lewis(ctx, name, mol.count, mol.at("lewis"))
     },
   )
 }
 
-#let draw-molecule(element, ctx) = {
+#let draw-fragment(element, ctx) = {
 	if ctx.first-branch {
 		panic("A molecule fragment can not be the first element in a cycle")
 	}
-	let (ctx, drawing) = draw-molecule-elements(element, ctx)
+	let (ctx, drawing) = draw-fragment-elements(element, ctx)
 	if element.links.len() != 0 {
 		ctx.hooks.insert(ctx.last-anchor.name, element)
 		ctx.hooks-links.push((element.links, ctx.last-anchor.name, true))

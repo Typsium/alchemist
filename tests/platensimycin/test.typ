@@ -5,27 +5,27 @@
   {
   branch({
     double(angle: 10)
-    molecule("O")
+    fragment("O")
   })
   branch({
     single(angle: -6)
-    molecule("OH")
+    fragment("OH")
   })
   single(angle: 2)
   cycle(6, {
     double()
     branch({
       single(angle: -6)
-      molecule("OH")
+      fragment("OH")
     })
     single()
     branch({
       single(angle: -2)
-      molecule("NH", vertical: true)
+      fragment("NH", vertical: true)
       single(angle: 2)
       branch({
         double(angle: 6)
-        molecule("O")
+        fragment("O")
       })
       single(angle: -2)
       single(angle: 2)
@@ -36,7 +36,7 @@
       single(angle: 1)
       branch({
         double(angle: 5)
-        molecule("O")
+        fragment("O")
       })
       single(angle: -1)
       double(angle: -7, offset: "right")
@@ -49,7 +49,7 @@
           hook("1")
         })
         single(angle: -8)
-        molecule("O")
+        fragment("O")
         single(angle: 1)
         branch({
           single(angle: -8)
@@ -69,7 +69,7 @@
     double()
     branch({
       single(angle: 2)
-      molecule("OH")
+      fragment("OH")
     })
     single()
     double()

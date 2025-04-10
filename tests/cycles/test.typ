@@ -1,18 +1,18 @@
 #import "../../lib.typ": *
 
 #skeletize({
-  molecule("A")
+  fragment("A")
   cycle(
     5,
     {
       single()
-      molecule("B")
+      fragment("B")
       double()
-      molecule("C")
+      fragment("C")
       single()
-      molecule("D")
+      fragment("D")
       single()
-      molecule("E")
+      fragment("E")
       double()
     },
   )
@@ -20,19 +20,19 @@
 
 #skeletize({
   single()
-  molecule("A")
+  fragment("A")
   cycle(
     5,
     align: true,
     {
       single()
-      molecule("B")
+      fragment("B")
       double()
-      molecule("C")
+      fragment("C")
       single()
-      molecule("D")
+      fragment("D")
       single()
-      molecule("E")
+      fragment("E")
       double()
     },
   )
@@ -43,13 +43,13 @@
     4,
     {
       single()
-      molecule("A")
+      fragment("A")
       single()
-      molecule("B")
+      fragment("B")
       single()
-      molecule("C")
+      fragment("C")
       single()
-      molecule("D")
+      fragment("D")
     },
   )
 })
@@ -60,18 +60,18 @@
     {
       branch({
         single()
-        molecule("A")
+        fragment("A")
         double()
-        molecule("B")
+        fragment("B")
         single()
-        molecule("C")
+        fragment("C")
       })
       single()
       branch({
         single()
-        molecule("D")
+        fragment("D")
         single()
-        molecule("E")
+        fragment("E")
       })
       single()
       branch({
@@ -80,12 +80,12 @@
       single()
       branch({
         single()
-        molecule("F")
+        fragment("F")
       })
       single()
       branch({
         single()
-        molecule("G")
+        fragment("G")
         double()
       })
       single()
@@ -97,12 +97,12 @@
 })
 
 #skeletize({
-  molecule("A")
+  fragment("A")
   cycle(
     7,
     {
       single()
-      molecule("B")
+      fragment("B")
       cycle(
         5,
         {
@@ -131,18 +131,18 @@
 })
 
 #skeletize({
-  molecule("AB")
+  fragment("AB")
   cycle(
     5,
     {
       single(from: 1, to: 0)
-      molecule("CDE")
+      fragment("CDE")
       single(from: 0)
-      molecule("F")
+      fragment("F")
       single(to: 0)
-      molecule("GH")
+      fragment("GH")
       single(from: 0)
-      molecule("I")
+      fragment("I")
       single(to: 1)
     },
   )

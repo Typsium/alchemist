@@ -35,76 +35,76 @@
 })
 
 #skeletize({
-  molecule("A")
+  fragment("A")
   single(stroke: red + 5pt)
-  molecule("B")
+  fragment("B")
 })
 
  #skeletize({
-  molecule("A")
+  fragment("A")
   double(
     stroke: orange + 2pt,
     gap: .8em
   )
-  molecule("B")
+  fragment("B")
 })
 
 #skeletize({
-  molecule("A")
+  fragment("A")
   double(offset: "right")
-  molecule("B")
+  fragment("B")
   double(offset: "left")
-  molecule("C")
+  fragment("C")
   double(offset: "center")
-  molecule("D")
+  fragment("D")
 })
 
  #skeletize({
-  molecule("A")
+  fragment("A")
   triple(
     stroke: blue + .5pt,
     gap: .15em
   )
-  molecule("B")
+  fragment("B")
 })
 
  #skeletize({
-  molecule("A")
+  fragment("A")
   cram-filled-right(
     stroke: red + 2pt,
     fill: green,
     base-length: 2em
   )
-  molecule("B")
+  fragment("B")
 })
 
  #skeletize({
-  molecule("A")
+  fragment("A")
   cram-filled-left(
     stroke: red + 2pt,
     fill: green,
     base-length: 2em
   )
-  molecule("B")
+  fragment("B")
 })
 
  #skeletize({
-  molecule("A")
+  fragment("A")
   cram-dashed-right(
     stroke: red + 2pt,
     base-length: 2em,
     tip-length: 1em,
     dash-gap: .5em
   )
-  molecule("B")
+  fragment("B")
 })
 
 #skeletize({
-  molecule("A")
+  fragment("A")
   cram-dashed-left(
     stroke: red + 2pt,
     base-length: 2em,
     dash-gap: .5em
   )
-  molecule("B")
+  fragment("B")
 })
