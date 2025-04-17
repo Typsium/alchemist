@@ -42,11 +42,18 @@
   result
 }
 
+#let fragment-cor-regex = "[0-9]*[A-Z][a-z]*'*"
+#let exponent-regex = "((?:[0-9]+(?:\\+|\\-)?)|[A-Z]|\\+|\\-)"
+#let exponent-base-regex = "(?:(\\^|_)" + exponent-regex + ")?(?:(\\^|_)" + exponent-regex + ")?"
+#let fragment-regex = regex("^ *(" + fragment-cor-regex + ")" + exponent-base-regex)
+
 #let split-string(mol) = {
   let aux(str) = {
-    let match = str.match(regex("^ *([0-9]*[A-Z][a-z]*'*)(?:(\\^)((?:[0-9]+(?:\\+|\\-)?)|[A-Z]|\\+|\\-))?(?:(_)([0-9]+|[A-Z]))?"))
+    let match = str.match(fragment-regex)
     if match == none {
-      panic(str + " is not a valid atom")
+      panic(str + " is not a valid fragment")
+    } else if match.captures.at(1) == match.captures.at(3) and match.captures.at(1) != none {
+      panic("You cannot use an exponent and a subscript twice")
     }
     let eq = "\"" + match.captures.at(0) + "\""
     if match.captures.at(1) != none {
