@@ -11,7 +11,7 @@
       panic("Lewis function takes no positional arguments")
     }
     let args = args.named()
-    let angle = args.at("angle", default: 0)
+    let angle = args.at("angle", default: none)
 		let fragment-margin = args.at("fragment-margin", default: none)
     (
       angle: angle,

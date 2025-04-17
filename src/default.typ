@@ -28,6 +28,10 @@
 		base-length: .8em,
 		tip-length: .1em
 	),
+	lewis: (
+		angle: 0,
+		fragment-margin: 0em,
+	),
 	lewis-single: (
 		stroke: black,
 		fill: black,
