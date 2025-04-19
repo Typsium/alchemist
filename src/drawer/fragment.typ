@@ -49,12 +49,12 @@
 	}
 	import cetz.draw: *
   get-ctx(cetz-ctx => {
-    for (id, (angle: lewis-angle, fragment-margin, draw)) in lewis.enumerate() {
+    for (id, (angle: lewis-angle, radius, draw)) in lewis.enumerate() {
       if (lewis-angle == none) {
         lewis-angle = ctx.config.lewis.angle
       }
-      if (fragment-margin == none) {
-        fragment-margin = ctx.config.lewis.fragment-margin
+      if (radius == none) {
+        radius = ctx.config.lewis.radius
       }
       let lewis-angle = angles.angle-correction(lewis-angle)
       let mol-id = if angles.angle-in-range-inclusive(lewis-angle, 90deg, 270deg) {
@@ -68,7 +68,7 @@
         lewis-angle,
         group-name,
         str(mol-id),
-        margin: fragment-margin,
+        margin: radius,
       )
       scope({
         set-origin(anchor)

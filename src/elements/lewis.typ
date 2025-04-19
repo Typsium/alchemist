@@ -12,10 +12,10 @@
     }
     let args = args.named()
     let angle = args.at("angle", default: none)
-		let fragment-margin = args.at("fragment-margin", default: none)
+		let radius = args.at("radius", default: none)
     (
       angle: angle,
-			fragment-margin: fragment-margin,
+			radius: radius,
       draw: (ctx, cetz-ctx) => draw-function(ctx, cetz-ctx, args)
     )
   }

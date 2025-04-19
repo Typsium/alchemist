@@ -213,11 +213,11 @@ Links functions are used to draw links between molecules. They all have the same
 
 === Lewis structures <lewis>
 All the lewis elements have two common arguments to control their position:
-#argument("angle", types: 0deg, default: 0deg)[
+#argument("angle", types: 0deg, default: default.lewis.angle)[
   Angle of the lewis element relative to the abscissa axis.
 ]
 
-#argument("fragment-margin", types: (default.fragment-margin), default: default.fragment-margin)[
+#argument("fragment-margin", types: (default.lewis.radius), default: default.lewis.radius)[
   Space between the lewis element and the molecule.
 ]
 

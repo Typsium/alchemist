@@ -29,8 +29,8 @@
 		tip-length: .1em
 	),
 	lewis: (
-		angle: 0,
-		fragment-margin: 0em,
+		angle: 0deg,
+		radius: 0.2em,
 	),
 	lewis-single: (
 		stroke: black,
