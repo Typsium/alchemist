@@ -8,6 +8,7 @@
 #import "drawer/cycle.typ" as cycle
 #import "drawer/parenthesis.typ" as parenthesis
 #import "drawer/hook.typ" as hook
+#import "drawer/operator.typ" as operator
 
 #import cetz.draw: *
 
@@ -18,6 +19,7 @@
   last-anchor: default-anchor, // keep trace of the place to draw
   group-id: 0, // id of the current group
   link-id: 0, // id of the current link
+  operator-id: 0, // id of the current operator
   links: (), // list of links to draw
   hooks: (:), // list of hooks
   hooks-links: (), // list of links to hooks
@@ -115,7 +117,9 @@
 			ctx = hook.draw-hook(element, ctx)
 		} else if element.type == "parenthesis" {
 			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = parenthesis.draw-parenthesis(element, ctx, draw-fragments-and-link)
-		} else {
+		} else if element.type == "operator" {
+      (ctx, drawing) = operator.draw-operator(element, fragment-drawing, ctx)
+    } else {
 			panic("Unknown element type " + element.type)
 		}
 		fragment-drawing += drawing

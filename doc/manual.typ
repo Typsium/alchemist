@@ -746,6 +746,8 @@ Any styling argument of the cetz `arc` function can be used.
 	})
 ```)
 
+== Resonance <resonance>
+
 == Custom links
 
 Using the #cmd[build-link] function, you can create your own links. The function passed as argument to #cmd[build-link] must takes four arguments:
