@@ -203,21 +203,22 @@
   }
   let links = draw-link-decoration(ctx).at(1)
 
+  let final-drawing = {
+    atoms
+    links
+    on-layer(1, parenthesis)
+    on-layer(2, cetz-drawing)
+  }
+
   if name == none {
-		atoms
-		links
-		parenthesis
-		cetz-drawing
+		final-drawing
   } else {
     group(
       name: name,
       anchor: mol-anchor,
       {
         anchor("default", (0, 0))
-        atoms
-        links
-				parenthesis
-        cetz-drawing
+				final-drawing
       },
     )
   }

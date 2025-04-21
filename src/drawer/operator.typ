@@ -31,8 +31,8 @@
       )
 
 			if (ctx.config.debug) {
-				circle(west-previous-mol-anchor, radius: 0.05, fill: orange)
-				circle(ctx.last-anchor.anchor, radius: 0.05, fill: orange)
+				circle(west-previous-mol-anchor, radius: 0.05, fill: yellow, stroke: none)
+				circle(ctx.last-anchor.anchor, radius: 0.05, fill: yellow, stroke: none)
 			}
     }),
   )
