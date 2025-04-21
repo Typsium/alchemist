@@ -57,7 +57,7 @@
 		math.attach(right-parenthesis, br: parenthesis.br, tr: parenthesis.tr)
 	}
 
-	(left-parenthesis, right-parenthesis-with-attach)
+	(left-parenthesis, right-parenthesis, right-parenthesis-with-attach)
 }
 
 #let draw-parenthesis(parenthesis, ctx, draw-molecules-and-link) = {
@@ -96,7 +96,7 @@
 				height = utils.convert-length(cetz-ctx, height)
 			}
 			
-			let (left-parenthesis, right-parenthesis-with-attach) = parenthesis-content(parenthesis, height, cetz-ctx)
+			let (left-parenthesis, right-parenthesis, right-parenthesis-with-attach) = parenthesis-content(parenthesis, height, cetz-ctx)
 
 			let (_, (lx, ly, _)) = cetz.coordinate.resolve(cetz-ctx, update: false, left-anchor)
 			let (_, (rx, ry, _)) = cetz.coordinate.resolve(cetz-ctx, update: false, right-anchor)
@@ -146,8 +146,8 @@
 				right-voffset *= -1
 			}
 	
-			content((lx , ly), name: left-name, anchor: "mid-east", left-parenthesis, auto-scale: false)
-			content((rx, ry - right-voffset), name: right-name, anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
+			content((lx , ly), anchor: "mid-east", left-parenthesis, auto-scale: false)
+			content((rx, ry - right-voffset), anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
 		})
 	}
 
@@ -176,7 +176,7 @@
 		}
 		let width = utils.bounding-box-width(sub-bounds)
 
-		let (left-parenthesis, right-parenthesis-with-attach) = parenthesis-content(parenthesis, height, cetz-ctx)
+		let (left-parenthesis, _, right-parenthesis-with-attach) = parenthesis-content(parenthesis, height, cetz-ctx)
 
 		let right-anchor = (rel: (width, 0), to: (name: left-name, anchor: "east"))
 
