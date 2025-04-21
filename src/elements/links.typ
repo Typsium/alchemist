@@ -304,13 +304,13 @@
 #let plus = build-link((length, ctx, cetz-ctx, args) => {
   import cetz.draw: *
   content(
-    anchor: "center",
+    anchor: "mid",
     (length / 2, 0),
     {
       set text(fill: args.fill) if "fill" in args
       set text(stroke: args.stroke) if "stroke" in args
       set text(size: args.size) if "size" in args
-      text("+")
+      text($+$)
     }
   )
 })
