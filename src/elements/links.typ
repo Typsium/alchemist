@@ -290,3 +290,27 @@
   cetz-ctx,
   args,
 ))
+
+
+/// Draw a plus sign between two fragments
+/// #example(````
+/// #skeletize({
+///   fragment("A")
+///   plus()
+///   fragment("B")
+/// })
+/// ````)
+/// You can change the filling, size and stroke of the glyph with the `fill`, `size` and `stoke` arguments.
+#let plus = build-link((length, ctx, cetz-ctx, args) => {
+  import cetz.draw: *
+  content(
+    anchor: "center",
+    (length / 2, 0),
+    {
+      set text(fill: args.fill) if "fill" in args
+      set text(stroke: args.stroke) if "stroke" in args
+      set text(size: args.size) if "size" in args
+      text("+")
+    }
+  )
+})
