@@ -1,14 +1,6 @@
 #import "../utils/utils.typ"
 #import "@preview/cetz:0.3.4"
 
-#let bounding-box-height(bounds) = {
-	calc.abs(bounds.high.at(1) - bounds.low.at(1))
-}
-
-#let bounding-box-width(bounds) = {
-	calc.abs(bounds.high.at(0) - bounds.low.at(0))
-}
-
 #let left-parenthesis-anchor(parenthesis, ctx) = {
 	let anchor = if parenthesis.body.at(0).type == "fragment" {
     let name = parenthesis.body.at(0).name
@@ -49,53 +41,50 @@
 	(ctx, parenthesis, anchor)
 }
 
-#let draw-parenthesis(parenthesis, ctx, draw-molecules-and-link) = {
-	let left-name = "parenthesis-" + str(ctx.id)
-	let right-name = "parenthesis-" + str(ctx.id + 1)
-	ctx.id += 2
-
-	let last-anchor = ctx.last-anchor
-	if (parenthesis.resonance) {
-		ctx.last-anchor = (type: "coord", "anchor": (name: left-name, anchor: "east"))
+#let parenthesis-content(parenthesis, height, cetz-ctx) = {
+	let block = block(height: height * cetz-ctx.length * 1.2, width: 0pt)
+	let left-parenthesis = {
+		set text(top-edge: "bounds", bottom-edge: "bounds")
+		math.lr($parenthesis.l block$, size: 100%)
 	}
+	let right-parenthesis = {
+		set text(top-edge: "bounds", bottom-edge: "bounds")
+		math.lr($block parenthesis.r$, size: 100%)
+	}
+
+	let right-parenthesis-with-attach = {
+		set text(top-edge: "bounds", bottom-edge: "bounds")
+		math.attach(right-parenthesis, br: parenthesis.br, tr: parenthesis.tr)
+	}
+
+	(left-parenthesis, right-parenthesis-with-attach)
+}
+
+#let draw-parenthesis(parenthesis, ctx, draw-molecules-and-link) = {
+
   let (parenthesis-ctx, drawing, parenthesis-rec, cetz-rec) = draw-molecules-and-link(
     ctx,
     parenthesis.body,
   )
   ctx = parenthesis-ctx
 
-	if (parenthesis.resonance) {
-		ctx.last-anchor = (type: "coord", anchor: right-name)
-	}
 
 	let parenthesis-drawing = {
 		import cetz.draw: *
 		get-ctx(cetz-ctx => {
 			let sub-bounds = cetz.process.many(cetz-ctx, {
-				circle((0,0), radius: .000000001pt, name: left-name)
 				drawing
 			}).bounds
 			sub-bounds = cetz.util.revert-transform(cetz-ctx.transform, sub-bounds)
 			
-			let sub-height = bounding-box-height(sub-bounds)
+			let sub-height = utils.bounding-box-height(sub-bounds)
 			let sub-v-mid = sub-bounds.low.at(1) - sub-height / 2
 
-			let sub-width = bounding-box-width(sub-bounds)
+			let sub-width = utils.bounding-box-width(sub-bounds)
   		
-			let (ctx, parenthesis, left-anchor) = if (parenthesis.resonance) {
-				if (last-anchor.type != "coord") {
-					panic("The parenthesis resonance mode can only be used if the previous element is an operator or as the first element of the skeletal formula. The last element was a " + last-anchor.type)
-				}
-				(ctx, parenthesis, last-anchor.anchor)
-			} else {
-				left-parenthesis-anchor(parenthesis, ctx)
-			}
+			let (ctx, parenthesis, left-anchor) = left-parenthesis-anchor(parenthesis, ctx)
 
-			let (ctx, parenthesis, right-anchor) = if (parenthesis.resonance) {
-				(ctx, parenthesis, (rel: (sub-width, 0), to: left-anchor))
-			} else {
-				right-parenthesis-anchor(parenthesis, ctx)
-			}
+			let (ctx, parenthesis, right-anchor) = right-parenthesis-anchor(parenthesis, ctx)
 
 			let height = parenthesis.at("height")
 			if height == none {
@@ -106,20 +95,8 @@
 			} else {
 				height = utils.convert-length(cetz-ctx, height)
 			}
-			let block = block(height: height * cetz-ctx.length * 1.2, width: 0pt)
-			let left-parenthesis = {
-				set text(top-edge: "bounds", bottom-edge: "bounds")
-				math.lr($parenthesis.l block$, size: 100%)
-			}
-			let right-parenthesis = {
-				set text(top-edge: "bounds", bottom-edge: "bounds")
-				math.lr($block parenthesis.r$, size: 100%)
-			}
-
-			let right-parenthesis-with-attach = {
-				set text(top-edge: "bounds", bottom-edge: "bounds")
-				math.attach(right-parenthesis, br: parenthesis.br, tr: parenthesis.tr)
-			}
+			
+			let (left-parenthesis, right-parenthesis-with-attach) = parenthesis-content(parenthesis, height, cetz-ctx)
 
 			let (_, (lx, ly, _)) = cetz.coordinate.resolve(cetz-ctx, update: false, left-anchor)
 			let (_, (rx, ry, _)) = cetz.coordinate.resolve(cetz-ctx, update: false, right-anchor)
@@ -168,22 +145,46 @@
 			} else if (parenthesis.tr != none) {
 				right-voffset *= -1
 			}
-
-			if parenthesis.resonance {
-				let left-width = bounding-box-width(cetz.process.element(cetz-ctx, content((0,0), left-parenthesis, auto-scale: false).at(0)).bounds)
-				translate(x: left-width)
-			}		
 	
 			content((lx , ly), name: left-name, anchor: "mid-east", left-parenthesis, auto-scale: false)
 			content((rx, ry - right-voffset), name: right-name, anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
 		})
 	}
 
-	if (parenthesis.resonance) {
-		drawing = cetz.draw.on-layer(1, parenthesis-drawing) + drawing
-	} else {
-		parenthesis-rec += parenthesis-drawing
-	}
+	parenthesis-rec += parenthesis-drawing
 
   (ctx, drawing, parenthesis-rec, cetz-rec)
+}
+
+
+#let draw-resonance-parenthesis(parenthesis, child-drawable, ctx) = {
+	import cetz.draw: *
+	let left-name = "parenthesis-" + str(ctx.id)
+	let right-name = "parenthesis-" + str(ctx.id + 1)
+	ctx.id += 2
+
+	let drawing = get-ctx(cetz-ctx => {
+		let sub-bounds = cetz.process.many(cetz-ctx, {
+			child-drawable
+		}).bounds
+		sub-bounds = cetz.util.revert-transform(cetz-ctx.transform, sub-bounds)
+		let height = parenthesis.height
+		if height == none {
+			height = utils.bounding-box-height(sub-bounds)
+		} else {
+			height = utils.convert-length(cetz-ctx, height)
+		}
+		let width = utils.bounding-box-width(sub-bounds)
+
+		let (left-parenthesis, right-parenthesis-with-attach) = parenthesis-content(parenthesis, height, cetz-ctx)
+
+		let right-anchor = (rel: (width, 0), to: (name: left-name, anchor: "east"))
+
+		content(ctx.last-anchor.anchor, name: left-name, anchor: "mid-west", left-parenthesis, auto-scale: false)
+		content(right-anchor, name: right-name, anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
+	})
+
+	ctx.last-anchor = (type: "coord", anchor:(name: left-name, anchor: "mid-east"))
+	let left-east-anchor = (type: "coord", anchor: (name: left-name, anchor: "mid-east"))
+	(ctx, drawing, left-east-anchor)
 }

@@ -59,3 +59,17 @@
 	}
 	none
 }
+
+/// Calculate the height of a bounding box
+/// - bounds (dictionary): the bounding box
+/// -> float
+#let bounding-box-height(bounds) = {
+	calc.abs(bounds.high.at(1) - bounds.low.at(1))
+}
+
+/// Calculate the width of a bounding box
+/// - bounds (dictionary): the bounding box
+/// -> float
+#let bounding-box-width(bounds) = {
+	calc.abs(bounds.high.at(0) - bounds.low.at(0))
+}

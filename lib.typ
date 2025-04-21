@@ -228,7 +228,7 @@
 /// === Operator
 /// Create an operator between two fragments. Creating an operator "reset" the placement of the next fragment.
 /// This allow to add multiple molecules in the same skeletal formula. Without this, the next fragment would be placed at the end of the previous one.
-/// An important point is that the operator does not reset the context. This means that fragments names are still valid. Thus, you can use anchors of the previous molecule. Be careful with this, it can lead to some confusion. 
+/// An important point is that the operator reset the context. This means that fragments names can be reused and that you can't use previous hooks.
 /// This element is used in resonance structures (@resonance) and in some cases to put multiples molecules in the same skeletal formula.
 /// 
 /// - op (content | string | none): The operator content. It can be a string or a content. A none value won't display anything.

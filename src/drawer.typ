@@ -2,6 +2,7 @@
 #import "@preview/cetz:0.3.4"
 #import "utils/utils.typ": *
 #import "utils/anchors.typ": *
+#import "utils/utils.typ" as utils
 #import "drawer/fragment.typ" as fragment
 #import "drawer/link.typ" as link
 #import "drawer/branch.typ" as branch
@@ -93,49 +94,53 @@
 }
 
 #let draw-fragments-and-link(ctx, body) = {
-	let fragment-drawing = ()
-	let parenthesis-drawing = ()
+  let fragment-drawing = ()
+  let parenthesis-drawing = ()
   let cetz-drawing = ()
-	for element in body {
-		if ctx.in-cycle and ctx.faces-count >= ctx.cycle-faces {
-			continue
-		}
-		let drawing = ()
-		let parenthesis-drawing-rec = ()
-		let cetz-rec = ()
-		if type(element) == function {
-			cetz-drawing.push(element)
-		} else if "type" not in element {
-			panic("Element " + str(element) + " has no type")
-		} else if element.type == "fragment" {
-			(ctx, drawing) = fragment.draw-fragment(element, ctx)
-		} else if element.type == "link" {
-			(ctx, drawing) = link.draw-link(element, ctx)
-		} else if element.type == "branch" {
-			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = branch.draw-branch(element, ctx, draw-fragments-and-link)
-		} else if element.type == "cycle" {
-			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = cycle.draw-cycle(element, ctx, draw-fragments-and-link)
-		} else if element.type == "hook" {
-			ctx = hook.draw-hook(element, ctx)
-		} else if element.type == "parenthesis" {
-			(ctx, drawing, parenthesis-drawing-rec, cetz-rec) = parenthesis.draw-parenthesis(element, ctx, draw-fragments-and-link)
-		} else if element.type == "operator" {
+  for element in body {
+    if ctx.in-cycle and ctx.faces-count >= ctx.cycle-faces {
+      continue
+    }
+    let drawing = ()
+    let parenthesis-drawing-rec = ()
+    let cetz-rec = ()
+    if type(element) == function {
+      cetz-drawing.push(element)
+    } else if "type" not in element {
+      panic("Element " + repr(element) + " has no type")
+    } else if element.type == "fragment" {
+      (ctx, drawing) = fragment.draw-fragment(element, ctx)
+    } else if element.type == "link" {
+      (ctx, drawing) = link.draw-link(element, ctx)
+    } else if element.type == "branch" {
+      (ctx, drawing, parenthesis-drawing-rec, cetz-rec) = branch.draw-branch(element, ctx, draw-fragments-and-link)
+    } else if element.type == "cycle" {
+      (ctx, drawing, parenthesis-drawing-rec, cetz-rec) = cycle.draw-cycle(element, ctx, draw-fragments-and-link)
+    } else if element.type == "hook" {
+      ctx = hook.draw-hook(element, ctx)
+    } else if element.type == "parenthesis" {
+      (ctx, drawing, parenthesis-drawing-rec, cetz-rec) = parenthesis.draw-parenthesis(
+        element,
+        ctx,
+        draw-fragments-and-link,
+      )
+    } else if element.type == "operator" {
       (ctx, drawing) = operator.draw-operator(element, fragment-drawing, ctx)
     } else {
-			panic("Unknown element type " + element.type)
-		}
-		fragment-drawing += drawing
-		cetz-drawing += cetz-rec
-		parenthesis-drawing += parenthesis-drawing-rec
-	}
-	if ctx.last-anchor.type == "link" and not ctx.last-anchor.at("drew", default: false) {
-		ctx.links.push(ctx.last-anchor)
-		ctx.last-anchor.drew = true
-	}
+      panic("Unknown element type " + element.type)
+    }
+    fragment-drawing += drawing
+    cetz-drawing += cetz-rec
+    parenthesis-drawing += parenthesis-drawing-rec
+  }
+  if ctx.last-anchor.type == "link" and not ctx.last-anchor.at("drew", default: false) {
+    ctx.links.push(ctx.last-anchor)
+    ctx.last-anchor.drew = true
+  }
   (
     ctx,
     fragment-drawing,
-		parenthesis-drawing,
+    parenthesis-drawing,
     cetz-drawing,
   )
 }
@@ -162,8 +167,9 @@
   )
 }
 
-#let set-elements-names(body, group-id: 0, link-id:0, operator-id: 0) = {
-  let result = ()
+/// set elements names and split the molecule into sub-groups
+#let preprocessing(body, group-id: 0, link-id: 0, operator-id: 0) = {
+  let result = ((),)
   for element in body {
     if type(element) == dictionary {
       if element.at("name", default: none) == none {
@@ -176,17 +182,112 @@
         } else if element.type == "operator" {
           element.name = "operator-" + str(operator-id)
           operator-id += 1
-        } 
+        }
       }
       if element.at("body", default: none) != none {
         let child-body
-        (child-body, group-id, link-id, operator-id) = set-elements-names(element.body, group-id: group-id, link-id:link-id, operator-id: operator-id)
-        element.body = child-body
+        (child-body, group-id, link-id, operator-id) = preprocessing(
+          element.body,
+          group-id: group-id,
+          link-id: link-id,
+          operator-id: operator-id,
+        )
+        if element.type == "parenthesis" and element.resonance {
+          element.body = child-body.len()
+          result.push(element)
+          result += child-body
+          result.push(())
+        } else {
+          element.body = child-body.at(0)
+        }
       }
+      if element.type == "operator" {
+        result.push(element)
+        result.push(())
+      } else if element.type != "parenthesis" or not element.resonance {
+        result.at(-1).push(element)
+      }
+    } else {
+      result.at(-1).push(element)
     }
-    result.push(element)
   }
   (result, group-id, link-id, operator-id)
+}
+
+#let draw-groups(ctx, bodies, decoration: true) = {
+  let parent-anchors = ()
+  let after-operator = false
+  let last-name = ""
+
+  for (i, body) in bodies.enumerate() {
+    if (parent-anchors.len() > 0 and parent-anchors.first().at(0) == i) {
+      ctx.last-anchor = parent-anchors.first().at(1)
+    }
+    if type(body) == array {
+      if body.len() > 0 {
+        last-name = str(i)
+        get-ctx(cetz-ctx => {
+          let ctx = ctx
+          if ctx.last-anchor.type == "coord" {
+            ctx.last-anchor.anchor = cetz.coordinate.resolve(cetz-ctx, ctx.last-anchor.anchor).at(1)
+          }
+          let last-anchor = ctx.last-anchor
+          let (ctx, atoms, parenthesis, cetz-drawing) = draw-fragments-and-link(ctx, body)
+          let links = if (decoration) {
+            for (links, name, from-mol) in ctx.hooks-links {
+              ctx = draw-hooks-links(links, name, ctx, from-mol)
+            }
+            draw-link-decoration(ctx).at(1)
+          } else {
+            ()
+          }
+
+          let molecule = {
+            atoms
+            links
+            on-layer(1, parenthesis)
+            if decoration {
+              on-layer(2, cetz-drawing)
+            }
+          }
+
+          group(
+            name: str(i),
+            {
+              if after-operator {
+                let molecule-bounds = cetz.process.many(cetz-ctx, atoms + links + parenthesis).bounds
+                molecule-bounds = cetz.util.revert-transform(cetz-ctx.transform, molecule-bounds)
+                let (_, origin-anchor) = cetz.coordinate.resolve(cetz-ctx, last-anchor.anchor)
+                translate(
+                  x: origin-anchor.at(0) - molecule-bounds.low.at(0),
+                  y: origin-anchor.at(1) - (
+                    molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
+                  ) / 2
+                )
+              }
+              molecule
+            },
+          )
+        })
+      }
+    } else if body.type == "operator" {
+      let (op-ctx, drawable) = operator.draw-operator(body, last-name, ctx)
+      after-operator = true
+      ctx = op-ctx
+      drawable
+    } else if body.type == "parenthesis" {
+      let sub = i + 1
+      let sup = sub + body.body
+      let child-drawable = draw-groups(ctx, bodies.slice(sub, sup), decoration: false)
+      let (parenthesis-ctx, drawable, next-anchor) = parenthesis.draw-resonance-parenthesis(body, child-drawable, ctx)
+      parent-anchors.push((sup, next-anchor))
+      ctx = parenthesis-ctx
+      last-name = "parenthesis-" + str(ctx.id - 1)
+      drawable
+    } else {
+      panic("Unexpected element type: " + body.type)
+    }
+  }
 }
 
 #let draw-skeleton(config: default, name: none, mol-anchor: none, body) = {
@@ -195,30 +296,19 @@
   ctx.angle = config.base-angle
   ctx.config = config
 
-  body = set-elements-names(body).at(0)
+  let bodies = preprocessing(body).at(0)
 
-  let (ctx, atoms, parenthesis, cetz-drawing) = draw-fragments-and-link(ctx, body)
-  for (links, name, from-mol) in ctx.hooks-links {
-    ctx = draw-hooks-links(links, name, ctx, from-mol)
-  }
-  let links = draw-link-decoration(ctx).at(1)
-
-  let final-drawing = {
-    atoms
-    links
-    on-layer(1, parenthesis)
-    on-layer(2, cetz-drawing)
-  }
+  let final-drawing = draw-groups(ctx, bodies)
 
   if name == none {
-		final-drawing
+    final-drawing
   } else {
     group(
       name: name,
       anchor: mol-anchor,
       {
         anchor("default", (0, 0))
-				final-drawing
+        final-drawing
       },
     )
   }

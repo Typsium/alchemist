@@ -1,6 +1,6 @@
 #import "@preview/cetz:0.3.4": draw, process, util
 
-#let draw-operator(operator, fragment-drawing, ctx) = {
+#let draw-operator(operator, last-name, ctx) = {
   import draw: *
 
   let op-name = operator.name
@@ -9,11 +9,8 @@
   (
     ctx,
     get-ctx(cetz-ctx => {
-      let bounds = util.revert-transform(cetz-ctx.transform, process.many(cetz-ctx, fragment-drawing).bounds)
 
-      let v-middle = bounds.low.at(1) + (bounds.high.at(1) - bounds.low.at(1)) / 2
-
-      let west-previous-mol-anchor = (bounds.high.at(0), v-middle)
+      let west-previous-mol-anchor = (name: last-name, anchor: "east")
 
       let east-op-anchor = (rel: (operator.margin, 0), to: west-previous-mol-anchor)
 
