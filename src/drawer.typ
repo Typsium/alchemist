@@ -17,14 +17,12 @@
 #let default-ctx = (
   // general
   last-anchor: default-anchor, // keep trace of the place to draw
-  group-id: 0, // id of the current group
-  link-id: 0, // id of the current link
-  operator-id: 0, // id of the current operator
   links: (), // list of links to draw
   hooks: (:), // list of hooks
   hooks-links: (), // list of links to hooks
   relative-angle: 0deg, // current global relative angle
   angle: 0deg, // current global angle
+  id: 0, // an id used to name things with an unique name
   // branch
   first-branch: false, // true if the next element is the first in a branch
   // cycle
@@ -37,8 +35,13 @@
   vertex-anchors: (), // list of the cycle vertices
 )
 
-#let draw-hooks-links(links, name, ctx, from-mol) = {
+#let draw-hooks-links(links, mol-name, ctx, from-mol) = {
+  let hook-id = 0
   for (to-name, (link,)) in links {
+    if link.at(mol-name, default: none) == none {
+      link.name = mol-name + "-hook-" + str(hook-id)
+      hook-id += 1
+    }
     if to-name not in ctx.hooks {
       panic("Molecule " + to-name + " does not exist")
     }
@@ -46,14 +49,14 @@
     if to-hook.type == "fragment" {
       ctx.links.push((
         type: "link",
-        name: link.at("name", default: "link" + str(ctx.link-id)),
+        name: link.at("name"),
         from-pos: if from-mol {
-          (name: name, anchor: "mid")
+          (name: mol-name, anchor: "mid")
         } else {
-          name + "-end-anchor"
+          mol-name + "-end-anchor"
         },
         from-name: if from-mol {
-          name
+          mol-name
         },
         to-name: to-name,
         from: none,
@@ -68,14 +71,14 @@
         } else {
           "link-hook-link"
         },
-        name: link.at("name", default: "link" + str(ctx.link-id)),
+        name: link.at("name"),
         from-pos: if from-mol {
-          (name: name, anchor: "mid")
+          (name: mol-name, anchor: "mid")
         } else {
-          name + "-end-anchor"
+          mol-name + "-end-anchor"
         },
         from-name: if from-mol {
-          name
+          mol-name
         },
         to-name: to-name,
         to-hook: to-hook.hook,
@@ -85,7 +88,6 @@
     } else {
       panic("Unknown hook type " + ctx.hook.at(to-name).type)
     }
-    ctx.link-id += 1
   }
   ctx
 }
@@ -160,11 +162,41 @@
   )
 }
 
+#let set-elements-names(body, group-id: 0, link-id:0, operator-id: 0) = {
+  let result = ()
+  for element in body {
+    if type(element) == dictionary {
+      if element.at("name", default: none) == none {
+        if element.type == "fragment" {
+          element.name = "fragment-" + str(group-id)
+          group-id += 1
+        } else if element.type == "link" {
+          element.name = "link-" + str(link-id)
+          link-id += 1
+        } else if element.type == "operator" {
+          element.name = "operator-" + str(operator-id)
+          operator-id += 1
+        } 
+      }
+      if element.at("body", default: none) != none {
+        let child-body
+        (child-body, group-id, link-id, operator-id) = set-elements-names(element.body, group-id: group-id, link-id:link-id, operator-id: operator-id)
+        element.body = child-body
+      }
+    }
+    result.push(element)
+  }
+  (result, group-id, link-id, operator-id)
+}
+
 #let draw-skeleton(config: default, name: none, mol-anchor: none, body) = {
   let config = merge-dictionaries(config, default)
   let ctx = default-ctx
   ctx.angle = config.base-angle
   ctx.config = config
+
+  body = set-elements-names(body).at(0)
+
   let (ctx, atoms, parenthesis, cetz-drawing) = draw-fragments-and-link(ctx, body)
   for (links, name, from-mol) in ctx.hooks-links {
     ctx = draw-hooks-links(links, name, ctx, from-mol)

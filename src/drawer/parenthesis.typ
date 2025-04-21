@@ -12,18 +12,15 @@
 #let left-parenthesis-anchor(parenthesis, ctx) = {
 	let anchor = if parenthesis.body.at(0).type == "fragment" {
     let name = parenthesis.body.at(0).name
-    if name == none {
-      name = "fragment" + str(ctx.group-id)
-    }
-    ctx.group-id += 1
     parenthesis.body.at(0).name = name
     (name: name, anchor: "west")
   } else if parenthesis.body.at(0).type == "link" {
-    let name = parenthesis.body.at(0).at("name", default: "link" + str(ctx.link-id))
-    ctx.link-id += 1
+    let name = parenthesis.body.at(0).at("name")
     parenthesis.body.at(0).name = name
     (name: name, anchor: 50%)
-  } else {
+  } else if not left {
+		
+	} else {
     panic("The first element of a parenthesis must be a molecule fragment or a link")
   }
 	(ctx, parenthesis, anchor)
@@ -39,15 +36,7 @@
 		}
 	} else {
 		right-type = parenthesis.body.at(-1).type
-		if right-type == "fragment" {
-			right-name = "fragment" + str(ctx.group-id)
-			ctx.group-id += 1
-			parenthesis.body.at(-1).name = right-name
-		} else if right-type == "link" {
-			right-name = "link" + str(ctx.link-id)
-			ctx.link-id += 1
-			parenthesis.body.at(-1).name = right-name
-		}
+		right-name = parenthesis.body.at(-1).at("name", default: none)
  	}
 
 	let anchor = if right-type == "fragment" {
@@ -61,30 +50,52 @@
 }
 
 #let draw-parenthesis(parenthesis, ctx, draw-molecules-and-link) = {
-  let (ctx, parenthesis, left-anchor) = left-parenthesis-anchor(parenthesis, ctx)
-	let (ctx, parenthesis, right-anchor) = right-parenthesis-anchor(parenthesis, ctx)
+	let left-name = "parenthesis-" + str(ctx.id)
+	let right-name = "parenthesis-" + str(ctx.id + 1)
+	ctx.id += 2
 
+	if (parenthesis.resonance) {
+		ctx.last-anchor = (type: "coord", "anchor": (name: "left-name", anchor: "east"))
+	}
   let (parenthesis-ctx, drawing, parenthesis-rec, cetz-rec) = draw-molecules-and-link(
     ctx,
     parenthesis.body,
   )
   ctx = parenthesis-ctx
-	parenthesis-rec += {
+
+
+	if (parenthesis.resonance) {
+		ctx.last-anchor = (type: "coord", anchor: right-name)
+	}
+
+	parenthesis-rec = {
 		import cetz.draw: *
 		get-ctx(cetz-ctx => {
 			let sub-bounds = cetz.process.many(cetz-ctx, {
 				drawing
 			}).bounds
-			sub-bounds = cetz.util.revert-transform(cetz-ctx.transform, sub-bounds.low, sub-bounds.high)
-			sub-bounds = (
-				low: sub-bounds.at(0),
-				high: sub-bounds.at(1),
-			)
+			sub-bounds = cetz.util.revert-transform(cetz-ctx.transform, sub-bounds)
 			
 			let sub-height = bounding-box-height(sub-bounds)
 			let sub-v-mid = sub-bounds.low.at(1) - sub-height / 2
 
 			let sub-width = bounding-box-width(sub-bounds)
+  		
+			let (ctx, parenthesis, left-anchor) = if (parenthesis.resonance) {
+				if (ctx.last-anchor.type != "coord") {
+					panic("The parenthesis resonance mode can only be used if the previous element is an operator or as the first element of the skeletal formula")
+				}
+				(ctx, parenthesis, ctx.last-anchor)
+			} else {
+				left-parenthesis-anchor(parenthesis, ctx)
+			}
+
+
+			let (ctx, parenthesis, right-anchor) = if (parenthesis.resonance) {
+				(ctx, parenthesis, (rel: (sub-width, 0), to: left-anchor))
+			} else {
+				right-parenthesis-anchor(parenthesis, ctx)
+			}
 
 			let height = parenthesis.at("height")
 			if height == none {
@@ -157,8 +168,10 @@
 			} else if (parenthesis.tr != none) {
 				right-voffset *= -1
 			}
+			
 			content((lx , ly), anchor: "mid-east", left-parenthesis, auto-scale: false)
-			content((rx, ry - right-voffset), anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
+			parenthesis-rec
+			content(name: right-name, (rx, ry - right-voffset), anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
 		})
 	}
   (ctx, drawing, parenthesis-rec, cetz-rec)

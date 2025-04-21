@@ -81,14 +81,11 @@
 
 #let draw-fragment-elements(mol, ctx) = {
   let name = mol.name
-  if name != none {
-    if name in ctx.hooks {
-      panic("Molecule fragment with name " + name + " already exists")
-    }
-    ctx.hooks.insert(name, mol)
-  } else {
-    name = "fragment" + str(ctx.group-id)
+  if name in ctx.hooks {
+    panic("Molecule fragment with name " + name + " already exists : " + ctx.hooks.keys().join(", "))
   }
+  ctx.hooks.insert(name, mol)
+  
   let (group-anchor, side, coord) = if ctx.last-anchor.type == "coord" {
     ("west", true, ctx.last-anchor.anchor)
   } else if ctx.last-anchor.type == "link" {
@@ -110,7 +107,9 @@
     ctx,
     (type: "fragment", name: name, count: mol.at("count"), vertical: mol.vertical),
   )
-  ctx.group-id += 1
+  if (side) {
+    ctx.id += 1
+  }
   (
     ctx,
     {
@@ -119,7 +118,7 @@
         anchor: if side {
           group-anchor
         } else {
-          "from" + str(ctx.group-id)
+          "from" + str(ctx.id)
         },
         name: name,
         {
@@ -127,7 +126,7 @@
           anchor("default", (0, 0))
           draw-fragment-text(mol)
           if not side {
-            anchor("from" + str(ctx.group-id), group-anchor)
+            anchor("from" + str(ctx.id), group-anchor)
           }
         },
       )

@@ -188,7 +188,7 @@
 /// - l (string): the left parenthesis
 /// - r (string): the right parenthesis
 /// - align (true): if true, the parenthesis will have the same y position. They will also get sized and aligned according to the body height. If false, they are not aligned and the height argument must be specified.
-///
+/// - resonance (boolean): if true, the parenthesis will be drawn in resonance mode. This means that the left and right parenthesis will be placed outside the molecule. Also, the parenthesis will be separated from the previous and next molecule. This can be true only if the parenthesis is the first element of the skeletal formula or if the previous element is an operator. See @resonance for more details.
 /// - height (float, length): the height of the parenthesis. If align is true, this argument is optional.
 /// - yoffset (float, length, list): the vertical offset of parenthesis. You can also provide a tuple for left and right parenthesis
 /// - xoffset (float, length, list): the horizontal offset of parenthesis. You can also provide a tuple for left and right parenthesis
@@ -196,7 +196,7 @@
 /// - tr (content): the exponent content of the right parenthesis
 /// - br (content): the indice content of the right parenthesis
 /// -> drawable
-#let parenthesis(body, l: "(", r: ")", align: true, height: none, yoffset: none, xoffset: none, right: none, tr: none, br: none) = {
+#let parenthesis(body, l: "(", r: ")", align: true, resonance: false, height: none, yoffset: none, xoffset: none, right: none, tr: none, br: none) = {
 	if l.len() > 2 {
 		panic("Left can be at most 2 characters")
 	}
@@ -219,6 +219,7 @@
       xoffset: xoffset,
 			yoffset: yoffset,
 			right: right,
+      resonance: resonance,
     ),
   )
 }

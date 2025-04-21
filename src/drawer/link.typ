@@ -48,7 +48,7 @@
     panic("Unknown anchor type " + ctx.last-anchor.type)
   }
   let length = link.at("atom-sep", default: ctx.config.atom-sep)
-  let link-name = link.at("name", default: "link" + str(ctx.link-id))
+  let link-name = link.at("name")
   if ctx.record-vertex {
     if ctx.faces-count == 0 {
       ctx.vertex-anchors.push(from-pos)
@@ -72,7 +72,6 @@
       draw: link.draw,
     ),
   )
-  ctx.link-id += 1
   (
     ctx,
     {

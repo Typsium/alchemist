@@ -4,10 +4,6 @@
   import draw: *
 
   let op-name = operator.name
-  if (op-name == none) {
-    op-name = "operator" + str(ctx.operator-id)
-  }
-  ctx.operator-id += 1
   ctx.last-anchor = (type: "coord", anchor: (rel: (operator.margin, 0), to: (name: op-name, anchor: "east")))
 
   (

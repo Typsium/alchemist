@@ -13,8 +13,6 @@
     hooks: ctx.hooks,
     hooks-links: ctx.hooks-links,
     links: ctx.links,
-    group-id: ctx.group-id,
-    link-id: ctx.link-id,
   )
 }
 

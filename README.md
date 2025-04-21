@@ -95,6 +95,7 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 - Renamed `molecule` into `fragment`
 - Added support for charges and apostrophes in the string of a molecule
 - Fixed the parenthesis auto positioning and alignment
+- Added new elements and parameters to write resonance formulae
 
 ### 0.1.5
 
