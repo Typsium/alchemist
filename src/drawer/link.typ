@@ -24,9 +24,7 @@
   let from-connection = none
   let from-name = none
 
-  let init-point = false
   let from-pos = if ctx.last-anchor.type == "coord" {
-    init-point = true
     ctx.last-anchor.anchor
   } else if ctx.last-anchor.type == "fragment" {
     from-connection = link-fragment-index(
@@ -75,14 +73,9 @@
   (
     ctx,
     {
-      if init-point {
-        hide(
-          {
-            circle(from-pos, radius: .25em)
-          },
-          bounds: true,
-        )
-      }
+       hide({
+          circle(name: link-name + "-start-anchor", from-pos, radius: .25em)
+      })
       let end-anchor = (to: from-pos, rel: (angle: link-angle, radius: length))
       if ctx.config.debug {
         line(from-pos, end-anchor, stroke: blue + .1em)

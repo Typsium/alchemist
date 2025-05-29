@@ -17,7 +17,7 @@
 
 #let draw-branch(branch, ctx, draw-fragments-and-link) = {
 	let angle = angles.angle-from-ctx(ctx, branch.args, cycle-angle(ctx))
-	let (branch-ctx, drawing, parenthesis-drawing-rec, cetz-rec) = draw-fragments-and-link(
+	let (branch-ctx, drawing, cetz-rec) = draw-fragments-and-link(
 		(
 			..ctx,
 			in-cycle: false,
@@ -28,5 +28,5 @@
 		branch.body,
 	)
 	ctx = context_.update-parent-context(ctx, branch-ctx)
-	(ctx, drawing, parenthesis-drawing-rec, cetz-rec)
+	(ctx, drawing, cetz-rec)
 }

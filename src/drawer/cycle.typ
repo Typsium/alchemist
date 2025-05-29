@@ -136,7 +136,7 @@
   } else if "arc" in cycle.args {
     record-vertex = true
   }
-  let (cycle-ctx, drawing, parenthesis-drawing-rec, cetz-rec) = draw-fragments-and-link(
+  let (cycle-ctx, drawing, cetz-rec) = draw-fragments-and-link(
     (
       ..ctx,
       in-cycle: true,
@@ -156,5 +156,5 @@
   if record-vertex {
     drawing += draw-cycle-center-arc(cycle-ctx, name, cycle.args.at("arc", default: none))
   }
-	(ctx, drawing, parenthesis-drawing-rec, cetz-rec)
+	(ctx, drawing, cetz-rec)
 }

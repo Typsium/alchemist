@@ -1,6 +1,6 @@
 #import "@preview/cetz:0.3.4": draw, process, util
 
-#let draw-operator(operator, last-name, ctx) = {
+#let draw-operator(operator, ctx) = {
   import draw: *
 
   let op-name = operator.name
@@ -10,7 +10,7 @@
     ctx,
     get-ctx(cetz-ctx => {
 
-      let west-previous-mol-anchor = (name: last-name, anchor: "east")
+      let west-previous-mol-anchor = (name: ctx.last-name, anchor: "east")
 
       let east-op-anchor = (rel: (operator.margin, 0), to: west-previous-mol-anchor)
 
