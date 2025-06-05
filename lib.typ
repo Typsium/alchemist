@@ -228,10 +228,18 @@
 /// === Operator
 /// Create an operator between two fragments. Creating an operator "reset" the placement of the next fragment.
 /// This allow to add multiple molecules in the same skeletal formula. Without this, the next fragment would be placed at the end of the previous one.
-/// An important point is that the operator reset the context. This means that fragments names can be reused and that you can't use previous hooks.
-/// This element is used in resonance structures (@resonance) and in some cases to put multiples molecules in the same skeletal formula.
+/// An important point is that you can't use previous hooks to link two molecules separate by an operator.
+/// This element is used in resonance structures (@resonance) and in some cases to put multiples molecules in the same skeletal formula (as you can set op to none).
 /// 
 /// - op (content | string | none): The operator content. It can be a string or a content. A none value won't display anything.
+/// #example(```
+/// #skeletize({
+///  fragment("A")
+/// operator($->$, margin: 1em)
+/// fragment("B")
+/// })
+/// ```)
+/// See @resonance for more examples.
 /// - name (string): The name of the operator.
 /// - margin (float, length): The margin between the operator and previous / next molecule.
 /// -> drawable
