@@ -1,6 +1,6 @@
 /// [ppi:100]
 #import "../../lib.typ" : *
-#import "@preview/cetz:0.3.4"
+#import "@preview/cetz:0.4.0"
 
 #set page(width: auto, height: auto, margin: 0.5em)
 

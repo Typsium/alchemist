@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.3.4"
+#import "@preview/cetz:0.4.0"
 #import "../utils/utils.typ"
 #import "../utils/angles.typ"
 #import "../utils/context.typ" as context_

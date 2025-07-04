@@ -1,6 +1,6 @@
 #import "../utils/context.typ": *
 #import "../utils/anchors.typ": *
-#import "@preview/cetz:0.3.4"
+#import "@preview/cetz:0.4.0"
 
 #let draw-fragment-text(mol) = {
 	import cetz.draw: *

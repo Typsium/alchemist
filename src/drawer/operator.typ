@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.3.4": draw, process, util
+#import "@preview/cetz:0.4.0": draw, process, util
 
 #let draw-operator(operator, ctx) = {
   import draw: *
