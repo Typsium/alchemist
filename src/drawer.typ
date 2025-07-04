@@ -190,12 +190,12 @@
           operator-id: operator-id,
         )
         if element.type == "parenthesis" and element.resonance {
-        element.body = child-body
+          element.body = child-body
         } else {
           element.body = child-body.at(0)
         }
       }
-      if element.type == "operator"  or (element.type == "parenthesis" and element.resonance) {
+      if element.type == "operator" or (element.type == "parenthesis" and element.resonance) {
         result.push(element)
         result.push(())
       } else {
@@ -233,38 +233,35 @@
             on-layer(2, cetz-drawing)
           }
 
-          group(
-            name: str(i),
-            {
-              if after-operator {
-                let (ctx: cetz-ctx, drawables, bounds: molecule-bounds) = cetz.process.many(cetz-ctx, atoms + links)
-                molecule-bounds = cetz.util.revert-transform(cetz-ctx.transform, molecule-bounds)
+          group(name: str(i), {
+            if after-operator {
+              let (ctx: cetz-ctx, drawables, bounds: molecule-bounds) = cetz.process.many(cetz-ctx, atoms + links)
+              molecule-bounds = cetz.util.revert-transform(cetz-ctx.transform, molecule-bounds)
 
-                let (_, origin-anchor) = cetz.coordinate.resolve(cetz-ctx, last-anchor.anchor)
+              let (_, origin-anchor) = cetz.coordinate.resolve(cetz-ctx, last-anchor.anchor)
+              (
                 (
-                  (
-                    cetz-ctx => (
-                      ctx: cetz-ctx,
-                      drawables: cetz.drawable.apply-transform(
-                        cetz.matrix.transform-translate(
-                          origin-anchor.at(0) - molecule-bounds.low.at(0),
-                          -origin-anchor.at(1)
-                            + (
-                              molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
-                            )
-                              / 2,
-                          0,
-                        ),
-                        drawables,
+                  cetz-ctx => (
+                    ctx: cetz-ctx,
+                    drawables: cetz.drawable.apply-transform(
+                      cetz.matrix.transform-translate(
+                        origin-anchor.at(0) - molecule-bounds.low.at(0),
+                        -origin-anchor.at(1)
+                          + (
+                            molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
+                          )
+                            / 2,
+                        0,
                       ),
-                    )
-                  ),
-                )
-              } else {
-                molecule
-              }
-            },
-          )
+                      drawables,
+                    ),
+                  )
+                ),
+              )
+            } else {
+              molecule
+            }
+          })
         })
       }
     } else if body.type == "operator" {
@@ -295,14 +292,10 @@
   if name == none {
     final-drawing
   } else {
-    group(
-      name: name,
-      anchor: mol-anchor,
-      {
-        anchor("default", (0, 0))
-        final-drawing
-      },
-    )
+    group(name: name, anchor: mol-anchor, {
+      anchor("default", (0, 0))
+      final-drawing
+    })
   }
 }
 
@@ -311,9 +304,5 @@
   if "debug" not in config {
     config.insert("debug", debug)
   }
-  cetz.canvas(
-    debug: debug,
-    background: background,
-    draw-skeleton(config: config, body),
-  )
+  cetz.canvas(debug: debug, background: background, draw-skeleton(config: config, body))
 }
