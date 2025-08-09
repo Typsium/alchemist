@@ -4,6 +4,10 @@
   angle-increment: 45deg,
   base-angle: 0deg,
 	debug: false,
+	fragment: (
+		color: none,
+		font: none,
+	),
 	single: (
 		stroke: black
 	),

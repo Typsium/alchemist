@@ -2,7 +2,7 @@
 #import "../utils/anchors.typ": *
 #import "@preview/cetz:0.4.0"
 
-#let draw-fragment-text(mol) = {
+#let draw-fragment-text(ctx, mol) = {
 	import cetz.draw: *
   for (id, eq) in mol.atoms.enumerate() {
     let name = str(id)
@@ -13,8 +13,9 @@
         mol.colors.at(calc.min(id, mol.colors.len() - 1))
       }
     } else {
-      none
+      ctx.config.fragment.color
     }
+
     // draw atoms of the group one after the other from left to right
     content(
       name: name,
@@ -36,6 +37,7 @@
       {
         show math.equation: math.upright
         set text(fill: color) if color != none
+        set text(font: ctx.config.fragment.font) if ctx.config.fragment.font != none
         eq
       },
     )
@@ -124,7 +126,7 @@
         {
           set-origin(coord)
           anchor("default", (0, 0))
-          draw-fragment-text(mol)
+          draw-fragment-text(ctx, mol)
           if not side {
             anchor("from" + str(ctx.id), group-anchor)
           }
