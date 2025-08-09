@@ -5,6 +5,7 @@
 
 #grid(
   columns: 3,
+  column-gutter: 1em,
   align: horizon + center,
   skeletize({
     import cetz.draw: *
