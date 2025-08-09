@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.4.0"
+#import "@preview/cetz:0.4.1"
 
 #let convert-length(ctx, num) = {
   // This function come from the cetz module

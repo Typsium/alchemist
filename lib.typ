@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.4.0"
+#import "@preview/cetz:0.4.1"
 #import "src/default.typ": default
 #import "src/utils/utils.typ"
 #import "src/drawer.typ"

@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.4.0"
+#import "@preview/cetz:0.4.1"
 
 /// Create a lewis function that is then used to draw a lewis
 /// formulae element around the fragment

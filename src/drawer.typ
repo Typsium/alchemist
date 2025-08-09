@@ -1,5 +1,5 @@
 #import "default.typ": default
-#import "@preview/cetz:0.4.0"
+#import "@preview/cetz:0.4.1"
 #import "utils/utils.typ": *
 #import "utils/anchors.typ": *
 #import "utils/utils.typ" as utils

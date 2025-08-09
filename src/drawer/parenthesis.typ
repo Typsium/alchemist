@@ -1,5 +1,5 @@
 #import "../utils/utils.typ"
-#import "@preview/cetz:0.4.0"
+#import "@preview/cetz:0.4.1"
 
 #let left-parenthesis-anchor(parenthesis, ctx) = {
   let anchor = if parenthesis.body.at(0).type == "fragment" {

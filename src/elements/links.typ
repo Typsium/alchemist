@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.4.0"
+#import "@preview/cetz:0.4.1"
 #import "../drawer/cram.typ": *
 #import "../utils/utils.typ"
 
