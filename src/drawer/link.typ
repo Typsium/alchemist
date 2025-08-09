@@ -73,24 +73,18 @@
   (
     ctx,
     {
-       hide({
-          circle(name: link-name + "-start-anchor", from-pos, radius: .25em)
+      hide({
+        circle(name: link-name + "-start-anchor", from-pos, radius: .25em)
       })
       let end-anchor = (to: from-pos, rel: (angle: link-angle, radius: length))
       if ctx.config.debug {
         line(from-pos, end-anchor, stroke: blue + .1em)
       }
-      group(
-        name: link-name + "-end-anchor",
+      hide(
         {
-          anchor("default", end-anchor)
-          hide(
-            {
-              circle(end-anchor, radius: .25em)
-            },
-            bounds: true,
-          )
+          circle(name: link-name + "-end-anchor", end-anchor, radius: .25em)
         },
+        bounds: true,
       )
     },
   )
