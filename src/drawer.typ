@@ -1,5 +1,6 @@
 #import "default.typ": default
 #import "@preview/cetz:0.4.1"
+#import "cetz/process.typ" as custom-process
 #import "utils/utils.typ": *
 #import "utils/anchors.typ": *
 #import "utils/utils.typ" as utils
@@ -208,58 +209,91 @@
   (result, group-id, link-id, operator-id)
 }
 
+#let operator-group-name = id => {
+  "operator-group-" + str(id)
+}
+
 #let draw-groups(ctx, bodies, after-operator: false) = {
   ctx.last-name = ""
 
   let drawables = for (i, body) in bodies.enumerate() {
     if type(body) == array {
       if body.len() > 0 {
-        ctx.last-name = str(i)
+        ctx.last-name = operator-group-name(i)
         get-ctx(cetz-ctx => {
           let ctx = ctx
           if ctx.last-anchor.type == "coord" {
-            ctx.last-anchor.anchor = cetz.coordinate.resolve(cetz-ctx, ctx.last-anchor.anchor).at(1)
+            (cetz-ctx, ctx.last-anchor.anchor) = cetz.coordinate.resolve(cetz-ctx, ctx.last-anchor.anchor)
           }
           let last-anchor = ctx.last-anchor
           let (ctx, atoms, cetz-drawing) = draw-fragments-and-link(ctx, body)
           for (links, name, from-mol) in ctx.hooks-links {
             ctx = draw-hooks-links(links, name, ctx, from-mol)
           }
-          let links = draw-link-decoration(ctx).at(1)
 
           let molecule = {
             atoms
-            links
-            on-layer(2, cetz-drawing)
           }
 
-          group(name: str(i), {
-            if after-operator {
-              let (ctx: cetz-ctx, drawables, bounds: molecule-bounds) = cetz.process.many(cetz-ctx, atoms + links)
-              molecule-bounds = cetz.util.revert-transform(cetz-ctx.transform, molecule-bounds)
+          let (ctx: cetz-ctx, drawables, bounds: molecule-bounds, anchors) = custom-process.many(cetz-ctx, molecule)
+          molecule-bounds = cetz.util.revert-transform(cetz-ctx.transform, molecule-bounds)
 
-              let (_, origin-anchor) = cetz.coordinate.resolve(cetz-ctx, last-anchor.anchor)
-              (
-                (
-                  cetz-ctx => (
-                    ctx: cetz-ctx,
-                    drawables: cetz.drawable.apply-transform(
-                      cetz.matrix.transform-translate(
-                        origin-anchor.at(0) - molecule-bounds.low.at(0),
-                        -origin-anchor.at(1)
-                          + (
-                            molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
-                          )
-                            / 2,
-                        0,
-                      ),
-                      drawables,
-                    ),
-                  )
+          let (translate-x, translate-y) = if after-operator {
+            let (_, origin-anchor) = cetz.coordinate.resolve(cetz-ctx, last-anchor.anchor)
+            (
+              origin-anchor.at(0) - molecule-bounds.low.at(0),
+              -origin-anchor.at(1)
+                + (
+                  molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
+                )
+                  / 2,
+            )
+          } else {
+            (0, 0)
+          }
+          let transform-matrix = cetz.matrix.transform-translate(
+            translate-x,
+            translate-y,
+            0,
+          )
+          // panic(anchors)
+          for name in anchors {
+            let hold-anchors = cetz-ctx.nodes.at(name).anchors
+            cetz-ctx.nodes.at(name).anchors = (name) => {
+              if name != () {
+                cetz.matrix.mul4x4-vec3(transform-matrix, hold-anchors(name))
+              } else {
+                hold-anchors(name)
+              }
+            }
+          }
+          (
+            _ => (
+              ctx: cetz-ctx,
+              drawables: cetz.drawable.apply-transform(
+                cetz.matrix.transform-translate(
+                  translate-x,
+                  translate-y,
+                  0,
                 ),
-              )
+                drawables,
+              ),
+            ),
+          )
+          scope({
+            translate(x: translate-x, y: -translate-y)
+            draw-link-decoration(ctx).at(1)
+            on-layer(2, cetz-drawing)
+            let bound-rect = cetz.draw.rect(
+              molecule-bounds.low,
+              molecule-bounds.high,
+              name: ctx.last-name,
+              stroke: purple,
+            )
+            if ctx.config.debug {
+              bound-rect
             } else {
-              molecule
+              cetz.draw.hide(bound-rect)
             }
           })
         })

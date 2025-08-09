@@ -5,7 +5,7 @@
 #set page(width: auto, height: auto, margin: 0.5em)
 
 #skeletize(
-  config: (angle-increment: 15deg, debug: true),
+  config: (angle-increment: 15deg),
   {
     import cetz.draw: *
     molecule("C")
