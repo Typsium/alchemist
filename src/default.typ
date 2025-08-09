@@ -7,6 +7,9 @@
 	fragment: (
 		color: none,
 		font: none,
+		over: (
+			radius: .2
+		)
 	),
 	single: (
 		stroke: black

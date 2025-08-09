@@ -67,6 +67,7 @@
       to-name: to-name,
       to: to-connection,
       angle: link-angle,
+      over: link.at("over", default: none),
       draw: link.draw,
     ),
   )

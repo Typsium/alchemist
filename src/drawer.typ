@@ -64,6 +64,7 @@
         to-name: to-name,
         from: none,
         to: none,
+        over: link.at("over", default: none),
         override: angles.angle-override(ctx.angle, ctx),
         draw: link.draw,
       ))
@@ -87,6 +88,7 @@
         to-hook: to-hook.hook,
         override: angles.angle-override(ctx.angle, ctx),
         draw: link.draw,
+        over: link.at("over", default: none),
       ))
     } else {
       panic("Unknown hook type " + ctx.hook.at(to-name).type)
@@ -155,6 +157,43 @@
         }
         let length = distance-between(cetz-ctx, from, to)
         hide(line(from, to, name: link.name))
+        if link.at("over") != none {
+          let name = link.name + "-over"
+          let (over, length, radius) = if type(link.at("over")) == str {
+            (link.at("over"), ctx.config.fragment.over.radius, ctx.config.fragment.over.radius)
+          } else if type(link.at("over")) == dictionary {
+            let over = link.at("over")
+            let name = over.at("name", default: link.name + "-over")
+            if "length" in over or "radius" in over {
+              (
+                name, 
+                over.at("length", default: ctx.config.fragment.over.radius),
+                over.at("radius", default: ctx.config.fragment.over.radius)
+              )
+            } else {
+              panic("Over must have radius or length and radius")
+            }
+          } else {
+            panic("Over must be a string or a dictionary")
+          }
+          intersections(name, over, link.name)
+          let color = if ctx.config.debug {
+            red
+          } else {
+            white
+          }
+          scope({
+            rotate(angle)
+            rect(
+              anchor: "center",
+              (to: name + ".0", rel: (-length/2,-radius/2)),
+              (rel: (length, radius)),
+              fill: color,
+              stroke: color
+            )
+          })
+        }
+
         scope({
           set-origin(from)
           rotate(angle)
