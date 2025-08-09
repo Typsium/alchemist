@@ -145,6 +145,41 @@
   )
 }
 
+#let draw-link-over(ctx, link, over, angle) = {
+  let name = link.name + "-over"
+  let (over, length, radius) = if type(over) == str {
+    (over, ctx.config.fragment.over.radius, ctx.config.fragment.over.radius)
+  } else if type(over) == dictionary {
+    let name = over.at("name", default: none)
+    if name == none {
+      panic("Over argument must have a name")
+    }
+    (
+      name, 
+      over.at("length", default: ctx.config.fragment.over.radius),
+      over.at("radius", default: ctx.config.fragment.over.radius)
+    )
+  } else {
+    panic("Over must be a string or a dictionary, got " + type(link.at("over")))
+  }
+  intersections(name, over, link.name)
+  let color = if ctx.config.debug {
+    red
+  } else {
+    white
+  }
+  scope({
+    rotate(angle)
+    rect(
+      anchor: "center",
+      (to: name + ".0", rel: (-length/2,-radius/2)),
+      (rel: (length, radius)),
+      fill: color,
+      stroke: color
+    )
+  })
+}
+
 #let draw-link-decoration(ctx) = {
   (
     ctx,
@@ -158,40 +193,13 @@
         let length = distance-between(cetz-ctx, from, to)
         hide(line(from, to, name: link.name))
         if link.at("over") != none {
-          let name = link.name + "-over"
-          let (over, length, radius) = if type(link.at("over")) == str {
-            (link.at("over"), ctx.config.fragment.over.radius, ctx.config.fragment.over.radius)
-          } else if type(link.at("over")) == dictionary {
-            let over = link.at("over")
-            let name = over.at("name", default: link.name + "-over")
-            if "length" in over or "radius" in over {
-              (
-                name, 
-                over.at("length", default: ctx.config.fragment.over.radius),
-                over.at("radius", default: ctx.config.fragment.over.radius)
-              )
-            } else {
-              panic("Over must have radius or length and radius")
+          if type(link.at("over")) == array {
+            for over in link.at("over") {
+              draw-link-over(ctx, link, over, angle)
             }
           } else {
-            panic("Over must be a string or a dictionary")
+            draw-link-over(ctx, link, link.at("over"), angle)
           }
-          intersections(name, over, link.name)
-          let color = if ctx.config.debug {
-            red
-          } else {
-            white
-          }
-          scope({
-            rotate(angle)
-            rect(
-              anchor: "center",
-              (to: name + ".0", rel: (-length/2,-radius/2)),
-              (rel: (length, radius)),
-              fill: color,
-              stroke: color
-            )
-          })
         }
 
         scope({
