@@ -2,7 +2,7 @@
 #import "src/default.typ": default
 #import "src/utils/utils.typ"
 #import "src/drawer.typ"
-#import "src/drawer.typ": skeletize, draw-skeleton
+#import "src/drawer.typ": skeletize, draw-skeleton, skeletize-config, draw-skeleton-config
 #import "src/elements/links.typ": *
 #import "src/elements/fragment.typ": *
 #import "src/elements/lewis.typ": *

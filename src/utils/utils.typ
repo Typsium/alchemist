@@ -28,9 +28,9 @@
 	let result = default
 	for (key, value) in dict1 {
 		if type(value) == dictionary {
-			result.at(key) = merge-dictionaries(value, default.at(key))
+			result.insert(key, merge-dictionaries(value, default.at(key)))
 		} else {
-			result.at(key) = value
+			result.insert(key, value)
 		}
 	}
 	result

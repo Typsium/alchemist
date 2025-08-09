@@ -306,3 +306,17 @@
   }
   cetz.canvas(debug: debug, background: background, draw-skeleton(config: config, body))
 }
+
+#let skeletize-config(default-config) = {
+  let config-function(debug: false, background: none, config: (:), body) = {
+    skeletize(debug: debug, background: background, config: merge-dictionaries(config, default-config), body)
+  }
+  config-function
+}
+
+#let draw-skeleton-config(default-config) = {
+  let config-function(config: (:), name: none, mol-anchor: none, body) = {
+    draw-skeleton(config: merge-dictionaries(config, default-config), body)
+  }
+  config-function
+}
