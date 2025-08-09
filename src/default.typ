@@ -1,16 +1,12 @@
 #let default = (
   atom-sep: 3em,
 	fragment-margin: 0.2em,
+	fragment-font: none,
+	fragment-color: none,
+	link-over-radius: .2,
   angle-increment: 45deg,
   base-angle: 0deg,
 	debug: false,
-	fragment: (
-		color: none,
-		font: none,
-		over: (
-			radius: .2
-		)
-	),
 	single: (
 		stroke: black
 	),
