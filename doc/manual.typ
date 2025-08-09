@@ -1,4 +1,4 @@
-#import "@preview/mantys:1.0.1": *
+#import "@preview/mantys:1.0.2": *
 #import "@preview/alchemist:0.1.6"
 #import "@preview/cetz:0.4.0"
 
@@ -132,6 +132,18 @@ The configuration dictionary that you can pass to skeletize defines a set of def
   Default space between a molecule and all it's attachements (links and lewis formulae elements).
 ]
 
+#argument("fragment-color", default: default.fragment-color, types: red)[
+  Default color of the fragments. It is used to color the atoms in the molecule.
+]
+
+#argument("fragment-font", default: default.fragment-font, types: str)[
+  Default font of the fragments. It is used to display the atoms in the molecule.
+]
+
+#argument("link-over-radius", default: default.link-over-radius, types: (default.link-over-radius, 1em))[
+  Default radius around the links used to hide overlaped links.
+]
+
 === Link default style
 The default values also contains styling arguments for the links. You can specify default `stroke`, `fill`, `dash`, etc, depending on the link type. Each link default values are in a dictionary named after the link name.
 
@@ -200,6 +212,17 @@ Links functions are used to draw links between molecules. They all have the same
 
 #argument("links", types: (:))[
   Dictionary of links to other molecules or hooks. The key is the name of the molecule or the hook and the value is the link function.
+]
+
+#argument("over", types: ((:), (), str))[
+  If the link overlap other links and is drawn over them, this argument can be used to specify that you want to hide the overlapped links.
+  There are three possible values:
+  - #dtype("string"): The name of the link to overlape
+  - #dtype("dict"): A dictionary containing the keys:
+    - `name`: The name of the link to overlap
+    - `length`: The length of the overlap mask
+    - `radius`: The distance from the link center to the edge of the mask
+  - #dtype("array"): An array of the two aboves.
 ]
 
 ==== Links

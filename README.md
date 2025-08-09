@@ -89,6 +89,14 @@ For more information, check the [manual](https://raw.githubusercontent.com/Robot
 
 ## Changelog
 
+### 0.1.7
+
+- Updated cetz to version 0.4.1
+- Added default values for `color` and `font` for `fragment` elements
+- Added a `skeletize-config` function to create a `skeletize` function with a specific configuration
+- Fixed a bug with cetz anchors not being correctly translated
+- Added an `over` argument to links to allow hide overlapped links
+
 ### 0.1.6
 
 - Fixed the parenthesis height to work with the new typst version

@@ -148,7 +148,7 @@
 #let draw-link-over(ctx, link, over, angle) = {
   let name = link.name + "-over"
   let (over, length, radius) = if type(over) == str {
-    (over, ctx.config.fragment.over.radius, ctx.config.fragment.over.radius)
+    (over, link-over-radius, link-over-radius)
   } else if type(over) == dictionary {
     let name = over.at("name", default: none)
     if name == none {
@@ -156,8 +156,8 @@
     }
     (
       name, 
-      over.at("length", default: ctx.config.fragment.over.radius),
-      over.at("radius", default: ctx.config.fragment.over.radius)
+      over.at("length", default: link-over-radius),
+      over.at("radius", default: link-over-radius)
     )
   } else {
     panic("Over must be a string or a dictionary, got " + type(link.at("over")))

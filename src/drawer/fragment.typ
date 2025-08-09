@@ -13,7 +13,7 @@
         mol.colors.at(calc.min(id, mol.colors.len() - 1))
       }
     } else {
-      ctx.config.fragment.color
+      fragment-color
     }
 
     // draw atoms of the group one after the other from left to right
@@ -37,7 +37,7 @@
       {
         show math.equation: math.upright
         set text(fill: color) if color != none
-        set text(font: ctx.config.fragment.font) if ctx.config.fragment.font != none
+        set text(font: fragment-font) if fragment-font != none
         eq
       },
     )
