@@ -2,7 +2,7 @@
 #import "../utils/anchors.typ": *
 #import "@preview/cetz:0.4.1"
 
-#let draw-fragment-text(ctx, mol) = {
+#let draw-fragment-text(ctx, mol, pos) = {
 	import cetz.draw: *
   for (id, eq) in mol.atoms.enumerate() {
     let name = str(id)
@@ -26,7 +26,7 @@
       },
       (
         if id == 0 {
-          (0, 0)
+          pos
         } else if mol.vertical {
           (to: str(id - 1) + ".south", rel: (0, -.2em))
         } else {
@@ -124,9 +124,8 @@
         },
         name: name,
         {
-          set-origin(coord)
-          anchor("default", (0, 0))
-          draw-fragment-text(ctx, mol)
+          anchor("default", coord)
+          draw-fragment-text(ctx, mol, coord)
           if not side {
             anchor("from" + str(ctx.id), group-anchor)
           }

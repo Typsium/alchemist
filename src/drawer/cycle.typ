@@ -65,12 +65,7 @@
     let (center, min-radius, debug) = cycle-center-radius(ctx, cetz-ctx, vertex)
 		debug
     if name != none {
-      group(
-        name: name,
-        {
-          anchor("default", center)
-        },
-      )
+      anchor(name, center)
     }
     if center-arc != none {
       if min-radius == max-int {

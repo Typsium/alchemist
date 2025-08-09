@@ -52,16 +52,16 @@
   let radius = args.at("radius", default: ctx.config.lewis-single.radius)
   let gap = args.at("gap", default: ctx.config.lewis-single.gap)
   let offset = args.at("offset", default: ctx.config.lewis-single.offset)
-  if offset == "top" {
-    translate((0, gap))
+  let gap = if offset == "top" {
+    gap
   } else if offset == "bottom" {
-    translate((0, -gap))
+    -gap
   } else if offset != "center" {
     panic("Invalid position, expected 'top', 'bottom' or 'center'")
   }
   let fill = args.at("fill", default: ctx.config.lewis-single.fill)
   let stroke = args.at("stroke", default: ctx.config.lewis-single.stroke)
-  circle((0, 0), radius: radius, fill: fill, stroke: stroke)
+  circle((0, gap), radius: radius, fill: fill, stroke: stroke)
 })
 
 /// Draw a pair of electron around the fragment

@@ -94,31 +94,31 @@
   if coeff < 0 or coeff > 1 {
     panic("Invalid offset-coeff value: must be between 0 and 1")
   }
-  if offset == "right" {
-    translate((0, -gap))
+  let gap-offset = if offset == "right" {
+    -gap
   } else if offset == "left" {
-    translate((0, gap))
-  } else if offset == "center" { } else {
+    gap
+  } else if offset == "center" { 
+    0 
+  } else {
     panic("Invalid offset value: must be \"left\", \"right\" or \"center\"")
   }
 
-  translate((0, -gap))
   line(
     ..if offset == "right" {
       let x = length * (1 - coeff) / 2
-      ((x, 0), (x + length * coeff, 0))
+      ((x, -gap + gap-offset), (x + length * coeff, -gap + gap-offset))
     } else {
-      ((0, 0), (length, 0))
+      ((0, -gap + gap-offset), (length, -gap + gap-offset))
     },
     stroke: args.at("stroke", default: ctx.config.double.stroke),
   )
-  translate((0, 2 * gap))
   line(
     ..if offset == "left" {
       let x = length * (1 - coeff) / 2
-      ((x, 0), (x + length * coeff, 0))
+      ((x, gap + gap-offset), (x + length * coeff, gap + gap-offset))
     } else {
-      ((0, 0), (length, 0))
+      ((0, gap + gap-offset), (length, gap + gap-offset))
     },
     stroke: args.at("stroke", default: ctx.config.double.stroke),
   )
@@ -149,10 +149,8 @@
   import cetz.draw: *
   let gap = utils.convert-length(cetz-ctx, args.at("gap", default: ctx.config.triple.gap))
   line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.triple.stroke))
-  translate((0, -gap))
-  line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.triple.stroke))
-  translate((0, 2 * gap))
-  line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.triple.stroke))
+  line((0, -gap), (length, -gap), stroke: args.at("stroke", default: ctx.config.triple.stroke))
+  line((0, gap), (length, gap), stroke: args.at("stroke", default: ctx.config.triple.stroke))
 })
 
 /// Draw a filled cram between two fragments with the arrow pointing to the right
