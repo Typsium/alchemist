@@ -73,7 +73,7 @@ To start drawing molecules, you first need to initialise the drawing environment
 
 The main argument is a block of code that contains the drawing instructions. The block can also contain any cetz code to draw more complex structures, see @exemple-cez.
 
-#command("skeletize", arg(debug: false), arg(background: none), arg(config: (:)), arg("body"))[
+#command("skeletize", arg(debug: false), arg(background: none), arg(config: (:)), arg("body"), ret: content)[
   #argument("debug", types: true)[
     Display bounding boxes of the objects in the drawing environment.
   ]
@@ -88,11 +88,18 @@ The main argument is a block of code that contains the drawing instructions. The
   ]
 ]
 
+#command("skeletize-config", arg(config: (:)), ret: function)[
+  Create a #cmd[skeletize] function with the given configuration. The returned function uses this configuration as default.
+  #argument("config", types: (:))[
+    Configuration of the drawing environment. See @config.
+  ]
+]
+
 == Drawing a molecule directly in Cetz
 
 Sometimes, you may want to draw a molecule directly in cetz. To do so, you can use the #cmd[draw-skeleton] function. This function is what is used internally by the #cmd[skeletize] function.
 
-#command("draw-skeleton", arg(config: (:)), arg("body"))[
+#command("draw-skeleton", arg(config: (:)), arg("body"), ret: "drawable")[
   #argument("config", types: (:))[
     Configuration of the drawing environment. See @config.
   ]
@@ -105,6 +112,13 @@ Sometimes, you may want to draw a molecule directly in cetz. To do so, you can u
   #argument("mol-anchor", types: "", default: none)[
     Anchor of the group. It is working the same way as the `anchor` argument of the cetz `group` function. The `default` anchor
     of the molecule is the east anchor of the first atom or the starting point of the first link.
+  ]
+]
+
+#command("draw-skeleton-config", arg(config: (:)), ret: function)[
+  Create a #cmd[draw-skeleton] function with the given configuration. The returned function uses this configuration as default.
+  #argument("config", types: (:))[
+    Configuration of the drawing environment. See @config.
   ]
 ]
 
