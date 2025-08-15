@@ -13,7 +13,7 @@
         mol.colors.at(calc.min(id, mol.colors.len() - 1))
       }
     } else {
-      fragment-color
+      ctx.config.fragment-color
     }
 
     // draw atoms of the group one after the other from left to right
