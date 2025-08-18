@@ -15,6 +15,7 @@
     } else {
       ctx.config.fragment-color
     }
+    let fragment-font = ctx.config.fragment-font
 
     // draw atoms of the group one after the other from left to right
     content(
