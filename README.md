@@ -78,7 +78,7 @@ Alchemist uses cetz to draw the molecules. This means that you can draw cetz sha
 To start using alchemist, just use the following code:
 
 ```typ
-#import "@preview/alchemist:0.1.7": *
+#import "@preview/alchemist:0.1.8": *
 
 #skeletize({
   // Your molecule here
@@ -88,6 +88,10 @@ To start using alchemist, just use the following code:
 For more information, check the [manual](https://raw.githubusercontent.com/Robotechnic/alchemist/master/doc/manual.pdf).
 
 ## Changelog
+
+### 0.1.8
+
+- Fixed bus introduced in 0.1.7
 
 ### 0.1.7
 
