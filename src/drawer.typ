@@ -147,6 +147,7 @@
 
 #let draw-link-over(ctx, link, over, angle) = {
   let name = link.name + "-over"
+  let link-over-radius = ctx.config.link-over-radius
   let (over, length, radius) = if type(over) == str {
     (over, link-over-radius, link-over-radius)
   } else if type(over) == dictionary {
