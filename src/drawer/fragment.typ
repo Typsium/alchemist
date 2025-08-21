@@ -13,8 +13,9 @@
         mol.colors.at(calc.min(id, mol.colors.len() - 1))
       }
     } else {
-      fragment-color
+      ctx.config.fragment-color
     }
+    let fragment-font = ctx.config.fragment-font
 
     // draw atoms of the group one after the other from left to right
     content(
