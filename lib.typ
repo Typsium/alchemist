@@ -1,6 +1,7 @@
 #import "@preview/cetz:0.4.1"
 #import "src/default.typ": default
 #import "src/utils/utils.typ"
+#import "src/molecule/molecule.typ": molecule
 #import "src/drawer.typ"
 #import "src/drawer.typ": skeletize, draw-skeleton, skeletize-config, draw-skeleton-config
 #import "src/elements/links.typ": *
