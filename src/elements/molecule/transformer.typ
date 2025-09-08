@@ -53,7 +53,6 @@
     return (atom,)
   }
   
-  // String processing
   if type(atom) == str {
     // Pattern with function name followed by parentheses
     let func-pattern = regex("^[a-z-]+\(.*\)$")
@@ -93,43 +92,59 @@
       
       i += 1
     }
-    
     return elements
   }
-  
   return (atom,)
 }
 
-// Determine bond connection points based on angle
-#let get-bond-connection-points(angle, from-atom-length, to-atom-length) = {
+// Get atom priority and find connection point
+#let get-atom-connection-point(fragment, from-end: false) = {
+  let position = 0
+  for atom in fragment {
+    if atom == "C" or atom == "N" or atom == "O" {
+      return position
+    }
+    position += 1
+  }
+
+  return 0
+}
+
+// Determine bond connection points based on atom priority (for rings) or angle (for non-rings)
+#let get-bond-connection-points(angle, from-atom, to-atom, in-ring) = {
   if angle == none {
     return (from: none, to: none)
   }
   
-  let from-len = if from-atom-length <= 0 { 1 } else { from-atom-length }
-  let to-len = if to-atom-length <= 0 { 1 } else { to-atom-length }
-  
-  let normalized-angle = angle
-  while normalized-angle > 180deg { normalized-angle -= 360deg }
-  while normalized-angle < -180deg { normalized-angle += 360deg }
-  
-  // -90 < angle <= 90: left to right (from right edge, to left edge)
-  // Otherwise: right to left (from left edge, to right edge)
   let from-point = none
   let to-point = none
   
-  if normalized-angle > -90deg and normalized-angle <= 90deg {
-    from-point = from-len - 1  // Right edge (0-indexed)
-    to-point = 0  // Left edge
+  // Outside ring: use angle to determine connection direction
+  while angle > 180deg { angle -= 360deg }
+  while angle < -180deg { angle += 360deg }
+  
+  if in-ring or angle == 90deg or angle == -90deg {
+    // Inside ring: use atom priority to determine connection points
+    let from-pos = get-atom-connection-point(from-atom)
+    let to-pos = get-atom-connection-point(to-atom)
+    
+    // Use the position from the connection point info
+    from-point = from-pos
+    to-point = to-pos
+  } else if angle > -90deg and angle < 90deg {
+    // Left to right connection
+    from-point = calc.max(0, from-atom.len() - 1)
+    to-point = 0
   } else {
-    from-point = 0  // Left edge
-    to-point = to-len - 1  // Right edge (0-indexed)
+    // Right to left connection
+    from-point = 0
+    to-point = calc.max(0, to-atom.len() - 1)
   }
   
   return (from: from-point, to: to-point)
 }
 
-#let get-bond-with-angle(bond-type, angle: none, from-atom-length: none, to-atom-length: none) = {
+#let get-bond-with-angle(bond-type, angle: none, from-atom: none, to-atom: none, in-ring: false) = {
   let bond = if bond-type == "double" {
     double
   } else if bond-type == "triple" {
@@ -146,21 +161,38 @@
     single
   }
   
-  // Calculate connection points (only when from/to are specified)
-  if from-atom-length != none and to-atom-length != none {
-    let connection-points = get-bond-connection-points(angle, from-atom-length, to-atom-length)
-    // TODO: Add processing to use connection-points
+  // Calculate connection points and create bond with appropriate parameters
+  let bond-args = (:)
+  
+  // Add angle if specified (now absolute angle)
+  if angle != none {
+    bond-args.insert("absolute", angle)
   }
   
-  // Set angle and connection points
-  if angle != none {
-    bond(relative: angle)
+  // Add connection points if atoms are specified
+  if from-atom != none and to-atom != none {
+    let connection-points = get-bond-connection-points(
+      angle, from-atom, to-atom, in-ring
+    )
+    
+    // Add connection points to bond arguments
+    if connection-points.from != none {
+      bond-args.insert("from", connection-points.from)
+    }
+    if connection-points.to != none {
+      bond-args.insert("to", connection-points.to)
+    }
+  }
+  
+  // Return bond with all calculated parameters
+  if bond-args.len() > 0 {
+    bond(..bond-args)
   } else {
     bond()
   }
 }
 
-#let build-molecule-structure(graph, node-id, visited, angles) = {
+#let build-molecule-structure(graph, node-id, visited, angles, in-ring: false) = {
   if node-id in visited { return () }
   visited.push(node-id)
   
@@ -192,185 +224,77 @@
     let ring-rotation = calculate-ring-rotation(node-id, graph, angles)
     
     let cycle-body = ()
-    let leading-fragment = none
     
     // If ring has content, expand it
-    if ring-content != none and ring-content != (:) {
-      // ring-content contains complete graph structure (nodes, edges, root, etc.)
-      if ring-content.at("root", default: none) != none {
-        // Follow links to find first and last of linear chain
-        let chain-nodes = ()
-        let current = ring-content.root
-        let visited-chain = ()
-        
-        // Follow the chain
-        while current != none and current not in visited-chain {
-          visited-chain.push(current)
-          let node-data = ring-content.nodes.at(current)
-          chain-nodes.push((id: current, node: node-data))
-          
-          // Find next node
-          let next = none
-          for edge in ring-content.edges {
-            if edge.from == current and edge.to not in visited-chain {
-              next = edge.to
-              break
-            }
-          }
-          current = next
-        }
-        
-        // Check if first and last nodes are fragments
-        if chain-nodes.len() > 0 {
-          let first-node = chain-nodes.at(0)
-          let last-node = chain-nodes.at(-1)
-          
-          // If first or last is a fragment, extract it
-          if first-node.node.type == "fragment" or (chain-nodes.len() > 1 and last-node.node.type == "fragment") {
-            // Extract one as leading-fragment (prioritize first)
-            let fragment-node = if first-node.node.type == "fragment" { first-node } else { last-node }
-            let atom-raw = fragment-node.node.data.atom
-            let atom-content = process-atom(atom-raw)
-            let count = if type(atom-content) == array { atom-content.len() } else { 1 }
-            
-            leading-fragment = (
-              type: "fragment",
-              name: none,
-              atoms: atom-content,
-              colors: none,
-              links: (:),
-              lewis: (),
-              vertical: false,
-              count: count,
-            )
-            
-            // Build cycle-body with non-fragment elements
-            let ring-angles = calculate-all-angles(ring-content)
-            let ring-visited = (fragment-node.id,)
-            
-            // Start from the node after the fragment
-            let found-next = false
-            for edge in ring-content.edges {
-              if edge.from == fragment-node.id {
-                // Add bond (don't use from/to within cycle)
-                let bond = get-bond-with-angle(
-                  edge.data.at("bondType", default: "single"),
-                  angle: ring-angles.at(str(edge.from) + "->" + str(edge.to), default: none)
-                )
-                cycle-body += bond
-                
-                // Expand from next node
-                let next-elements = build-molecule-structure(ring-content, edge.to, ring-visited, ring-angles)
-                cycle-body += next-elements
-                found-next = true
-                break
-              }
-            }
-            
-            // If fragment is at the end, no edges exist, so add default bonds
-            if not found-next and cycle-body == () {
-              // Add single bonds for ring size
-              for i in range(ring-size) {
-                cycle-body += single()
-              }
-            }
-          } else {
-            // If no fragment, proceed normally
-            let ring-angles = calculate-all-angles(ring-content)
-            let ring-visited = ()
-            let ring-elements = build-molecule-structure(ring-content, ring-content.root, ring-visited, ring-angles)
-            cycle-body = ring-elements
-          }
+    if ring-content != none and ring-content != (:) and ring-content.at("root", default: none) != none {
+      let ring-angles = calculate-all-angles(ring-content, is-ring: true)
+      let ring-visited = ()
+      let ring-elements = build-molecule-structure(ring-content, ring-content.root, ring-visited, ring-angles, in-ring: true)
+      
+      // Move leading and trailing fragments
+      let number = 0
+      for i in range(ring-elements.len()) {
+        let element = ring-elements.at(i)
+        let type = element.at("type", default: none)
+
+        if type == "fragment" and (number == 0 or number == ring-size) {
+          elements += (element, )
         } else {
-          // If no chain, use default
-          for i in range(ring-size) {
-            cycle-body += single()
+          if number == ring-size { panic("bonds is too many for ring size: " + str(ring-size)) }
+          if type == "link" { number += 1 }
+          if type == "branch" {
+            let _ = element.at("body").at(0).remove("absolute")
           }
-        }
-      } else if ring-content.at("nodes", default: (:)).len() == 0 {
-        // If no nodes, default to single bonds only
-        for i in range(ring-size) {
-          cycle-body += single()
+          cycle-body += (element,)
         }
       }
     } else {
-      // If no content, default to single bonds only
       for i in range(ring-size) {
         cycle-body += single()
       }
     }
     
-    // Mark this ring node itself as visited
     visited.push(node-id)
-    
-    // If leading-fragment exists, add it first
-    if leading-fragment != none {
-      elements += (leading-fragment,)
-    }
     
     elements += create-cycle(ring-size, cycle-body, args: (relative: ring-rotation))
   }
   
-  let main-edges = ()
-  let branch-edges = ()
-  
+  // Process all edges from current node
   for edge in graph.edges {
-    if edge.from == node-id and edge.to not in visited {
-      if edge.data.at("role", default: "main") == "main" {
-        main-edges.push(edge)
-      } else if edge.data.role == "branch" {
-        branch-edges.push(edge)
-      }
+    if edge.from != node-id or edge.to in visited { continue }
+
+    let role = edge.data.at("role", default: "main")
+    let edge-key = str(edge.from) + "->" + str(edge.to)
+    let angle = angles.at(edge-key, default: none)
+    
+    // Get lengths of connecting atoms
+    let from-atom = if node.type == "fragment" { process-atom(node.data.atom) } else { "" }
+    let to-node = graph.nodes.at(edge.to)
+    let to-atom = if to-node.type == "fragment" { process-atom(to-node.data.atom) } else { "" }
+
+    if role == "branch" {
+      in-ring = false
     }
-  }
-  
-  for edge in branch-edges {
-    // Get edge angle
-    let edge-key = str(edge.from) + "->" + str(edge.to)
-    let angle = angles.at(edge-key, default: none)
-    
-    // Get lengths of connecting atoms
-    let from-atom = if node.type == "fragment" { node.data.atom } else { "" }
-    let to-node = graph.nodes.at(edge.to)
-    let to-atom = if to-node.type == "fragment" { to-node.data.atom } else { "" }
-    
-    let from-length = if from-atom == "" { 1 } else if type(from-atom) == str { from-atom.len() } else { 1 }
-    let to-length = if to-atom == "" { 1 } else if type(to-atom) == str { to-atom.len() } else { 1 }
-    
-    let bond = get-bond-with-angle(
-      edge.data.at("bondType", default: "single"), 
-      angle: angle,
-      from-atom-length: from-length,
-      to-atom-length: to-length
-    )
-    let branch-elements = build-molecule-structure(graph, edge.to, visited, angles)
-    
-    let branch-body = bond + branch-elements
-    elements += create-branch(branch-body, args: (relative: angle))
-  }
-  
-  for edge in main-edges {
-    let edge-key = str(edge.from) + "->" + str(edge.to)
-    let angle = angles.at(edge-key, default: none)
-    
-    // Get lengths of connecting atoms
-    let from-atom = if node.type == "fragment" { node.data.atom } else { "" }
-    let to-node = graph.nodes.at(edge.to)
-    let to-atom = if to-node.type == "fragment" { to-node.data.atom } else { "" }
-    
-    let from-length = if from-atom == "" { 1 } else if type(from-atom) == str { from-atom.len() } else { 1 }
-    let to-length = if to-atom == "" { 1 } else if type(to-atom) == str { to-atom.len() } else { 1 }
     
     let bond = get-bond-with-angle(
       edge.data.at("bondType", default: "single"),
       angle: angle,
-      from-atom-length: from-length,
-      to-atom-length: to-length
+      from-atom: from-atom,
+      to-atom: to-atom,
+      in-ring: in-ring
     )
-    elements += bond
     
-    let next-elements = build-molecule-structure(graph, edge.to, visited, angles)
-    elements += next-elements
+    let next-elements = build-molecule-structure(graph, edge.to, visited, angles, in-ring: in-ring)
+
+    // Different handling for main vs branch
+    if role == "branch" {
+      let branch-body = bond + next-elements
+      elements += create-branch(branch-body)
+    } else {
+      // Main edge
+      elements += bond
+      elements += next-elements
+    }
   }
   
   return elements
@@ -395,9 +319,7 @@
   }
   
   let angles = calculate-all-angles(graph)
-  
-  let visited = ()
-  let elements = build-molecule-structure(graph, root, visited, angles)
+  let elements = build-molecule-structure(graph, root, (), angles, in-ring: false)
   
   return elements
 }
