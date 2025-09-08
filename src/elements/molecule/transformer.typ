@@ -1,6 +1,5 @@
-#import "../elements/links.typ": single, double, triple, cram-filled-right, cram-filled-left, cram-dashed-right, cram-dashed-left
-
-#import "iupac-angle.typ": *
+#import "../links.typ": single, double, triple, cram-filled-right, cram-filled-left, cram-dashed-right, cram-dashed-left
+#import "iupac-angle.typ": calculate-all-angles, calculate-ring-rotation
 
 // Inline branch function to avoid circular reference
 #let create-branch(body, args: (:)) = {
