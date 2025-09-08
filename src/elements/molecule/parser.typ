@@ -7,7 +7,7 @@
   fragment      ::= ATOM_STRING label? options?
   bond          ::= BOND_SYMBOL bond_label? options?
   branch        ::= "(" bond molecule ")"
-  ring          ::= "*" DIGIT+ "(" molecule? ")" label? options?
+  ring          ::= "@" DIGIT+ "(" molecule? ")" label? options?
 
   label         ::= ":" IDENTIFIER
   bond_label    ::= "::" IDENTIFIER
@@ -291,7 +291,7 @@
 #let parse-ring(ctx, parse-mol-fn) = {
   ctx = skip-whitespace(ctx)
   
-  if peek-char(ctx) != "*" { return (none, ctx) }
+  if peek-char(ctx) != "@" { return (none, ctx) }
   ctx = advance(ctx)
   
   let (sizeStr, newCtx) = parse-digits(ctx)
