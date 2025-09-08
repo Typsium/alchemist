@@ -63,9 +63,9 @@
 
 // Calculate branch angles (relative angles)
 // Equally spaced in appropriate range based on situation
-#let calculate-branch-angles(node-id, graph, edge-index, is-root-node, main-chain-length, branch-edges, has-incoming-main, has-outgoing-main) = {
+#let calculate-branch-angles(node-id, graph, edge-index, is-root-node, main-chain-length, branch-edges, has-incoming-main, has-outgoing-main, is-in-branch: false) = {
   let branch-angles = ()
-  let total-branches = branch-edges.len()
+  let total-branches = branch-edges.len() + if is-in-branch { 1 } else { 0 }
   
   if total-branches == 0 { return branch-angles }
   
@@ -107,7 +107,7 @@
 }
 
 // Calculate angles for all edges from node
-#let calculate-edge-angles(node-id, graph, edge-index, is-root-node, main-chain-length, node-info: none) = {
+#let calculate-edge-angles(node-id, graph, edge-index, is-root-node, main-chain-length, node-info: none, is-in-branch: false) = {
   // Get edges and hybridization from node info (calculate defaults if not present)
   let edges = node-info.at("edges", default: graph.edges.filter(e => e.from == node-id))
   
@@ -158,7 +158,7 @@
   if branch-edges.len() > 0 {
     let branch-angles-list = calculate-branch-angles(
       node-id, graph, edge-index, is-root-node, main-chain-length, 
-      branch-edges, has-incoming-main, has-outgoing-main
+      branch-edges, has-incoming-main, has-outgoing-main, is-in-branch: is-in-branch
     )
     for (index, edge) in branch-edges.enumerate() {
       let angle = branch-angles-list.at(index)
@@ -197,7 +197,7 @@
 }
 
 // Traverse graph and calculate angles
-#let traverse-and-calculate(graph, node-id, visited, edge-index, angles, is-root, node-cache: none) = {
+#let traverse-and-calculate(graph, node-id, visited, edge-index, angles, is-root, node-cache: none, is-in-branch: false) = {
   if node-id in visited { return (angles, edge-index) }
   visited.push(node-id)
   
@@ -212,7 +212,7 @@
   
   let node-angles = calculate-edge-angles(
     node-id, graph, edge-index, is-root, main-chain-length,
-    node-info: node-info
+    node-info: node-info, is-in-branch: is-in-branch
   )
   
   // Merge angles (more efficient merging)
@@ -229,12 +229,11 @@
       if role == "main" {
         // For main chain, advance the index
         next-edge-index = next-edge-index + 1
-        let (new-angles, new-index) = traverse-and-calculate(graph, edge.to, visited, next-edge-index, angles, false, node-cache: node-cache)
+        let (new-angles, new-index) = traverse-and-calculate(graph, edge.to, visited, next-edge-index, angles, false, node-cache: node-cache, is-in-branch: is-in-branch)
         angles = new-angles
         next-edge-index = new-index
       } else if role == "branch" {
-        // For branches, start with new index
-        let (new-angles, _) = traverse-and-calculate(graph, edge.to, visited, 0, angles, false, node-cache: node-cache)
+        let (new-angles, _) = traverse-and-calculate(graph, edge.to, visited, 0, angles, false, node-cache: node-cache, is-in-branch: true)
         angles = new-angles
       }
     }
@@ -243,10 +242,50 @@
   return (angles, next-edge-index)
 }
 
+// Convert relative angles to absolute angles
+#let relative-to-absolute(angles, graph) = {
+  let absolute-angles = (:)
+  let node-absolute-angles = (:)  // Track cumulative angle for each node
+  
+  // Start from root with 0deg absolute angle
+  let root = graph.at("root", default: none)
+  if root == none and graph.nodes.len() > 0 {
+    root = if "node_0" in graph.nodes { "node_0" } else { graph.nodes.keys().first() }
+  }
+  
+  if root != none {
+    node-absolute-angles.insert(root, 0deg)
+  }
+  
+  // Convert each relative angle to absolute
+  for (edge-key, relative-angle) in angles {
+    // Parse edge key to get from and to nodes
+    let parts = edge-key.split("->")
+    if parts.len() == 2 {
+      let from-node = parts.at(0)
+      let to-node = parts.at(1)
+      
+      // Get the absolute angle of the from node (default to 0deg)
+      let from-absolute = node-absolute-angles.at(from-node, default: 0deg)
+      
+      // Calculate absolute angle by adding relative to from node's absolute
+      let absolute-angle = from-absolute + relative-angle
+      
+      // Store for this edge
+      absolute-angles.insert(edge-key, absolute-angle)
+      
+      // Update the to-node's absolute angle for next calculations
+      node-absolute-angles.insert(to-node, absolute-angle)
+    }
+  }
+  
+  return absolute-angles
+}
+
 // ===== Main Functions =====
 
-// Calculate angles for entire graph
-#let calculate-all-angles(graph) = {
+// Calculate relative angles for entire graph
+#let calculate-all-relative-angles(graph, is-ring: false) = {
   // Efficient search for root node
   let root = graph.at("root", default: none)
   if root == none and graph.nodes.len() > 0 {
@@ -280,10 +319,18 @@
   let angles = (:)
   let (final-angles, _) = traverse-and-calculate(
     graph, root, visited, 0, angles, true, 
-    node-cache: if node-cache.len() > 0 { node-cache } else { none }
+    node-cache: if node-cache.len() > 0 { node-cache } else { none },
+    is-in-branch: false
   )
   
   return final-angles
+}
+
+// Calculate absolute angles for entire graph
+#let calculate-all-angles(graph, is-ring: false) = {
+  let relative-angles = calculate-all-relative-angles(graph, is-ring: is-ring)
+  
+  return relative-to-absolute(relative-angles, graph)
 }
 
 // Calculate ring rotation angle (using relative angles only)
