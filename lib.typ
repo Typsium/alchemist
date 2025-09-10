@@ -1,7 +1,7 @@
 #import "@preview/cetz:0.4.1"
 #import "src/default.typ": default
 #import "src/utils/utils.typ"
-#import "src/elements/molecule/molecule.typ": molecule as mol
+#import "src/elements/molecule/molecule.typ": molecule
 #import "src/drawer.typ"
 #import "src/drawer.typ": skeletize, draw-skeleton, skeletize-config, draw-skeleton-config
 #import "src/elements/links.typ": *
@@ -79,7 +79,6 @@
     ),
   )
 }
-#let molecule(name: none, links: (:), lewis: (), vertical: false, mol) = fragment(name: name, links: links, lewis: lewis, vertical: vertical, mol)
 
 /// === Hooks
 /// Create a hook in the fragment. It allows to connect links to the place where the hook is.
