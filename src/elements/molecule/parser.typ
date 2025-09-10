@@ -1,10 +1,24 @@
 /* 
-  molecule      ::= node? (bond_node_pair)*
+  // reaction syntax
+  input         ::= reaction
+  reaction      ::= side (ARROW_EXPR side)*
+  side          ::= term ("+" term)*
+  term          ::= COEFFICIENT? molecule
+  COEFFICIENT   ::= DIGIT+
 
-  bond_node_pair::= bond node?
-  node          ::= (fragment | ring) branch*
+  // arrow expression
+  ARROW_EXPR    ::= COND_BEFORE? ARROW COND_AFTER?
+  COND_BEFORE   ::= "[" TEXT "]"
+  COND_AFTER    ::= "[" TEXT "]"
+  ARROW         ::= "->" | "<=>" | "⇌" | "→" | "⇄" | "=>" | "-->"
 
-  fragment      ::= ATOM_STRING label? options?
+  // molecule syntax
+  molecule      ::= unit (bond unit)*
+  unit          ::= (node | implicit_node) branch*
+  node          ::= fragment | ring
+  implicit_node ::= ε                             // empty node
+
+  fragment      ::= FRAGMENT label? options?
   bond          ::= BOND_SYMBOL bond_label? options?
   branch        ::= "(" bond molecule ")"
   ring          ::= "@" DIGIT+ "(" molecule? ")" label? options?
@@ -13,7 +27,30 @@
   bond_label    ::= "::" IDENTIFIER
   options       ::= "(" key_value_pair ("," key_value_pair)* ")"
   key_value_pair::= IDENTIFIER ":" value
-  value         ::= STRING | NUMBER | IDENTIFIER
+
+  // FRAGMENT definition
+  FRAGMENT      ::= MOLECULE | ABBREVIATION
+  MOLECULE      ::= MOLECULE_PART+ CHARGE?
+  MOLECULE_PART ::= ELEMENT_GROUP | PARENTHETICAL | COMPLEX
+  ELEMENT_GROUP ::= ISOTOPE? ELEMENT SUBSCRIPT?
+  ISOTOPE       ::= "^" DIGIT+
+  ELEMENT       ::= [A-Z][a-z]?
+  SUBSCRIPT     ::= DIGIT+
+  PARENTHETICAL ::= "(" MOLECULE ")" SUBSCRIPT?
+  COMPLEX       ::= "[" MOLECULE "]"
+  CHARGE        ::= "^" DIGIT? ("+" | "-")
+  ABBREVIATION  ::= [a-z][A-Za-z]+
+
+  // bond syntax
+  BOND_SYMBOL   ::= "-" | "=" | "#" | ">" | "<" | ":>" | "<:" | "|>" | "<|"
+
+  // remote connection syntax
+  remote_connection ::= ":" IDENTIFIER "=" ":" IDENTIFIER options?
+
+  // Basic tokens
+  TEXT          ::= [^[\]]+ | [^\s\(\)\[\]:,=\-<>#]+
+  IDENTIFIER    ::= [a-zA-Z_][a-zA-Z0-9_]*
+  DIGIT         ::= [0-9]
 */
 
 #let create-parser-context(input, config: (:)) = {
