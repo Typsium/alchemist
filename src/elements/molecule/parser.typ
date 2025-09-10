@@ -13,11 +13,13 @@
   // molecule syntax
   molecule      ::= unit (bond unit)*
   unit          ::= (node | implicit_node) branch*
-  node          ::= fragment | ring
+  node          ::= fragment | ring | label
   implicit_node ::= ε
 
   fragment      ::= FRAGMENT label? options?
   bond          ::= BOND_SYMBOL bond_label? options?
+  BOND_SYMBOL   ::= "-" | "=" | "#" | ">" | "<" | ":>" | "<:" | "|>" | "<|"
+
   branch        ::= "(" bond molecule ")"
   ring          ::= "@" DIGIT+ "(" molecule? ")" label? options?
 
@@ -38,12 +40,6 @@
   COMPLEX       ::= "[" MOLECULE "]"
   CHARGE        ::= "^" DIGIT? ("+" | "-")
   ABBREVIATION  ::= [a-z][A-Za-z]+
-
-  // bond syntax
-  BOND_SYMBOL   ::= "-" | "=" | "#" | ">" | "<" | ":>" | "<:" | "|>" | "<|"
-
-  // remote connection syntax
-  remote_connection ::= ":" IDENTIFIER "=" ":" IDENTIFIER options?
 
   // Basic tokens
   TEXT          ::= [^[\]]+ | [^\s\(\)\[\]:,=\-<>#]+
