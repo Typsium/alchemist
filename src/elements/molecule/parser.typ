@@ -1,22 +1,20 @@
 /* 
   // reaction syntax
   input         ::= reaction
-  reaction      ::= side (ARROW_EXPR side)*
-  side          ::= term ("+" term)*
+  reaction      ::= term (OPERATOR term)*
   term          ::= COEFFICIENT? molecule
   COEFFICIENT   ::= DIGIT+
 
-  // arrow expression
-  ARROW_EXPR    ::= COND_BEFORE? ARROW COND_AFTER?
-  COND_BEFORE   ::= "[" TEXT "]"
-  COND_AFTER    ::= "[" TEXT "]"
-  ARROW         ::= "->" | "<=>" | "⇌" | "→" | "⇄" | "=>" | "-->"
+  // operator expression
+  OPERATOR      ::= CONDITION? OP_SYMBOL CONDITION?
+  CONDITION     ::= "[" TEXT "]"
+  OP_SYMBOL     ::= "->" | "<=>" | "⇌" | "→" | "⇄" | "=>" | "-->" | "+" | MATH_TEXT
 
   // molecule syntax
   molecule      ::= unit (bond unit)*
   unit          ::= (node | implicit_node) branch*
   node          ::= fragment | ring
-  implicit_node ::= ε                             // empty node
+  implicit_node ::= ε
 
   fragment      ::= FRAGMENT label? options?
   bond          ::= BOND_SYMBOL bond_label? options?
@@ -29,7 +27,7 @@
   key_value_pair::= IDENTIFIER ":" value
 
   // FRAGMENT definition
-  FRAGMENT      ::= MOLECULE | ABBREVIATION
+  FRAGMENT      ::= MOLECULE | ABBREVIATION | MATH_TEXT
   MOLECULE      ::= MOLECULE_PART+ CHARGE?
   MOLECULE_PART ::= ELEMENT_GROUP | PARENTHETICAL | COMPLEX
   ELEMENT_GROUP ::= ISOTOPE? ELEMENT SUBSCRIPT?
