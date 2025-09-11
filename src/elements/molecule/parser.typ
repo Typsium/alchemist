@@ -420,6 +420,11 @@
     ),
     parts => {
       let (_, digits, mol, lbl, opts) = parts
+      if type(mol) == array {
+        let (_, mol, _) = mol
+      } else {
+        mol = none
+      }
       (
         type: "cycle",
         faces: int(digits.join()),
@@ -484,7 +489,10 @@
         (
           type: "molecule",
           first: first,
-          rest: rest
+          rest: rest.map(unit => {
+            let (bond, unit) = unit 
+            (bond: bond, unit: unit)
+          })
         )
       }
     ),
@@ -564,15 +572,13 @@
     parts => {
       let (first, rest) = parts
       let terms = (first,)
-      let edges = ()
       for (operator, term) in rest {
+        terms.push(operator)
         terms.push(term)
-        edges.push((..operator, from: terms.len() - 1, to: terms.len()))
       }
       (
         type: "reaction",
-        terms: terms,
-        edges: edges
+        terms: terms
       )
     }
   ),
