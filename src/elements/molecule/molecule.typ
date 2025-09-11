@@ -4,10 +4,10 @@
 #let molecule(content, name: none, ..args) = {
   let parsed = alchemist-parser(content)
   if not parsed.success {
-    panic([
-      Failed to parse #content reaction: #parsed.error
-      #repr(parsed)
-    ])
+    // Display error inline
+    return text(fill: red)[
+      Failed to parse "#content": #parsed.error
+    ]
   }
 
   let reaction = parsed.value

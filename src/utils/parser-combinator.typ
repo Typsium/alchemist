@@ -238,7 +238,7 @@
   
   for i in range(n) {
     let r = (p.run)(current)
-    if not r.ok { return err("expected " + str(n) + " items, got " + str(i), current) }
+    if not r.ok { return err("expected " + repr(n) + " items, got " + repr(i), current) }
     results.push(r.value)
     current = r.state
   }
@@ -275,7 +275,14 @@
 #let label(p, lbl) = parser(lbl, s => {
   let r = (p.run)(s)
   if not r.ok {
-    err(lbl + " failed: " + r.error, s)
+    // Create a more descriptive error message
+    let context_str = if s.pos < s.len {
+      let preview = (s.peek)(s, n: calc.min(10, s.len - s.pos))
+      " at '" + preview + "'"
+    } else {
+      " at end of input"
+    }
+    err("Expected " + lbl + context_str + " (got: " + r.error + ")", s)
   } else {
     r
   }
@@ -322,7 +329,14 @@
   (
     success: r.ok,
     value: if r.ok { r.value } else { none },
-    error: if not r.ok { r.error } else { none },
+    error: if not r.ok { 
+      let pos_info = if r.state.pos > 0 {
+        " (at position " + repr(r.state.pos) + ")"
+      } else {
+        ""
+      }
+      r.error + pos_info
+    } else { none },
     rest: (r.state.remaining)(r.state),
   )
 }

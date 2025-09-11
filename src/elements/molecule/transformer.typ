@@ -1,4 +1,3 @@
-// Simple transformer for new parser structure with angles already calculated
 #import "iupac-angle.typ": calculate_angles
 #import "../links.typ": single, double, triple, cram-filled-right, cram-filled-left, cram-dashed-right, cram-dashed-left
 

@@ -169,7 +169,7 @@
     seq(char("^"), some(digit)),
     parts => {
       let (_, digits) = parts
-      (type: "isotope", value: int(digits.join()))
+      int(digits.join())
     }
   ),
   "isotope notation (e.g., ^14, ^235)"
@@ -287,6 +287,7 @@
   math-text-parser,
 )
 
+// Atoms to math content processor
 #let process-atom(parts) = {
   let type = parts.type
 
@@ -365,7 +366,7 @@
 // ==================== Rings ====================
 
 #let ring-parser(mol-parser) = label(
-  lazy(() => map(
+  map(
     seq(
       char("@"), some(digit),
       optional(seq(char("("), mol-parser, char(")"))),
@@ -387,7 +388,7 @@
         options: opts
       )
     }
-  )),
+  ),
   "ring notation (e.g., @6, @5(C-C-C-C-C))"
 )
 
@@ -527,6 +528,40 @@
 // ==================== Parse Functions ====================
 
 #let alchemist-parser(input) = {
-  let full = map(seq(reaction-parser, eof()), r => r.at(0))
-  parse(full, input)
+  let reaction_result = parse(reaction-parser, input)
+  
+  if not reaction_result.success {
+    return reaction_result
+  }
+  
+  if reaction_result.rest != "" {
+    let rest = reaction_result.rest
+    let preview_len = calc.min(10, rest.len())
+    let preview = rest.slice(0, preview_len)
+    
+    let first_char = rest.at(0)
+    let error_msg = if first_char >= "0" and first_char <= "9" {
+      "Unexpected number '" + preview + "' - numbers must be part of subscripts, isotopes, or ring sizes"
+    } else if first_char == "&" or first_char == "!" or first_char == "%" {
+      "Invalid character '" + first_char + "' - not a valid bond or atom symbol"
+    } else if first_char == "@" {
+      "Invalid ring notation starting with '" + preview + "' - expected @N where N is a number"
+    } else if first_char == "^" {
+      "Invalid isotope or charge notation starting with '" + preview + "'"
+    } else if first_char == "-" or first_char == "=" or first_char == "#" {
+      "Unexpected bond '" + first_char + "' - bonds must connect atoms"
+    } else {
+      "Unexpected content '" + preview + "' after valid molecule"
+    }
+    
+    return (
+      success: false,
+      value: none,
+      error: error_msg + " (at position " + repr(input.len() - rest.len()) + ")",
+      rest: rest
+    )
+  }
+  
+  // Success - all input was consumed
+  return reaction_result
 }
