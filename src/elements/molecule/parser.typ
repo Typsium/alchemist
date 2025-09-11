@@ -29,15 +29,15 @@
   key_value_pair::= IDENTIFIER ":" value
 
   // FRAGMENT definition
-  FRAGMENT      ::= MOLECULE | ABBREVIATION | MATH_TEXT
-  MOLECULE      ::= MOLECULE_PART+ CHARGE?
-  MOLECULE_PART ::= ELEMENT_GROUP | PARENTHETICAL | COMPLEX
+  FRAGMENT      ::= ATOMS | ABBREVIATION | MATH_TEXT
+  ATOMS         ::= ATOMS_PART+ CHARGE?
+  ATOMS_PART    ::= ELEMENT_GROUP | PARENTHETICAL | COMPLEX
   ELEMENT_GROUP ::= ISOTOPE? ELEMENT SUBSCRIPT?
   ISOTOPE       ::= "^" DIGIT+
   ELEMENT       ::= [A-Z][a-z]?
   SUBSCRIPT     ::= DIGIT+
-  PARENTHETICAL ::= "(" MOLECULE ")" SUBSCRIPT?
-  COMPLEX       ::= "[" MOLECULE "]"
+  PARENTHETICAL ::= "(" ATOMS ")" SUBSCRIPT?
+  COMPLEX       ::= "[" ATOMS "]"
   CHARGE        ::= "^" DIGIT? ("+" | "-")
   ABBREVIATION  ::= [a-z][A-Za-z]+
 
@@ -47,703 +47,541 @@
   DIGIT         ::= [0-9]
 */
 
-#let create-parser-context(input, config: (:)) = {
-  let mainInput = input
-  let remoteConnections = ()
+#import "../../utils/parser-combinator.typ": *
+
+// ==================== Utilities ====================
+
+#let digit = satisfy(c => c >= "0" and c <= "9", name: "digit")
+#let letter = satisfy(c => (c >= "a" and c <= "z") or (c >= "A" and c <= "Z"), name: "letter")
+#let uppercase = satisfy(c => c >= "A" and c <= "Z", name: "uppercase")
+#let lowercase = satisfy(c => c >= "a" and c <= "z", name: "lowercase")
+#let alphanum = satisfy(c => {
+  (c >= "0" and c <= "9") or (c >= "a" and c <= "z") or (c >= "A" and c <= "Z")
+}, name: "alphanum")
+#let whitespace = one-of(" \t\n\r")
+#let ws = many(whitespace)
+#let space = one-of(" \t")
+#let newline = choice(str("\r\n"), char("\n"))
+#let lexeme(p) = map(seq(p, ws), r => r.at(0))
+#let token(s) = lexeme(str(s))
+
+// Integer
+#let integer = {
+  let sign = optional(one-of("+-"))
+  let digits = some(digit)
   
-  if type(input) == content {
-    let lines = input.text.split("\n").filter(line => line.trim() != "")
-    if lines.len() > 0 {
-      mainInput = lines.at(0)
-      remoteConnections = lines.slice(1)
-    }
-  } else if type(input) == str {
-    mainInput = input
-  } else {
-    mainInput = str(input)
-  }
+  map(seq(sign, digits), r => {
+    let (s, d) = r
+    let n = int(d.join())
+    if s == "-" { -n } else { n }
+  })
+}
+
+// Identifier
+#let identifier = {
+  let first = choice(letter, char("_"))
+  let rest = many(choice(alphanum, char("_")))
   
-  (
-    input: mainInput,
-    position: 0,
-    length: mainInput.len(),
-    graph: (
-      nodes: (:),
-      edges: (),
-      nodeCounter: 0,
-      edgeCounter: 0,
-      root: none,
-      labels: (:),
-      bondLabels: (:),
+  map(seq(first, rest), r => {
+    let (f, rs) = r
+    f + rs.join()
+  })
+}
+
+// String with escapes
+#let string-lit(quote: "\"") = {
+  let escape = map(seq(char("\\"), any()), r => {
+    let (_, c) = r
+    if c == "n" { "\n" }
+    else if c == "t" { "\t" }
+    else if c == "r" { "\r" }
+    else if c == "\\" { "\\" }
+    else if c == quote { quote }
+    else { c }
+  })
+  
+  let normal = none-of(quote + "\\")
+  let char-parser = choice(escape, normal)
+  
+  map(between(char(quote), char(quote), many(char-parser)), chars => chars.join())
+}
+
+// ==================== Fragment Components ====================
+
+// ELEMENT ::= [A-Z][a-z]?
+#let element-parser = label(
+  map(
+    seq(
+      uppercase,
+      optional(lowercase),
     ),
-    lastNodeId: none,
-    config: config,
-    remoteConnections: remoteConnections,
-  )
-}
+    parts => {
+      let (upper, lower) = parts
+      if lower != none { upper + lower } else { upper }
+    }
+  ),
+  "element symbol (e.g., H, Ca, Fe)"
+)
 
-// Create sub-context (for parsing ring content)
-#let create-sub-context(parent-ctx) = {
-  (
-    input: parent-ctx.input,
-    position: parent-ctx.position,
-    length: parent-ctx.length,
-    graph: (
-      nodes: (:),
-      edges: (),
-      nodeCounter: 0,
-      edgeCounter: 0,
-      root: none,
-      labels: (:),
-      bondLabels: (:),
+// SUBSCRIPT ::= DIGIT+
+#let subscript-parser = label(
+  map(
+    some(digit),
+    digits => int(digits.join())
+  ),
+  "subscript number"
+)
+
+// ISOTOPE ::= "^" DIGIT+
+#let isotope-parser = label(
+  map(
+    seq(char("^"), some(digit)),
+    parts => {
+      let (_, digits) = parts
+      (type: "isotope", value: int(digits.join()))
+    }
+  ),
+  "isotope notation (e.g., ^14, ^235)"
+)
+
+// CHARGE ::= "^" DIGIT? ("+" | "-")
+#let charge-parser = label(
+  map(
+    seq(char("^"), optional(digit), choice(char("+"), char("-"))),
+    parts => {
+      let (_, d, sign) = parts
+      d + sign
+    }
+  ),
+  "charge notation (e.g., ^+, ^2-, ^3+)"
+)
+
+// ELEMENT_GROUP ::= ISOTOPE? ELEMENT SUBSCRIPT?
+#let element-group-parser = map(
+  seq(optional(isotope-parser), element-parser, optional(subscript-parser)),
+  parts => {
+    let (isotope, element, subscript) = parts
+    (
+      type: "element-group",
+      isotope: isotope,
+      element: element,
+      subscript: subscript
+    )
+  }
+)
+
+// ABBREVIATION ::= [a-z][A-Za-z]+
+#let abbreviation-parser = map(
+  seq(lowercase, some(letter)),
+  parts => {
+    let (first, rest) = parts
+    (type: "abbreviation", value: first + rest.join())
+  }
+)
+
+// MATH_TEXT ::= "$" [^$]+ "$"
+#let math-text-parser = label(
+  map(
+    seq(
+      char("$"),
+      some(none-of("$")),
+      char("$")
     ),
-    lastNodeId: none,
-    config: parent-ctx.config,
-    remoteConnections: (),
-  )
-}
-
-#let create-node(nodeType: "fragment", data: (:)) = {
-  (
-    id: none,
-    type: nodeType,
-    data: data,
-  )
-}
-
-#let create-edge(fromId, toId, edgeType: "bond", data: (:)) = {
-  (
-    id: none,
-    from: fromId,
-    to: toId,
-    type: edgeType,
-    data: data,
-  )
-}
-
-#let add-node-to-graph(ctx, node) = {
-  let nodeId = "node_" + str(ctx.graph.nodeCounter)
-  node.id = nodeId
-  ctx.graph.nodeCounter += 1
-  ctx.graph.nodes.insert(nodeId, node)
-  
-  if "label" in node.data and node.data.label != none {
-    ctx.graph.labels.insert(node.data.label, nodeId)
-  }
-  
-  if ctx.graph.root == none {
-    ctx.graph.root = nodeId
-  }
-  
-  return (nodeId, ctx)
-}
-
-#let add-edge-to-graph(ctx, edge) = {
-  let edgeId = "edge_" + str(ctx.graph.edgeCounter)
-  edge.id = edgeId
-  ctx.graph.edgeCounter += 1
-  ctx.graph.edges.push(edge)
-  
-  if "label" in edge.data and edge.data.label != none {
-    ctx.graph.bondLabels.insert(edge.data.label, edgeId)
-  }
-  
-  return ctx
-}
-
-#let peek-char(ctx) = {
-  if ctx.position >= ctx.length { return none }
-  ctx.input.at(ctx.position)
-}
-
-#let peek-string(ctx, length) = {
-  let end = calc.min(ctx.position + length, ctx.length)
-  ctx.input.slice(ctx.position, end)
-}
-
-#let advance(ctx, count: 1) = {
-  ctx.position += count
-  ctx
-}
-
-#let skip-whitespace(ctx) = {
-  while ctx.position < ctx.length {
-    let char = peek-char(ctx)
-    if char != " " and char != "\t" { break }
-    ctx = advance(ctx)
-  }
-  ctx
-}
-
-#let ATOM_STRING_PATTERN = regex("^([A-Z][a-z]?(\d+)?)+(_[^\s\(\)\[\]:,=\-<>#]+|\^[^\s\(\)\[\]:,=\-<>#]+)*")
-#let IDENTIFIER_PATTERN = regex("^[a-zA-Z_][a-zA-Z0-9_]*")
-#let DIGIT_PATTERN = regex("^\d+")
-
-#let parse-identifier(ctx) = {
-  let remaining = ctx.input.slice(ctx.position)
-  let match = remaining.match(IDENTIFIER_PATTERN)
-  
-  if match != none and match.start == 0 {
-    ctx.position += match.text.len()
-    return (match.text, ctx)
-  }
-  
-  return (none, ctx)
-}
-
-#let parse-digits(ctx) = {
-  let remaining = ctx.input.slice(ctx.position)
-  let match = remaining.match(DIGIT_PATTERN)
-  
-  if match != none and match.start == 0 {
-    ctx.position += match.text.len()
-    return (match.text, ctx)
-  }
-  
-  return (none, ctx)
-}
-
-#let parse-value(ctx) = {
-  ctx = skip-whitespace(ctx)
-  
-  if peek-char(ctx) == "\"" {
-    ctx = advance(ctx)
-    let start = ctx.position
-    while ctx.position < ctx.length and peek-char(ctx) != "\"" {
-      ctx = advance(ctx)
+    parts => {
+      let (_, chars, _) = parts
+      (type: "math-text", value: chars.join())
     }
-    let value = ctx.input.slice(start, ctx.position)
-    if peek-char(ctx) == "\"" {
-      ctx = advance(ctx)
-    }
-    return (value, ctx)
-  }
-  
-  let (ident, newCtx) = parse-identifier(ctx)
-  if ident != none {
-    return (ident, newCtx)
-  }
-  
-  let start = ctx.position
-  let parenDepth = 0
-  while ctx.position < ctx.length {
-    let char = peek-char(ctx)
-    if parenDepth == 0 and (char == "," or char == ")") { break }
-    if char == "(" { parenDepth += 1 }
-    if char == ")" { parenDepth -= 1 }
-    ctx = advance(ctx)
-  }
-  
-  let value = ctx.input.slice(start, ctx.position).trim()
-  return (value, ctx)
-}
+  ),
+  "math text notation (e.g., $\\Delta$, $\\mu$)"
+)
 
-#let parse-options(ctx) = {
-  if peek-char(ctx) != "(" { return (none, ctx) }
-  ctx = advance(ctx)
-  
-  let options = (:)
-  
-  while ctx.position < ctx.length {
-    ctx = skip-whitespace(ctx)
-    
-    if peek-char(ctx) == ")" {
-      ctx = advance(ctx)
-      break
-    }
-    
-    let (key, newCtx) = parse-identifier(ctx)
-    if key == none { break }
-    ctx = newCtx
-    
-    ctx = skip-whitespace(ctx)
-    if peek-char(ctx) != ":" { break }
-    ctx = advance(ctx)
-    
-    let (value, newCtx2) = parse-value(ctx)
-    ctx = newCtx2
-    options.insert(key, value)
-    
-    ctx = skip-whitespace(ctx)
-    if peek-char(ctx) == "," {
-      ctx = advance(ctx)
-    }
-  }
-  
-  return (options, ctx)
-}
-
-#let parse-label(ctx) = {
-  if peek-char(ctx) != ":" { return (none, ctx) }
-  if peek-string(ctx, 2) == "::" { return (none, ctx) }
-  
-  ctx = advance(ctx)
-  return parse-identifier(ctx)
-}
-
-#let parse-bond-label(ctx) = {
-  if peek-string(ctx, 2) != "::" { return (none, ctx) }
-  
-  ctx = advance(ctx, count: 2)
-  return parse-identifier(ctx)
-}
-
-#let parse-fragment(ctx) = {
-  ctx = skip-whitespace(ctx)
-  
-  let remaining = ctx.input.slice(ctx.position)
-  let atomMatch = remaining.match(ATOM_STRING_PATTERN)
-  
-  if atomMatch == none or atomMatch.start != 0 {
-    return (none, ctx)
-  }
-  
-  let atom = atomMatch.text
-  ctx.position += atom.len()
-  
-  ctx = skip-whitespace(ctx)
-  let (label, newCtx) = parse-label(ctx)
-  if label != none {
-    ctx = newCtx
-  }
-  
-  ctx = skip-whitespace(ctx)
-  let options = (:)
-  
-  let node = create-node(
-    nodeType: "fragment",
-    data: (atom: atom, label: label, options: options)
-  )
-  
-  return (node, ctx)
-}
-
-// Parser functions that need mutual recursion
-#let parse-ring(ctx, parse-mol-fn) = {
-  ctx = skip-whitespace(ctx)
-  
-  if peek-char(ctx) != "@" { return (none, ctx) }
-  ctx = advance(ctx)
-  
-  let (sizeStr, newCtx) = parse-digits(ctx)
-  if sizeStr == none { return (none, ctx) }
-  ctx = newCtx
-  let size = int(sizeStr)
-  
-  // Optional content within parentheses
-  let ringContent = none
-  ctx = skip-whitespace(ctx)
-  if peek-char(ctx) == "(" {
-    ctx = advance(ctx)
-    
-    // Create sub-context for ring content
-    let sub-ctx = create-sub-context(ctx)
-    
-    // Parse in sub-context (into independent graph)
-    let (innerMol, newSubCtx) = parse-mol-fn(sub-ctx, parse-mol-fn: parse-mol-fn)
-    if innerMol != none {
-      // Save complete graph structure (not just metadata)
-      ringContent = newSubCtx.graph
-      // Update parent context position (up to closing parenthesis)
-      ctx.position = newSubCtx.position
-    }
-    
-    ctx = skip-whitespace(ctx)
-    if peek-char(ctx) != ")" { return (none, ctx) }
-    ctx = advance(ctx)  // Consume closing parenthesis
-  }
-  
-  ctx = skip-whitespace(ctx)
-  let (label, newCtx3) = parse-label(ctx)
-  if label != none {
-    ctx = newCtx3
-  }
-  
-  ctx = skip-whitespace(ctx)
-  let options = (:)
-  if peek-char(ctx) == "(" {
-    let (opts, newCtx4) = parse-options(ctx)
-    if opts != none {
-      options = opts
-      ctx = newCtx4
-    }
-  }
-  
-  let node = create-node(
-    nodeType: "ring",
-    data: (size: size, content: ringContent, label: label, options: options)
-  )
-  
-  return (node, ctx)
-}
-
-#let parse-bond(ctx) = {
-  ctx = skip-whitespace(ctx)
-  
-  let bondType = none
-  let twoChar = peek-string(ctx, 2)
-  
-  if twoChar == ":>" {
-    bondType = "wedge-dashed-right"
-    ctx = advance(ctx, count: 2)
-  } else if twoChar == "<:" {
-    bondType = "wedge-dashed-left"
-    ctx = advance(ctx, count: 2)
-  } else {
-    let char = peek-char(ctx)
-    if char == "-" {
-      bondType = "single"
-      ctx = advance(ctx)
-    } else if char == "=" {
-      bondType = "double"
-      ctx = advance(ctx)
-    } else if char == "#" {
-      bondType = "triple"
-      ctx = advance(ctx)
-    } else if char == ">" {
-      bondType = "wedge-filled-right"
-      ctx = advance(ctx)
-    } else if char == "<" {
-      bondType = "wedge-filled-left"
-      ctx = advance(ctx)
-    }
-  }
-  
-  if bondType == none { return (none, ctx) }
-  
-  ctx = skip-whitespace(ctx)
-  let (bondLabel, newCtx) = parse-bond-label(ctx)
-  if bondLabel != none {
-    ctx = newCtx
-  }
-  
-  ctx = skip-whitespace(ctx)
-  let options = (:)
-  if peek-char(ctx) == "(" {
-    let saved = ctx.position
-    ctx = advance(ctx)
-    ctx = skip-whitespace(ctx)
-    let char = peek-char(ctx)
-    let twoChar2 = peek-string(ctx, 2)
-    let isBond = char == "-" or char == "=" or char == "#" or char == ">" or char == "<" or twoChar2 == ":>" or twoChar2 == "<:"
-    
-    ctx.position = saved
-    if not isBond {
-      let (opts, newCtx2) = parse-options(ctx)
-      if opts != none {
-        options = opts
-        ctx = newCtx2
+#let parenthetical-parser(atoms-parser) = {
+  label(
+    map(
+      seq(
+        char("("),
+        lazy(() => atoms-parser()),
+        char(")"),
+        optional(subscript-parser)
+      ),
+      parts => {
+        let (_, atoms, _, subscript) = parts
+        (type: "parenthetical", atoms: atoms, subscript: subscript)
       }
-    }
-  }
-  
-  return ((bondType: bondType, label: bondLabel, options: options), ctx)
+    ),
+    "parenthetical group (e.g., (OH)2, (NH4)2)"
+  )
 }
 
-#let parse-branch(ctx, parentId, parse-mol-fn) = {
-  if peek-char(ctx) != "(" { return ((), ctx) }
-  
-  let saved = ctx.position
-  ctx = advance(ctx)
-  ctx = skip-whitespace(ctx)
-  
-  let (bond, newCtx) = parse-bond(ctx)
-  if bond == none {
-    ctx.position = saved
-    return ((), ctx)
-  }
-  ctx = newCtx
-  
-  let savedLastNode = ctx.lastNodeId
-  ctx.lastNodeId = none
-  
-  let (branchMol, newCtx2) = parse-mol-fn(ctx, parse-mol-fn: parse-mol-fn)
-  ctx = newCtx2
-  
-  ctx.lastNodeId = savedLastNode
-  
-  ctx = skip-whitespace(ctx)
-  if peek-char(ctx) != ")" {
-    ctx.position = saved
-    return ((), ctx)
-  }
-  ctx = advance(ctx)
-  
-  // If branch has no atoms (only bonds), create implicit node
-  if (branchMol == none or branchMol.root == none) and bond != none and parentId != none {
-    // Create implicit node
-    let implicitNode = create-node(
-      nodeType: "implicit",
-      data: (atom: none, label: none, options: (:))
-    )
-    let (implicitId, ctx3) = add-node-to-graph(ctx, implicitNode)
-    ctx = ctx3
-    
-    // Create edge from parent node to implicit node
-    let edge = create-edge(
-      parentId,
-      implicitId,
-      edgeType: "bond",
-      data: (
-        bondType: bond.bondType,
-        label: bond.label,
-        options: bond.options,
-        role: "branch"
-      )
-    )
-    ctx = add-edge-to-graph(ctx, edge)
-  } else if branchMol != none and branchMol.root != none and parentId != none {
-    // branchMol.root is the node ID
-    let edge = create-edge(
-      parentId,
-      branchMol.root,
-      edgeType: "bond",
-      data: (
-        bondType: bond.bondType,
-        label: bond.label,
-        options: bond.options,
-        role: "branch"
-      )
-    )
-    ctx = add-edge-to-graph(ctx, edge)
-  }
-  
-  return ((bond: bond, molecule: branchMol), ctx)
-}
-
-#let parse-node(ctx, parse-mol-fn) = {
-  ctx = skip-whitespace(ctx)
-  
-  let node = none
-  let nodeId = none
-  
-  let (ringNode, newCtx) = parse-ring(ctx, parse-mol-fn)
-  if ringNode != none {
-    let (id, ctx2) = add-node-to-graph(newCtx, ringNode)
-    nodeId = id
-    ctx = ctx2
-  } else {
-    let (fragmentNode, newCtx2) = parse-fragment(ctx)
-    if fragmentNode != none {
-      let (id, ctx3) = add-node-to-graph(newCtx2, fragmentNode)
-      nodeId = id
-      ctx = ctx3
-    }
-  }
-  
-  if nodeId == none { return (none, ctx) }
-  
-  let branches = ()
-  while true {
-    let (branch, newCtx) = parse-branch(ctx, nodeId, parse-mol-fn)
-    if branch == () { break }
-    branches.push(branch)
-    ctx = newCtx
-  }
-  
-  return (nodeId, ctx)
-}
-
-#let parse-bond-node-pair(ctx, parse-mol-fn) = {
-  ctx = skip-whitespace(ctx)
-  
-  let (bond, newCtx) = parse-bond(ctx)
-  if bond == none { return (none, ctx) }
-  ctx = newCtx
-  
-  let (nodeId, newCtx2) = parse-node(ctx, parse-mol-fn)
-  ctx = newCtx2
-  
-  if nodeId == none {
-    // Check if there's a branch instead of a node
-    if peek-char(ctx) == "(" {
-      // Create an implicit node to attach the branch to
-      let implicitNode = create-node(
-        nodeType: "implicit",
-        data: (atom: none, label: none, options: (:))
-      )
-      let (id, ctx3) = add-node-to-graph(ctx, implicitNode)
-      nodeId = id
-      ctx = ctx3
-      
-      // Parse branches attached to this implicit node
-      while peek-char(ctx) == "(" {
-        let (branch, branchCtx) = parse-branch(ctx, nodeId, parse-mol-fn)
-        if branch == () { break }
-        ctx = branchCtx
+#let complex-parser(atoms-parser) = {
+  label(
+    map(
+      seq(
+        char("["), 
+        lazy(() => atoms-parser()), 
+        char("]")
+      ),
+      parts => {
+        let (_, atoms, _) = parts
+        (type: "complex", atoms: atoms)
       }
+    ),
+    "complex notation (e.g., [Fe(CN)6]^3-, [Cu(NH3)4]^2+)"
+  )
+}
+
+// Forward declarations for recursive parsers
+#let atoms-part-parser(atoms-parser) = choice(
+  element-group-parser,
+  parenthetical-parser(atoms-parser),
+  complex-parser(atoms-parser)
+)
+
+#let atoms-parser() = {
+  label(
+    map(
+      seq(some(atoms-part-parser(atoms-parser)), optional(charge-parser)),
+      parts => {
+        let (parts, charge) = parts
+        (type: "atoms", parts: parts, charge: charge)
+      }
+    ),
+    "atoms composition"
+  )
+}
+
+// FRAGMENT ::= ATOMS | ABBREVIATION | MATH_TEXT
+#let fragment-content-parser = choice(
+  atoms-parser(),
+  abbreviation-parser,
+  math-text-parser,
+  element-parser  // Fallback for simple elements
+)
+
+// IDENTIFIER ::= [a-zA-Z_][a-zA-Z0-9_]*
+#let identifier-parser = map(
+  seq(
+    satisfy(c => (c >= "a" and c <= "z") or (c >= "A" and c <= "Z") or c == "_", name: "id-first"),
+    many(alphanum)
+  ),
+  parts => {
+    let (first, rest) = parts
+    (type: "identifier", value: first + rest.join())
+  }
+)
+
+// label ::= ":" IDENTIFIER
+#let label-parser = map(
+  seq(char(":"), identifier-parser),
+  parts => {
+    let (_, id) = parts
+    (type: "label", name: id.value)
+  }
+)
+
+// ==================== Options ====================
+
+// Simple value parser
+#let value-parser = choice(
+  map(some(digit), ds => int(ds.join())),
+  identifier-parser
+)
+
+// key_value_pair ::= IDENTIFIER ":" value
+#let key-value-pair-parser = label(
+  map(
+    seq(identifier-parser, token(":"), value-parser),
+    parts => {
+      let (key, _, value) = parts
+      (key: key.value, value: value)
+    }
+  ),
+  "key-value pair (e.g., color: red, angle: 45)"
+)
+
+// options ::= "(" key_value_pair ("," key_value_pair)* ")"
+#let options-parser = label(
+  map(
+    seq(char("("), sep-by(key-value-pair-parser, token(",")), char(")")),
+    parts => {
+      let (_, pairs, _) = parts
+      (type: "options", pairs: pairs)
+    }
+  ),
+  "options in parentheses"
+)
+
+// ==================== Fragment ====================
+
+#let process-atom(parts) = {
+  let type = parts.type
+
+  if type == "atoms" {
+    let base = parts.parts.map(process-atom).join()
+    if parts.charge != none {
+      math.attach(base, tr: eval("$" + parts.charge + "$"))
     } else {
-      // Create a simple implicit node
-      let implicitNode = create-node(
-        nodeType: "implicit",
-        data: (atom: none, label: none, options: (:))
-      )
-      let (id, ctx3) = add-node-to-graph(ctx, implicitNode)
-      nodeId = id
-      ctx = ctx3
+      base
     }
+  } else if type == "abbreviation" {
+    text(parts.value)
+  } else if type == "math-text" {
+    eval(parts.value)
+  } else if type == "element-group" {
+    math.attach(parts.element, tl: [#parts.isotope], br: [#parts.subscript])
+  } else if type == "parenthetical" {
+    let inner = process-atom(parts.atoms)
+    math.attach([(#inner)], br: [#parts.subscript])
+  } else if type == "complex" {
+    let inner = process-atom(parts.atoms)
+    [\[#inner\]]
+  } else {
+    "unkown type: " + type
   }
-  
-  return ((bond: bond, nodeId: nodeId), ctx)
 }
 
-#let process-remote-connections(ctx) = {
-  for connection in ctx.remoteConnections {
-    let parts = connection.split("=")
-    if parts.len() != 2 { continue }
-    
-    let fromPart = parts.at(0).trim()
-    let toPart = parts.at(1).trim()
-    
-    if fromPart.starts-with(":") and toPart.starts-with(":") {
-      let fromLabel = fromPart.slice(1)
-      let toLabel = toPart.slice(1)
-      
-      let options = (:)
-      let parenIdx = toLabel.position("(")
-      if parenIdx != none {
-        toLabel = toLabel.slice(0, parenIdx)
-      }
-      
-      let fromId = ctx.graph.labels.at(fromLabel, default: none)
-      let toId = ctx.graph.labels.at(toLabel, default: none)
-      
-      if fromId != none and toId != none {
-        let edge = create-edge(
-          fromId,
-          toId,
-          edgeType: "bond",
-          data: (
-            bondType: "double",
-            role: "remote",
-            options: options
-          )
-        )
-        ctx = add-edge-to-graph(ctx, edge)
-      }
+// fragment ::= FRAGMENT label? options?
+#let fragment-parser = label(
+  map(
+    seq(fragment-content-parser, optional(label-parser), optional(options-parser)),
+    parts => {
+      let (content, label, options) = parts
+      (
+        type: "fragment",
+        name: process-atom(content),
+        label: label,
+        options: options
+      )
     }
-  }
-  return ctx
-}
+  ),
+  "molecular fragment"
+)
 
-// Unified parse-molecule function
-#let parse-molecule(inputOrCtx, config: (:), parse-mol-fn: none) = {
-  // Set parse-mol-fn to self if not provided
-  if parse-mol-fn == none {
-    parse-mol-fn = parse-molecule
+// ==================== Bonds ====================
+
+// BOND_SYMBOL ::= "-" | "=" | "#" | ">" | "<" | ":>" | "<:" | "|>" | "<|"
+#let bond-symbol-parser = choice(
+  str("->"),  // Arrow prevention
+  str("=>"),  // Arrow prevention  
+  str(":>"),
+  str("<:"),
+  str("|>"),
+  str("<|"),
+  char("="),
+  char("#"),
+  char("-"),
+  char(">"),
+  char("<")
+)
+
+// bond_label ::= "::" IDENTIFIER
+#let bond-label-parser = map(
+  seq(str("::"), identifier-parser),
+  parts => {
+    let (_, id) = parts
+    (type: "bond-label", name: id.value)
   }
-  
-  // Determine if this is an initial call (with string input) or recursive call (with context)
-  let ctx = if type(inputOrCtx) == str {
-    // Initial call with string input
-    create-parser-context(inputOrCtx, config: config)
-  } else {
-    // Recursive call with context
-    inputOrCtx
-  }
-  
-  let initialNodeCount = ctx.graph.nodeCounter
-  let initialEdgeCount = ctx.graph.edgeCounter
-  let localRoot = none
-  
-  let (firstNodeId, newCtx) = parse-node(ctx, parse-mol-fn)
-  if firstNodeId != none {
-    ctx = newCtx
-    ctx.lastNodeId = firstNodeId
-    localRoot = firstNodeId
-    if ctx.graph.root == none {
-      ctx.graph.root = firstNodeId
-    }
-  } else {
-    // Check if input starts with branch (
-    if peek-char(ctx) == "(" {
-      // Create implicit node for branch-starting input
-      let implicitNode = create-node(
-        nodeType: "implicit",
-        data: (atom: none, label: none, options: (:))
+)
+
+// bond ::= BOND_SYMBOL bond_label? options?
+#let bond-parser = label(
+  map(
+    seq(bond-symbol-parser, optional(bond-label-parser), optional(options-parser)),
+    parts => {
+      let (symbol, label, options) = parts
+      (
+        type: "bond",
+        symbol: symbol,
+        label: label,
+        options: options
       )
-      let (implicitId, ctx3) = add-node-to-graph(ctx, implicitNode)
-      ctx = ctx3
-      ctx.lastNodeId = implicitId
-      localRoot = implicitId
-      if ctx.graph.root == none {
-        ctx.graph.root = implicitId
-      }
-      
-      // Parse branches attached to this implicit node
-      while peek-char(ctx) == "(" {
-        let (branch, branchCtx) = parse-branch(ctx, implicitId, parse-mol-fn)
-        if branch == () { break }
-        ctx = branchCtx
-      }
-    } else {
-      let savedPos = ctx.position
-      let (testBond, testCtx) = parse-bond(ctx)
-      ctx.position = savedPos
-      
-      if testBond != none {
-        let implicitNode = create-node(
-          nodeType: "implicit",
-          data: (atom: none, label: none, options: (:))
-        )
-        let (implicitId, ctx3) = add-node-to-graph(ctx, implicitNode)
-        ctx = ctx3
-        ctx.lastNodeId = implicitId
-        localRoot = implicitId
-        if ctx.graph.root == none {
-          ctx.graph.root = implicitId
-        }
-      }
     }
-  }
-  
-  while ctx.position < ctx.length {
-    ctx = skip-whitespace(ctx)
-    
-    if peek-char(ctx) == ")" { break }
-    
-    let (pair, newCtx2) = parse-bond-node-pair(ctx, parse-mol-fn)
-    if pair == none { break }
-    ctx = newCtx2
-    
-    if ctx.lastNodeId != none and pair.nodeId != none {
-      let edge = create-edge(
-        ctx.lastNodeId,
-        pair.nodeId,
-        edgeType: "bond",
-        data: (
-          bondType: pair.bond.bondType,
-          label: pair.bond.label,
-          options: pair.bond.options,
-          role: "main"
-        )
+  ),
+  "chemical bond"
+)
+
+// ==================== Rings ====================
+
+// ring ::= "@" DIGIT+ "(" molecule? ")" label? options?
+#let ring-parser(mol-parser) = label(
+  lazy(() => map(
+    seq(
+      char("@"),
+      some(digit),
+      optional(
+        seq(
+          char("("),
+          mol-parser,
+          char(")"),
+        ), 
+      ),
+      optional(label-parser),
+      optional(options-parser)
+    ),
+    parts => {
+      let (_, digits, mol, lbl, opts) = parts
+      (
+        type: "cycle",
+        faces: int(digits.join()),
+        body: mol,
+        label: lbl,
+        options: opts
       )
-      ctx = add-edge-to-graph(ctx, edge)
     }
-    
-    if localRoot == none {
-      localRoot = pair.nodeId
-    }
-    
-    ctx.lastNodeId = pair.nodeId
+  )),
+  "ring notation (e.g., @6, @5(C-C-C-C-C))"
+)
+
+// ==================== Molecules ====================
+
+// node ::= fragment | ring | label
+#let node-parser(mol-parser) = choice(
+  fragment-parser,
+  ring-parser(mol-parser),
+  label-parser
+)
+
+// branch ::= "(" bond molecule ")"
+#let branch-parser(mol-parser) = map(
+  seq(
+    char("("),
+    bond-parser,
+    mol-parser,
+    char(")")
+  ),
+  parts => {
+    let (_, bond, molecule, _) = parts
+    (type: "branch", bond: bond, body: molecule)
   }
-  
-  // Return different results based on whether this is initial or recursive call
-  if type(inputOrCtx) == str {
-    // Initial call - process remote connections and return the graph
-    if ctx.remoteConnections.len() > 0 {
-      ctx = process-remote-connections(ctx)
-    }
-    return ctx.graph
-  } else {
-    // Recursive call - return molecule info and context
-    let molecule = (
-      nodes: ctx.graph.nodes.pairs().filter(p => {
-        let nodeNum = int(p.at(0).slice(5))
-        nodeNum >= initialNodeCount
-      }).len(),
-      root: localRoot
+)
+
+// unit ::= (node | implicit_node) branch*
+#let unit-parser(mol-parser) = map(
+  seq(optional(node-parser(mol-parser)), many(branch-parser(mol-parser))),
+  parts => {
+    let (node, branches) = parts
+    (
+      type: "unit",
+      node: if node == none { (type: "implicit") } else { node },
+      branches: branches
     )
-    return (molecule, ctx)
   }
+)
+
+// molecule ::= unit (bond unit)*
+#let molecule-parser() = {
+  // Create a lazy reference to itself
+  let self = lazy(() => molecule-parser())
+  
+  label(
+    map(
+      seq(
+        unit-parser(self),
+        many(seq(bond-parser, unit-parser(self)))
+      ),
+      nodes => {
+        let (first, rest) = nodes
+        (
+          type: "molecule",
+          first: first,
+          rest: rest
+        )
+      }
+    ),
+    "molecule structure"
+  )
+}
+
+// ==================== Reactions ====================
+
+// COEFFICIENT ::= DIGIT+
+#let coefficient-parser = label(
+  map(
+    some(digit),
+    digits => (type: "coefficient", value: int(digits.join()))
+  ),
+  "stoichiometric coefficient"
+)
+
+// OP_SYMBOL ::= "->" | "<=>" | "⇌" | "→" | "⇄" | "=>" | "-->" | "+"
+#let op-symbol-parser = choice(
+  str("<=>"),
+  str("-->"),
+  str("->"),
+  str("=>"),
+  str("⇌"),
+  str("→"),
+  str("⇄"),
+  char("+")
+)
+
+// CONDITION ::= "[" TEXT "]"
+#let condition-parser = label(
+  map(
+    seq(char("["), many(none-of("]")), char("]")),
+    parts => {
+      let (_, chars, _) = parts
+      (type: "condition", text: chars.join())
+    }
+  ),
+  "reaction condition (e.g., [heat], [catalyst])"
+)
+
+// OPERATOR ::= CONDITION? OP_SYMBOL CONDITION?
+#let operator-parser = map(
+  seq(ws, optional(condition-parser), op-symbol-parser, optional(condition-parser), ws),
+  parts => {
+    let (_, cond1, symbol, cond2, _) = parts
+    (
+      type: "operator",
+      condition-before: cond1,
+      symbol: symbol,
+      condition-after: cond2
+    )
+  }
+)
+
+// term ::= COEFFICIENT? molecule
+#let term-parser = label(
+  map(
+    seq(optional(coefficient-parser), molecule-parser()),
+    parts => {
+      let (coeff, mol) = parts
+      (
+        type: "term",
+        coefficient: coeff,
+        molecule: mol
+      )
+    }
+  ),
+  "reaction term"
+)
+
+// reaction ::= term (OPERATOR term)*
+#let reaction-parser = label(
+  map(
+    seq(term-parser, many(seq(operator-parser, term-parser))),
+    parts => {
+      let (first, rest) = parts
+      let terms = (first,)
+      let edges = ()
+      for (operator, term) in rest {
+        terms.push(term)
+        edges.push((..operator, from: terms.len() - 1, to: terms.len()))
+      }
+      (
+        type: "reaction",
+        terms: terms,
+        edges: edges
+      )
+    }
+  ),
+  "chemical reaction"
+)
+
+// ==================== Parse Functions ====================
+
+#let alchemist-parser(input) = {
+  let full = map(seq(reaction-parser, eof()), r => r.at(0))
+  parse(full, input)
 }
