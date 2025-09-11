@@ -1,6 +1,6 @@
 #import "@preview/cetz:0.2.2"
 
-// IUPAC angles
+// relative angles
 #let IUPAC_ANGLES = (
   main_chain_initial: chain_length => if chain_length >= 2 { 30deg } else { 0deg },
   zigzag_up: 60deg,

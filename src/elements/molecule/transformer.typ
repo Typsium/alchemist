@@ -1,7 +1,7 @@
 // Simple transformer for new parser structure with angles already calculated
+#import "iupac-angle.typ": calculate_angles
 #import "../links.typ": single, double, triple, cram-filled-right, cram-filled-left, cram-dashed-right, cram-dashed-left
 
-// Create fragment element
 #let transform_fragment(node) = {
   let atoms = node.name
   (
@@ -16,7 +16,6 @@
   )
 }
 
-// Create bond element based on symbol and angle
 #let transform_bond(bond) = {
   let symbol = bond.symbol
   let absolute = bond.at("absolute", default: none)
@@ -43,10 +42,10 @@
   bond-fn(absolute: absolute, relative: relative)
 }
 
-#let transform_branch(branch, transform) = {
+#let transform_branch(branch, transform_molecule) = {
   let elements = ()
   elements += transform_bond(branch.bond)
-  elements += transform(branch.body)
+  elements += transform_molecule(branch.body)
   
   return (
     type: "branch",
@@ -55,49 +54,66 @@
   )
 }
 
-#let transform_cycle(cycle, transform) = {
+#let transform_cycle(cycle, transform_molecule) = {
   return (
     type: "cycle",
     faces: cycle.faces,
-    body: if cycle.body != none { transform(cycle.body) } else { none },
+    body: if cycle.body != none { transform_molecule(cycle.body) } else { none },
     args: (:),
   )
 }
 
-// Transform a single unit (node + branches)
-#let transform_unit(unit, transform) = {
+#let transform_unit(unit, transform_molecule) = {
   let elements = ()
   
-  // Add node content
   if unit.node != none {
     if unit.node.type == "fragment" {
       elements.push(transform_fragment(unit.node))
     } else if unit.node.type == "cycle" {
-      elements.push(transform_cycle(unit.node, transform))
+      elements.push(transform_cycle(unit.node, transform_molecule))
     } else if unit.node.type == "implicit" {
     } else {
       panic("Unknown node type: " + unit.node.type)
     }
   }
   
-  // Add branches
-  elements += unit.branches.map(branch => transform_branch(branch, transform))
+  elements += unit.branches.map(branch => transform_branch(branch, transform_molecule))
   
   return elements
 }
 
-// Main transformation function
-#let transform(molecule) = {
-  if molecule == none or molecule.type != "molecule" {
-    return ()
-  }
+#let transform_molecule(molecule) = {
+  if molecule == none { return () }
+  if type(molecule) == array { return molecule }
+  if molecule.type != "molecule" { return () }
   
   let elements = ()
-  elements += transform_unit(molecule.first, transform)
+  elements += transform_unit(molecule.first, transform_molecule)
   for item in molecule.rest {
     elements += transform_bond(item.bond)
-    elements += transform_unit(item.unit, transform)
+    elements += transform_unit(item.unit, transform_molecule)
   }
-  
   return elements
 }
+
+#let transform_reaction(reaction) = {
+  reaction.terms.map(term => {
+    if term.type == "term" {
+      let molecule = term.molecule
+      let molecule_with_angles = calculate_angles(molecule)
+
+      transform_molecule(molecule_with_angles)
+    } else if term.type == "operator" {
+      ((
+        type: "operator",
+        name: none,
+        op: eval("$" + term.op + "$"),
+        margin: 0.7em,
+      ),)
+    } else {
+      panic("Unknown term type: " + term.type)
+    }
+  }).join()
+}
+
+#let transform = transform_reaction
