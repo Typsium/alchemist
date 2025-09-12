@@ -71,6 +71,8 @@
 #test-parse("C(-CH3)()(-OH)", "Mixed empty and filled branches")
 #test-parse("C(-)(-)(=)", "Branches with only bonds")
 
+// #test-parse("$CH_3$-CH2-OH", "Typst math notation")
+
 // Long chain
 #let long-chain = "CH3-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-CH2-OH"
 #test-parse(long-chain, "Very long chain (50 CH2 units)")

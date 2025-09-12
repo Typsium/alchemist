@@ -23,8 +23,9 @@
 }
 
 #let calc_unit_angles(unit, prev_bond, next_bond, current_angle) = {
+  let branches = unit.at("branches", default: ())
   // Count all bonds
-  let n = unit.branches.len() + if prev_bond != none { 1 } else { 0 } + if next_bond != none { 1 } else { 0 }
+  let n = branches.len() + if prev_bond != none { 1 } else { 0 } + if next_bond != none { 1 } else { 0 }
   
   let bonds = ()
   if prev_bond != none { bonds.push(prev_bond) }
@@ -43,7 +44,7 @@
   if prev_bond != none { angle_idx += 1 }  // Skip incoming angle
   if next_bond != none { angle_idx += 1 }  // Skip outgoing angle
   
-  for _ in unit.branches {
+  for _ in branches {
     branch_angles.push(current_angle + angles.at(calc.rem(angle_idx, angles.len())))
     angle_idx += 1
   }
@@ -70,8 +71,9 @@
     
     // Create new branches with angles
     let new_branches = ()
-    if unit.branches != none {
-      for (b_idx, branch) in unit.branches.enumerate() {
+    let branches = unit.at("branches", default: ())
+    if branches != none and branches.len() > 0 {
+      for (b_idx, branch) in branches.enumerate() {
         if b_idx < branch_angles.len() {
           // Create new bond with angle
           let new_bond = if branch.bond != none {
@@ -121,9 +123,10 @@
       
       // Create new unit with branch angles
       let new_unit = unit
-      if unit != none and unit.branches != none {
+      let branches = unit.at("branches", default: ())
+      if unit != none and branches != none and branches.len() > 0 {
         let new_branches = ()
-        for (b_idx, branch) in unit.branches.enumerate() {
+        for (b_idx, branch) in branches.enumerate() {
           if b_idx < branch_angles.len() {
             // Create new bond with angle
             let new_bond = if branch.bond != none {

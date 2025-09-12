@@ -54,6 +54,7 @@
 #let digit = satisfy(
   c => c >= "0" and c <= "9", name: "digit"
 )
+#let integer = map(some(digit), ds => int(ds.join()))
 #let letter = satisfy(
   c => (c >= "a" and c <= "z") or (c >= "A" and c <= "Z"), name: "letter"
 )
@@ -104,7 +105,15 @@
   seq(char(":"), identifier),
   parts => {
     let (_, id) = parts
-    id.value
+    id
+  }
+)
+
+#let label-ref-parser = map(
+  seq(char(":"), identifier),
+  parts => {
+    let (_, id) = parts
+    (type: "label-ref", label: id)
   }
 )
 
@@ -112,32 +121,25 @@
   seq(str("::"), identifier),
   parts => {
     let (_, id) = parts
-    id.value
+    id
   }
 )
 
-#let value-parser = choice(
-  map(some(digit), ds => int(ds.join())),
-  identifier
-)
-
+// TODO: Fix this parser to support multiple key-value pairs
 #let key-value-pair-parser = label(
   map(
-    seq(identifier, token(":"), value-parser),
-    parts => {
-      let (key, _, value) = parts
-      (key: key, value: value)
-    }
+    seq(identifier, token(":"), some(none-of(")"))),
+    parts => parts.join()
   ),
   "key-value pair (e.g., color: red, angle: 45)"
 )
 
 #let options-parser = label(
   map(
-    seq(char("("), sep-by(key-value-pair-parser, token(",")), char(")")),
+    seq(char("("), key-value-pair-parser, char(")")),
     parts => {
       let (_, pairs, _) = parts
-      (type: "options", pairs: pairs)
+      (type: "options", pairs: eval("(" + pairs + ")"))
     }
   ),
   "options in parentheses"
@@ -157,19 +159,16 @@
 )
 
 #let subscript-parser = label(
-  map(
-    some(digit),
-    digits => int(digits.join())
-  ),
+  integer,
   "subscript number (e.g., CH4, O2)"
 )
 
 #let isotope-parser = label(
   map(
-    seq(char("^"), some(digit)),
+    seq(char("^"), integer),
     parts => {
-      let (_, digits) = parts
-      int(digits.join())
+      let (_, num) = parts
+      num
     }
   ),
   "isotope notation (e.g., ^14, ^235)"
@@ -225,40 +224,36 @@
   "math text notation (e.g., $\\Delta$, $\\mu$)"
 )
 
-#let parenthetical-parser(atoms-parser) = {
-  label(
-    map(
-      seq(
-        char("("),
-        atoms-parser,
-        char(")"),
-        optional(subscript-parser)
-      ),
-      parts => {
-        let (_, atoms, _, subscript) = parts
-        (type: "parenthetical", atoms: atoms, subscript: subscript)
-      }
+#let parenthetical-parser(atoms-parser) = label(
+  map(
+    seq(
+      char("("),
+      atoms-parser,
+      char(")"),
+      optional(subscript-parser)
     ),
-    "parenthetical group (e.g., (OH)2, (NH4)2)"
-  )
-}
+    parts => {
+      let (_, atoms, _, subscript) = parts
+      (type: "parenthetical", atoms: atoms, subscript: subscript)
+    }
+  ),
+  "parenthetical group (e.g., (OH)2, (NH4)2)"
+)
 
-#let complex-parser(atoms-parser) = {
-  label(
-    map(
-      seq(
-        char("["), 
-        atoms-parser,
-        char("]")
-      ),
-      parts => {
-        let (_, atoms, _) = parts
-        (type: "complex", atoms: atoms)
-      }
+#let complex-parser(atoms-parser) = label(
+  map(
+    seq(
+      char("["), 
+      atoms-parser,
+      char("]")
     ),
-    "complex notation (e.g., [Fe(CN)6]^3-, [Cu(NH3)4]^2+)"
-  )
-}
+    parts => {
+      let (_, atoms, _) = parts
+      (type: "complex", atoms: atoms)
+    }
+  ),
+  "complex notation (e.g., [Fe(CN)6]^3-, [Cu(NH3)4]^2+)"
+)
 
 #let atoms-part-parser(atoms-parser) = choice(
   element-group-parser,
@@ -292,9 +287,9 @@
   let type = parts.type
 
   if type == "atoms" {
-    let base = parts.parts.map(process-atom).join()
+    let base = parts.parts.map(process-atom)
     if parts.charge != none {
-      math.attach(base, tr: eval("$" + parts.charge + "$"))
+      (math.attach(base.join(), tr: eval("$" + parts.charge + "$")),)
     } else {
       base
     }
@@ -322,9 +317,9 @@
       let (content, label, options) = parts
       (
         type: "fragment",
-        name: process-atom(content),
-        label: label,
-        options: options
+        atoms: process-atom(content),
+        name: label,
+        options: if options != none { options } else { (:) }
       )
     }
   ),
@@ -355,8 +350,8 @@
       (
         type: "bond",
         symbol: symbol,
-        label: label,
-        options: options
+        name: label,
+        options: if options != none { options } else { (:) }
       )
     }
   ),
@@ -365,15 +360,20 @@
 
 // ==================== Rings ====================
 
-#let ring-size-parser = validate(
-  some(digit),
-  digits => {
-    if digits.len() == 0 {
-      return (false, "Ring notation (e.g., @6, @5(C-C-C-C-C)) must have at least one digit")
-    }
-    let num = int(digits.join())
-    (num >= 3, "Ring size must be at least 3")
-  },
+#let ring-size-parser = map(
+  validate(
+    some(digit),
+    digits => {
+      if digits.len() == 0 {
+        return (false, "Ring notation (e.g., @6, @5(C-C-C-C-C)) must have at least one digit")
+      }
+      let num = int(digits.join())
+      (num >= 3, "Ring size must be at least 3")
+    },
+  ),
+  parts => {
+    int(parts.join())
+  }
 )
 
 #let ring-parser(mol-parser) = label(
@@ -385,8 +385,7 @@
       optional(options-parser)
     ),
     parts => {
-      let (_, digits, mol, lbl, opts) = parts
-      let faces = int(digits.join())
+      let (_, faces, mol, lbl, opts) = parts
 
       if type(mol) == array {
         let (_, mol, _) = mol
@@ -410,14 +409,14 @@
 #let node-parser(mol-parser) = choice(
   fragment-parser,
   ring-parser(mol-parser),
-  label-parser
+  label-ref-parser
 )
 
 #let branch-parser(mol-parser) = map(
   seq(char("("), bond-parser, mol-parser, char(")")),
   parts => {
-    let (_, bond, molecule, _) = parts
-    (type: "branch", bond: bond, body: molecule)
+    let (_, bond, molecules, _) = parts
+    (type: "branch", bond: bond, body: molecules)
   }
 )
 
@@ -425,11 +424,22 @@
   seq(optional(node-parser(mol-parser)), many(branch-parser(mol-parser))),
   parts => {
     let (node, branches) = parts
-    (
-      type: "unit",
-      node: if node == none { (type: "implicit") } else { node },
-      branches: branches
-    )
+    
+    // Handle label reference as a special unit type
+    if node != none and node.type == "label-ref" {
+      (
+        type: "unit",
+        node: node,
+        branches: branches,
+        is_continuation_start: true
+      )
+    } else {
+      (
+        type: "unit",
+        node: if node == none { (type: "implicit") } else { node },
+        branches: branches
+      )
+    }
   }
 )
 
@@ -444,8 +454,19 @@
       ),
       nodes => {
         let (first, rest) = nodes
+        
+        // Check if molecule starts with a label reference
+        let is_continuation = first.at("is_continuation_start", default: false)
+        let continuation_label = if is_continuation and first.node.type == "label-ref" {
+          first.node.label
+        } else {
+          none
+        }
+        
         (
           type: "molecule",
+          is_continuation: is_continuation,
+          continuation_label: continuation_label,
           first: first,
           rest: rest.map(unit => {
             let (bond, unit) = unit 
@@ -462,8 +483,8 @@
 
 #let coefficient-parser = label(
   map(
-    some(digit),
-    digits => (type: "coefficient", value: int(digits.join()))
+    integer,
+    num => (type: "coefficient", value: num)
   ),
   "stoichiometric coefficient"
 )
@@ -541,6 +562,14 @@
 // ==================== Parse Functions ====================
 
 #let alchemist-parser(input) = {
+  if input == "" {
+    return (
+      success: true,
+      value: (type: "reaction", terms: ()),
+      rest: input
+    )
+  }
+  
   let reaction_result = parse(reaction-parser, input)
   
   if not reaction_result.success {
@@ -557,8 +586,6 @@
       "Unexpected number '" + preview + "' - numbers must be part of subscripts, isotopes, or ring sizes"
     } else if first_char == "&" or first_char == "!" or first_char == "%" {
       "Invalid character '" + first_char + "' - not a valid bond or atom symbol"
-    } else if first_char == "@" {
-      "Invalid ring notation starting with '" + preview + "' - expected @N where N is a number"
     } else if first_char == "^" {
       "Invalid isotope or charge notation starting with '" + preview + "'"
     } else if first_char == "-" or first_char == "=" or first_char == "#" {
