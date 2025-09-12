@@ -218,6 +218,19 @@
   ok(results, current)
 })
 
+// Validate parsed value
+#let validate(p, validator) = parser("validate", s => {
+  let result = (p.run)(s)
+  if not result.ok { return result }
+  
+  let (valid, error-msg) = validator(result.value)
+  if not valid {
+    return err(error-msg, s)
+  }
+  
+  ok(result.value, result.state)
+})
+
 // Separated by (at least one)
 #let sep-by1(p, separator) = parser("sep-by1", s => {
   let first = (p.run)(s)

@@ -365,16 +365,29 @@
 
 // ==================== Rings ====================
 
+#let ring-size-parser = validate(
+  some(digit),
+  digits => {
+    if digits.len() == 0 {
+      return (false, "Ring notation (e.g., @6, @5(C-C-C-C-C)) must have at least one digit")
+    }
+    let num = int(digits.join())
+    (num >= 3, "Ring size must be at least 3")
+  },
+)
+
 #let ring-parser(mol-parser) = label(
   map(
     seq(
-      char("@"), some(digit),
+      char("@"), ring-size-parser,
       optional(seq(char("("), mol-parser, char(")"))),
       optional(label-parser),
       optional(options-parser)
     ),
     parts => {
       let (_, digits, mol, lbl, opts) = parts
+      let faces = int(digits.join())
+
       if type(mol) == array {
         let (_, mol, _) = mol
       } else {
@@ -382,7 +395,7 @@
       }
       (
         type: "cycle",
-        faces: int(digits.join()),
+        faces: faces,
         body: mol,
         label: lbl,
         options: opts
