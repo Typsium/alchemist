@@ -63,8 +63,24 @@
 #test-parse("CH3-OH)", "Extra closing in chain")
 
 // Deeply nested structure
-#test-parse("C(-C(-C(-C(-C(-OH)))))", "Deeply nested (5 levels)")
-#test-parse("C(-(-(-(-OH))))", "Multiple nested empty branches")
+#test-parse("-(-(-(-OH)))", "Deeply nested (3 levels)")
+#test-parse("-(-(-(-(-OH))))", "Deeply nested (4 levels)")
+#test-parse("-(-(-(-(-(-OH)))))", "Deeply nested (5 levels)")
+#test-parse("-(-(-(-(-(-(-OH))))))", "Deeply nested (6 levels)")
+#test-parse("-(-(-(-(-(-(-(-OH)))))))", "Deeply nested (7 levels)")
+#test-parse("-(-(-(-(-(-(-(-(-OH))))))))", "Deeply nested (8 levels)")
+#test-parse("-(-(-(-(-(-(-(-(-(-OH)))))))))", "Deeply nested (9 levels)")
+#test-parse("-(-(-(-(-(-(-(-(-(-(-OH))))))))))", "Deeply nested (10 levels)")
+#test-parse("-(-(-(-(-(-(-(-(-(-(-(-OH)))))))))))", "Deeply nested (11 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-OH))))))))))))", "Deeply nested (12 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-OH)))))))))))))", "Deeply nested (13 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-(-OH))))))))))))))", "Deeply nested (14 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-OH)))))))))))))))", "Deeply nested (15 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-OH))))))))))))))))", "Deeply nested (16 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-OH)))))))))))))))))", "Deeply nested (17 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-OH))))))))))))))))))", "Deeply nested (18 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-OH)))))))))))))))))))", "Deeply nested (19 levels)")
+// #test-parse("-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-(-OH))))))))))))))))))))", "Deeply nested (20 levels)")
 
 // Complex branching patterns
 #test-parse("C()()()()", "Empty branches")
