@@ -69,7 +69,7 @@
   name: "alphanum"
 )
 #let identifier = {
-  map(seq(choice(letter, char("_")), many(choice(alphanum, char("_")))), r => {
+  seq(choice(letter, char("_")), many(choice(alphanum, char("_"))), map: r => {
     let (first, rest) = r
     first + rest.join()
   })
@@ -78,12 +78,12 @@
 #let ws = many(whitespace)
 #let space = one-of(" \t")
 #let newline = choice(str("\r\n"), char("\n"))
-#let lexeme(p) = map(seq(p, ws), r => r.at(0))
+#let lexeme(p) = seq(p, ws, map: r => r.at(0))
 #let token(s) = lexeme(str(s))
 
 // String with escapes
 #let string-lit(quote: "\"") = {
-  let escape = map(seq(char("\\"), any()), r => {
+  let escape = seq(char("\\"), any(), map: r => {
     let (_, c) = r
     if c == "n" { "\n" }
     else if c == "t" { "\t" }
@@ -96,98 +96,82 @@
   let normal = none-of(quote + "\\")
   let char-parser = choice(escape, normal)
   
-  map(between(char(quote), char(quote), many(char-parser)), chars => chars.join())
+  between(char(quote), char(quote), many(char-parser), map: chars => chars.join())
 }
 
 // ==================== Labels and Options ====================
 
-#let label-parser = map(
-  seq(char(":"), identifier),
-  parts => {
+#let label-parser = seq(
+  char(":"), identifier,
+  map: parts => {
     let (_, id) = parts
     id
   }
 )
 
-#let label-ref-parser = map(
-  seq(char(":"), identifier),
-  parts => {
+#let label-ref-parser = seq(
+  char(":"), identifier,
+  map: parts => {
     let (_, id) = parts
     (type: "label-ref", label: id)
   }
 )
 
-#let bond-label-parser = map(
-  seq(str("::"), identifier),
-  parts => {
+#let bond-label-parser = seq(
+  str("::"), identifier,
+  map: parts => {
     let (_, id) = parts
     id
   }
 )
 
 // TODO: Fix this parser to support multiple key-value pairs
-#let key-value-pair-parser = label(
-  map(
-    seq(identifier, token(":"), some(none-of(")"))),
-    parts => parts.join()
-  ),
-  "key-value pair (e.g., color: red, angle: 45)"
+// key-value pair (e.g., color: red, angle: 45)
+#let key-value-pair-parser = seq(
+  identifier, token(":"), some(none-of(")")),
+  map: parts => parts.join()
 )
 
-#let options-parser = label(
-  map(
-    seq(char("("), key-value-pair-parser, char(")")),
-    parts => {
-      let (_, pairs, _) = parts
-      (type: "options", pairs: eval("(" + pairs + ")"))
-    }
-  ),
-  "options in parentheses"
+#let options-parser = seq(
+  char("("), key-value-pair-parser, char(")"),
+  map: parts => {
+    let (_, pairs, _) = parts
+    (type: "options", pairs: eval("(" + pairs + ")"))
+  }
 )
 
 // ==================== Fragments ====================
 
-#let element-parser = label(
-  map(
-    seq(uppercase, optional(lowercase)),
-    parts => {
-      let (upper, lower) = parts
-      if lower != none { upper + lower } else { upper }
-    }
-  ),
-  "element symbol (e.g., H, Ca, Fe)"
+// element symbol (e.g., H, Ca, Fe)
+#let element-parser = seq(
+  uppercase, optional(lowercase),
+  map: parts => {
+    let (upper, lower) = parts
+    if lower != none { upper + lower } else { upper }
+  }
 )
 
-#let subscript-parser = label(
-  integer,
-  "subscript number (e.g., CH4, O2)"
+// isotope notation (e.g., ^14, ^235)
+#let isotope-parser = seq(
+  char("^"), integer,
+  map: parts => {
+    let (_, num) = parts
+    num
+  }
 )
 
-#let isotope-parser = label(
-  map(
-    seq(char("^"), integer),
-    parts => {
-      let (_, num) = parts
-      num
-    }
-  ),
-  "isotope notation (e.g., ^14, ^235)"
+// charge notation (e.g., ^+, ^2-, ^3+)
+#let charge-parser = seq(
+  char("^"), optional(digit), choice(char("+"), char("-")),
+  map: parts => {
+    let (_, d, sign) = parts
+    d + sign
+  }
 )
 
-#let charge-parser = label(
-  map(
-    seq(char("^"), optional(digit), choice(char("+"), char("-"))),
-    parts => {
-      let (_, d, sign) = parts
-      d + sign
-    }
-  ),
-  "charge notation (e.g., ^+, ^2-, ^3+)"
-)
-
-#let element-group-parser = map(
-  seq(optional(isotope-parser), element-parser, optional(subscript-parser)),
-  parts => {
+#let element-group-parser = seq(
+  optional(isotope-parser), element-parser, optional(integer),
+  map: parts => {
     let (isotope, element, subscript) = parts
     (
       type: "element-group",
@@ -198,61 +182,44 @@
   }
 )
 
-#let abbreviation-parser = label(
-  map(
-    seq(lowercase, some(letter)),
-    parts => {
-      let (first, rest) = parts
-      (type: "abbreviation", value: first + rest.join())
-    }
-  ),
-  "abbreviation (e.g., tBu, iPr)"
+// abbreviation (e.g., tBu, iPr)
+#let abbreviation-parser = seq(
+  lowercase, some(letter),
+  map: parts => {
+    let (first, rest) = parts
+    (type: "abbreviation", value: first + rest.join())
+  }
 )
 
-#let math-text-parser = label(
-  map(
-    seq(
-      char("$"),
-      some(none-of("$")),
-      char("$")
-    ),
-    parts => {
-      let (_, chars, _) = parts
-      (type: "math-text", value: chars.join())
-    }
-  ),
-  "math text notation (e.g., $\\Delta$, $\\mu$)"
+// math text notation (e.g., $\\Delta$, $\\mu$)
+#let math-text-parser = seq(
+  char("$"), some(none-of("$")), char("$"),
+  map: parts => {
+    let (_, chars, _) = parts
+    (type: "math-text", value: chars.join())
+  }
 )
 
-#let parenthetical-parser(atoms-parser) = label(
-  map(
-    seq(
-      char("("),
-      atoms-parser,
-      char(")"),
-      optional(subscript-parser)
-    ),
-    parts => {
-      let (_, atoms, _, subscript) = parts
-      (type: "parenthetical", atoms: atoms, subscript: subscript)
-    }
-  ),
-  "parenthetical group (e.g., (OH)2, (NH4)2)"
+#let parenthetical-parser(atoms-parser) = seq(
+  char("("),
+  atoms-parser,
+  char(")"),
+  optional(integer),
+  map: parts => {
+    let (_, atoms, _, subscript) = parts
+    (type: "parenthetical", atoms: atoms, subscript: subscript)
+  }
 )
 
-#let complex-parser(atoms-parser) = label(
-  map(
-    seq(
-      char("["), 
-      atoms-parser,
-      char("]")
-    ),
-    parts => {
-      let (_, atoms, _) = parts
-      (type: "complex", atoms: atoms)
-    }
-  ),
-  "complex notation (e.g., [Fe(CN)6]^3-, [Cu(NH3)4]^2+)"
+// complex notation (e.g., [Fe(CN)6]^3-, [Cu(NH3)4]^2+)
+#let complex-parser(atoms-parser) = seq(
+  char("["), 
+  atoms-parser,
+  char("]"),
+  map: parts => {
+    let (_, atoms, _) = parts
+    (type: "complex", atoms: atoms)
+  }
 )
 
 #let atoms-part-parser(atoms-parser) = choice(
@@ -264,15 +231,12 @@
 #let atoms-parser() = {
   let self = lazy(() => atoms-parser())
 
-  label(
-    map(
-      seq(some(atoms-part-parser(self)), optional(charge-parser)),
-      parts => {
-        let (parts, charge) = parts
-        (type: "atoms", parts: parts, charge: charge)
-      }
-    ),
-    "atoms composition"
+  seq(
+    some(atoms-part-parser(self)), optional(charge-parser),
+    map: parts => {
+      let (parts, charge) = parts
+      (type: "atoms", parts: parts, charge: charge)
+    }
   )
 }
 
@@ -310,20 +274,17 @@
   }
 }
 
-#let fragment-parser = label(
-  map(
-    seq(fragment-content-parser, optional(label-parser), optional(options-parser)),
-    parts => {
-      let (content, label, options) = parts
-      (
-        type: "fragment",
-        atoms: process-atom(content),
-        name: label,
-        options: if options != none { options } else { (:) }
-      )
-    }
-  ),
-  "molecular fragment"
+#let fragment-parser = seq(
+  fragment-content-parser, optional(label-parser), optional(options-parser),
+  map: parts => {
+    let (content, label, options) = parts
+    (
+      type: "fragment",
+      atoms: process-atom(content),
+      name: label,
+      options: if options != none { options } else { (:) }
+    )
+  }
 )
 
 // ==================== Bonds ====================
@@ -342,20 +303,17 @@
   char("<")
 )
 
-#let bond-parser = label(
-  map(
-    seq(bond-symbol-parser, optional(bond-label-parser), optional(options-parser)),
-    parts => {
-      let (symbol, label, options) = parts
-      (
-        type: "bond",
-        symbol: symbol,
-        name: label,
-        options: if options != none { options } else { (:) }
-      )
-    }
-  ),
-  "chemical bond"
+#let bond-parser = seq(
+  bond-symbol-parser, optional(bond-label-parser), optional(options-parser),
+  map: parts => {
+    let (symbol, label, options) = parts
+    (
+      type: "bond",
+      symbol: symbol,
+      name: label,
+      options: if options != none { options } else { (:) }
+    )
+  }
 )
 
 // ==================== Rings ====================
@@ -376,32 +334,28 @@
   }
 )
 
-#let ring-parser(mol-parser) = label(
-  map(
-    seq(
-      char("@"), ring-size-parser,
-      optional(seq(char("("), mol-parser, char(")"))),
-      optional(label-parser),
-      optional(options-parser)
-    ),
-    parts => {
-      let (_, faces, mol, lbl, opts) = parts
+// ring notation (e.g., @6, @5(C-C-C-C-C))
+#let ring-parser(mol-parser) = seq(
+  char("@"), ring-size-parser,
+  optional(seq(char("("), mol-parser, char(")"))),
+  optional(label-parser),
+  optional(options-parser),
+  map: parts => {
+    let (_, faces, mol, lbl, opts) = parts
 
-      if type(mol) == array {
-        let (_, mol, _) = mol
-      } else {
-        mol = none
-      }
-      (
-        type: "cycle",
-        faces: faces,
-        body: mol,
-        label: lbl,
-        options: opts
-      )
+    if type(mol) == array {
+      let (_, mol, _) = mol
+    } else {
+      mol = none
     }
-  ),
-  "ring notation (e.g., @6, @5(C-C-C-C-C))"
+    (
+      type: "cycle",
+      faces: faces,
+      body: mol,
+      label: lbl,
+      options: opts
+    )
+  }
 )
 
 // ==================== Molecules ====================
@@ -412,19 +366,19 @@
   label-ref-parser
 )
 
-#let branch-parser(mol-parser) = map(
-  seq(char("("), bond-parser, mol-parser, char(")")),
-  parts => {
+#let branch-parser(mol-parser) = seq(
+  char("("), bond-parser, mol-parser, char(")"),
+  map: parts => {
     let (_, bond, molecules, _) = parts
     (type: "branch", bond: bond, body: molecules)
   }
 )
 
-#let unit-parser(mol-parser) = map(
-  seq(optional(node-parser(mol-parser)), many(branch-parser(mol-parser))),
-  parts => {
+#let unit-parser(mol-parser) = seq(
+  optional(node-parser(mol-parser)), many(branch-parser(mol-parser)),
+  map: parts => {
     let (node, branches) = parts
-    
+
     // Handle label reference as a special unit type
     if node != none and node.type == "label-ref" {
       (
@@ -446,48 +400,35 @@
 #let molecule-parser() = {
   let self = lazy(() => molecule-parser())
   
-  label(
-    map(
-      seq(
-        unit-parser(self),
-        many(seq(bond-parser, unit-parser(self)))
-      ),
-      nodes => {
-        let (first, rest) = nodes
-        
-        // Check if molecule starts with a label reference
-        let is_continuation = first.at("is_continuation_start", default: false)
-        let continuation_label = if is_continuation and first.node.type == "label-ref" {
-          first.node.label
-        } else {
-          none
-        }
-        
-        (
-          type: "molecule",
-          is_continuation: is_continuation,
-          continuation_label: continuation_label,
-          first: first,
-          rest: rest.map(unit => {
-            let (bond, unit) = unit 
-            (bond: bond, unit: unit)
-          })
-        )
+  seq(
+    unit-parser(self),
+    many(seq(bond-parser, unit-parser(self))),
+    map: nodes => {
+      let (first, rest) = nodes
+      
+      // Check if molecule starts with a label reference
+      let is_continuation = first.at("is_continuation_start", default: false)
+      let continuation_label = if is_continuation and first.node.type == "label-ref" {
+        first.node.label
+      } else {
+        none
       }
-    ),
-    "molecule structure"
+      
+      (
+        type: "molecule",
+        is_continuation: is_continuation,
+        continuation_label: continuation_label,
+        first: first,
+        rest: rest.map(unit => {
+          let (bond, unit) = unit 
+          (bond: bond, unit: unit)
+        })
+      )
+    }
   )
 }
 
 // ==================== Reactions ====================
-
-#let coefficient-parser = label(
-  map(
-    integer,
-    num => (type: "coefficient", value: num)
-  ),
-  "stoichiometric coefficient"
-)
 
 #let op-symbol-parser = choice(
   str("<=>"),
@@ -501,20 +442,18 @@
   math-text-parser
 )
 
-#let condition-parser = label(
-  map(
-    seq(char("["), many(none-of("]")), char("]")),
-    parts => {
-      let (_, chars, _) = parts
-      (type: "condition", text: chars.join())
-    }
-  ),
-  "reaction condition (e.g., [heat], [catalyst])"
+// reaction condition (e.g., [heat], [catalyst])
+#let condition-parser = seq(
+  char("["), many(none-of("]")), char("]"),
+  map: parts => {
+    let (_, chars, _) = parts
+    (type: "condition", text: chars.join())
+  }
 )
 
-#let operator-parser = map(
-  seq(ws, optional(condition-parser), op-symbol-parser, optional(condition-parser), ws),
-  parts => {
+#let operator-parser = seq(
+  ws, optional(condition-parser), op-symbol-parser, optional(condition-parser), ws,
+  map: parts => {
     let (_, cond1, op, cond2, _) = parts
     (
       type: "operator",
@@ -525,38 +464,32 @@
   }
 )
 
-#let term-parser = label(
-  map(
-    seq(optional(coefficient-parser), molecule-parser()),
-    parts => {
-      let (coeff, mol) = parts
-      (
-        type: "term",
-        coefficient: coeff,
-        molecule: mol
-      )
-    }
-  ),
-  "reaction term"
+#let term-parser = seq(
+  optional(integer), molecule-parser(),
+  map: parts => {
+    let (coeff, mol) = parts
+    (
+      type: "term",
+      coefficient: coeff,
+      molecule: mol
+    )
+  }
 )
 
-#let reaction-parser = label(
-  map(
-    seq(term-parser, many(seq(operator-parser, term-parser))),
-    parts => {
-      let (first, rest) = parts
-      let terms = (first,)
-      for (operator, term) in rest {
-        terms.push(operator)
-        terms.push(term)
-      }
-      (
-        type: "reaction",
-        terms: terms
-      )
+#let reaction-parser = seq(
+  term-parser, many(seq(operator-parser, term-parser)),
+  map: parts => {
+    let (first, rest) = parts
+    let terms = (first,)
+    for (operator, term) in rest {
+      terms.push(operator)
+      terms.push(term)
     }
-  ),
-  "chemical reaction"
+    (
+      type: "reaction",
+      terms: terms
+    )
+  }
 )
 
 // ==================== Parse Functions ====================

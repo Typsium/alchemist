@@ -98,7 +98,7 @@
 
 // Map result
 #let map(p, f) = parser("map", s => {
-  let r = (p.run)(s)
+  let r = (p.run)(s) // map
   if r.ok {
     ok(f(r.value), r.state)
   } else {
@@ -107,7 +107,7 @@
 })
 
 // Sequence parsers (variadic)
-#let seq(..parsers) = {
+#let seq(..parsers, map: results => results) = {
   let ps = parsers.pos()
   if ps.len() == 0 { return parser("empty", s => ok((), s)) }
   if ps.len() == 1 { return ps.at(0) }
@@ -117,13 +117,13 @@
     let current = s
     
     for p in ps {
-      let r = (p.run)(current)
+      let r = (p.run)(current) // seq
       if not r.ok { return r }
       results.push(r.value)
       current = r.state
     }
     
-    ok(results, current)
+    ok(map(results), current)
   })
 }
 
@@ -135,7 +135,7 @@
   
   parser("choice", s => {
     for p in ps {
-      let r = (p.run)(s)
+      let r = (p.run)(s) // choice
       if r.ok { return r }
     }
     err("no alternative matched", s)
@@ -144,7 +144,7 @@
 
 // Optional
 #let optional(p) = parser("optional", s => {
-  let r = (p.run)(s)
+  let r = (p.run)(s) // optional
   if r.ok {
     ok(r.value, r.state)
   } else {
@@ -164,7 +164,7 @@
   let current = s
   
   while true {
-    let r = (p.run)(current)
+    let r = (p.run)(current) // many
     if not r.ok { break }
     results.push(r.value)
     current = r.state
@@ -175,7 +175,7 @@
 
 // One or more
 #let some(p) = parser("some", s => {
-  let first = (p.run)(s)
+  let first = (p.run)(s) // some
   if not first.ok { return first }
   
   let rest = (many(p).run)(first.state)
@@ -184,7 +184,7 @@
 
 // Between delimiters
 #let between(left, right, p) = parser("between", s => {
-  let l = (left.run)(s)
+  let l = (left.run)(s) // between
   if not l.ok { return l }
   
   let m = (p.run)(l.state)
@@ -198,14 +198,14 @@
 
 // Separated by
 #let sep-by(p, separator) = parser("sep-by", s => {
-  let first = (p.run)(s)
+  let first = (p.run)(s) // sep-by
   if not first.ok { return ok((), s) }
   
   let results = (first.value,)
   let current = first.state
   
   while true {
-    let sep = (separator.run)(current)
+    let sep = (separator.run)(current) // sep-by
     if not sep.ok { break }
     
     let item = (p.run)(sep.state)
@@ -220,7 +220,7 @@
 
 // Validate parsed value
 #let validate(p, validator) = parser("validate", s => {
-  let result = (p.run)(s)
+  let result = (p.run)(s) // validate
   if not result.ok { return result }
   
   let (valid, error-msg) = validator(result.value)
@@ -233,7 +233,7 @@
 
 // Separated by (at least one)
 #let sep-by1(p, separator) = parser("sep-by1", s => {
-  let first = (p.run)(s)
+  let first = (p.run)(s) // sep-by1
   if not first.ok { return first }
   
   let rest = (sep-by(p, separator).run)(first.state)
@@ -250,7 +250,7 @@
   let current = s
   
   for i in range(n) {
-    let r = (p.run)(current)
+    let r = (p.run)(current) // count
     if not r.ok { return err("expected " + repr(n) + " items, got " + repr(i), current) }
     results.push(r.value)
     current = r.state
@@ -261,7 +261,7 @@
 
 // Lookahead - check without consuming
 #let lookahead(p) = parser("lookahead", s => {
-  let r = (p.run)(s)
+  let r = (p.run)(s) // lookahead
   if r.ok {
     ok(r.value, s)  // Don't advance
   } else {
@@ -271,7 +271,7 @@
 
 // Negative lookahead
 #let not-ahead(p) = parser("not", s => {
-  let r = (p.run)(s)
+  let r = (p.run)(s) // not
   if r.ok {
     err("unexpected " + repr(r.value), s)
   } else {
@@ -281,12 +281,12 @@
 
 // Attempt - backtrack on failure
 #let attempt(p) = parser("attempt", s => {
-  (p.run)(s)
+  (p.run)(s) // attempt
 })
 
 // Label for better errors
 #let label(p, lbl) = parser(lbl, s => {
-  let r = (p.run)(s)
+  let r = (p.run)(s) // label
   if not r.ok {
     // Create a more descriptive error message
     let context_str = if s.pos < s.len {
@@ -303,7 +303,7 @@
 
 // Chain left - for left-associative operators
 #let chainl(p, op, default: none) = parser("chainl", s => {
-  let first = (p.run)(s)
+  let first = (p.run)(s) // chainl
   if not first.ok {
     if default != none {
       return ok(default, s)
@@ -315,10 +315,10 @@
   let current = first.state
   
   while true {
-    let o = (op.run)(current)
+    let o = (op.run)(current) // chainl
     if not o.ok { break }
     
-    let next = (p.run)(o.state)
+    let next = (p.run)(o.state) // chainl
     if not next.ok { break }
     
     acc = (o.value)(acc, next.value)
@@ -330,15 +330,15 @@
 
 // Lazy parser - defers evaluation until needed
 #let lazy(thunk) = parser("lazy", s => {
-  let p = thunk()
-  (p.run)(s)
+  let p = thunk() // lazy
+  (p.run)(s) // lazy
 })
 
 
 // Run parser
 #let parse(p, input) = {
   let s = state(input)
-  let r = (p.run)(s)
+  let r = (p.run)(s) // parse
   (
     success: r.ok,
     value: if r.ok { r.value } else { none },
