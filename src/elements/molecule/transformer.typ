@@ -46,7 +46,15 @@
     single
   }
   
-  bond-fn(absolute: absolute, relative: relative, name: name, ..options)
+  if absolute != none and relative != none {
+    bond-fn(relative: relative, absolute: absolute, name: name, ..options)
+  } else if relative != none {
+    bond-fn(relative: relative, name: name, ..options)
+  } else if absolute != none {
+    bond-fn(absolute: absolute, name: name, ..options)
+  } else {
+    bond-fn(name: name, ..options)
+  }
 }
 
 #let transform_branch(branch, transform_molecule) = {
@@ -62,10 +70,15 @@
 }
 
 #let transform_cycle(cycle, transform_molecule) = {
+  let body = transform_molecule(cycle.body)
+  if body.len() > 0 and body.at(0).type == "fragment" {
+    body = body.slice(1)
+  }
+
   return (
     type: "cycle",
     faces: cycle.faces,
-    body: if cycle.body != none { transform_molecule(cycle.body) } else { none },
+    body: body,
     args: (:),
   )
 }
@@ -177,10 +190,24 @@
       // Resolve any label references in the transformed molecule
       resolve_label_references(transformed)
     } else if term.type == "operator" {
+      let op = if term.op == "->" {
+        sym.arrow.r
+      } else if term.op == "<->" {
+        sym.arrow.l.r
+      } else if term.op == "<=>" {
+        sym.harpoons.ltrb
+      } else {
+        eval("$" + term.op + "$")
+      }
+      op = math.attach(
+        math.stretch(op, size: 100% + 2em),
+        t: [#term.condition-before], b: [#term.condition-after]
+      )
+
       ((
         type: "operator",
         name: none,
-        op: eval("$" + term.op + "$"),
+        op: op,
         margin: 0.7em,
       ),)
     } else {

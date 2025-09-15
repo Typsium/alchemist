@@ -342,12 +342,7 @@
   optional(options-parser),
   map: parts => {
     let (_, faces, mol, lbl, opts) = parts
-
-    if type(mol) == array {
-      let (_, mol, _) = mol
-    } else {
-      mol = none
-    }
+    mol = if mol != none { let (_, mol, _) = mol; mol } else { () }
     (
       type: "cycle",
       faces: faces,
