@@ -265,10 +265,10 @@
     math.attach(parts.element, tl: [#parts.isotope], br: [#parts.subscript])
   } else if type == "parenthetical" {
     let inner = process-atom(parts.atoms)
-    math.attach([(#inner)], br: [#parts.subscript])
+    math.attach([(#inner.join())], br: [#parts.subscript])
   } else if type == "complex" {
     let inner = process-atom(parts.atoms)
-    [\[#inner\]]
+    [\[#inner.join()\]]
   } else {
     "unkown type: " + type
   }
@@ -342,7 +342,10 @@
   optional(options-parser),
   map: parts => {
     let (_, faces, mol, lbl, opts) = parts
-    mol = if mol != none { let (_, mol, _) = mol; mol } else { () }
+    mol = if mol != none {
+      let (_, mol, _) = mol
+      mol
+    }
     (
       type: "cycle",
       faces: faces,
@@ -530,6 +533,5 @@
     )
   }
   
-  // Success - all input was consumed
   return reaction_result
 }

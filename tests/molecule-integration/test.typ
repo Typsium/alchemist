@@ -113,18 +113,12 @@
 == Complex Natural Compounds (Simplified)
 
 === Caffeine Skeleton (Simplified)
-#skeletize(molecule("@6(=O)(-N(-CH3))-N-@5(-N(-CH3))=N"))
-
-=== Cholesterol Skeleton (Simplified)
-// #skeletize(molecule("@6-@6-@6-@5(-CH3)(-CH(-CH3)-CH2-CH2-CH2-CH(-CH3)2)"))
+#skeletize(molecule("@6((=O)-N(-)-(=O)-@5(-N(-)-=N-=)--N(-)-)"))
 
 == Pharmaceutical Skeleton (Simplified)
 
 === Aspirin
-#skeletize(molecule("@6(-=-=(-O-C-CH3)-=)"))
+#skeletize(molecule("@6(-=-(-O-(=O)-CH3)=(-(=O)-OH)-=)"))
 
 === Paracetamol
-#skeletize(molecule("@6(-OH)---(-NH-C(=O)-CH3)"))
-
-=== Ibuprofen Skeleton
-// #skeletize(molecule("@6(-CH(-CH3)-CH2-CH(-CH3)2)---(-CH(-CH3)-C(=O)-OH)"))
+#skeletize(molecule("@6((-OH)-=-(-NH-(=O)-CH3)=-=)"))
