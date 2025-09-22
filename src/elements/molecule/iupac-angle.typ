@@ -5,6 +5,7 @@
   main_chain_initial: chain_length => if chain_length >= 2 { 30deg } else { 0deg } - 60deg,
   zigzag: idx => if calc.rem(idx, 2) == 1 { 60deg } else { -60deg },
   incoming: -180deg,
+  straight: 0deg,
   
   sp3: (60deg, -60deg, -120deg, -180deg),
   sp2: (60deg, -60deg, -180deg),
@@ -25,21 +26,18 @@
   if n == 2 and (triple >= 1 or double >= 2) { IUPAC_ANGLES.sp }
   else if branches_len <= 1 and (double >= 1 or other >= 2) { IUPAC_ANGLES.sp2 }
   else if branches_len <= 2 { IUPAC_ANGLES.sp3 }
-  else { (IUPAC_ANGLES.branch_angles)(n) }
+  else { range(n).map(i => (IUPAC_ANGLES.branch_angles)(n, i)) }
 }
 
-#let process_bond(ctx, bond) = {
+#let bond-angle(ctx, bond) = {
   let (n, idx) = ctx.position.last()
 
   let angle = if ctx.parent_type == "unit" or ctx.parent_type == none {
-    // if n == 2 {
-    //   panic(ctx, bond)
-    // }
     ctx.current_angle + (IUPAC_ANGLES.zigzag)(idx)
   } else if ctx.parent_type == "cycle" {
     ctx.current_angle + (IUPAC_ANGLES.cycle_edge_angles)(n, idx)
   } else if ctx.parent_type == "branch" {
-    ctx.current_angle + (IUPAC_ANGLES.branch_angles)(n, idx)
+    ctx.current_angle
   } else {
     panic("Unknown parent type: " + ctx.parent_type)
   }
@@ -47,10 +45,13 @@
   return (ctx + (current_angle: angle), angle)
 }
 
-#let process_branch(ctx, unit) = {
+#let unit-angles(ctx, unit) = {
   let (n, idx) = ctx.position.last()
+  if ctx.parent_type == "cycle" {
+    return range(n).map(i => ctx.current_angle + (IUPAC_ANGLES.cycle_branch_angles)(n, i))
+  }
 
-  let branches = unit.at("branches", default: ())
+  let branches = unit.branches
   if branches.len() == 0 { return () }
 
   let bonds = branches.map(b => b.bond)
@@ -58,9 +59,8 @@
   if ctx.next_bond != none { bonds.push(ctx.next_bond) }
 
   let angles = hybridization_angles(bonds, branches.len()).filter(
-    angle => (ctx.prev_bond == none or ctx.next_bond == none
-      or angle != IUPAC_ANGLES.incoming
-      or angle != IUPAC_ANGLES.zigzag(index))
+    angle => (ctx.prev_bond == none or angle != IUPAC_ANGLES.incoming)
+      and (ctx.next_bond == none or angle != (IUPAC_ANGLES.zigzag)(idx + 1))
   )
 
   // first branches of the main chain
@@ -69,4 +69,12 @@
   }
   
   return angles
+}
+
+#let initial-angle(ctx, molecule) = {
+  if molecule.first.node.type == "cycle" {
+    return (IUPAC_ANGLES.cycle_branch_angles)(molecule.first.node.faces, -1)
+  }
+
+  return (IUPAC_ANGLES.main_chain_initial)(molecule.rest.len())
 }

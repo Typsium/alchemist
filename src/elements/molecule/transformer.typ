@@ -1,8 +1,7 @@
-#import "iupac-angle.typ": process_bond, IUPAC_ANGLES
+#import "iupac-angle.typ": bond-angle, IUPAC_ANGLES, unit-angles, initial-angle
 #import "generator.typ": *
 
 #let init_state() = (
-  // Position and angle information
   position: (),              // Position in the molecule
   parent_type: none,         // Parent structure type
   prev_bond: none,           // Previous bond information
@@ -19,21 +18,25 @@
 }
 
 #let transform_bond(ctx, bond) = {
-  let (ctx, angle) = process_bond(ctx, bond)
+  let (ctx, angle) = bond-angle(ctx, bond)
 
-  (ctx, generate_bond(bond, angle))
+  // connecting points
+  if ctx.parent_type == "cycle" {
+    return (ctx, generate_bond(bond, angle, (from: 0, to: 0)))
+  }
+
+  (ctx, generate_bond(bond, angle, (:)))
 }
 
 #let transform_branch(ctx, branch, transform_molecule_fn) = {
   let (ctx, bond) = transform_bond(ctx, branch.bond)
-  let body = transform_molecule_fn(ctx, branch.body)
-
+  let body = transform_molecule_fn(ctx + (parent_type: "unit", ), branch.body)
   generate_branch(bond, body)
 }
 
 #let transform_cycle(ctx, cycle, transform_molecule_fn) = {
   let body = if cycle.body == none {
-    (single(), single())
+    range(cycle.faces).map(i => single()).join()
   } else {
     transform_molecule_fn(
       ctx + (
@@ -44,15 +47,23 @@
     )
   }
 
-  // (hetero, body) = if body.at(0).type == "fragment" {
-  //   (body.at(0), body.slice(1))
-  // }
-  // (hetero, body) = if body.at(n-1).type == "fragment" {
-  //   (body.at(n-1), body.slice(1))
-  // }
-  // 0, n fragment の付け替え
+  let hetero = none
+  (hetero, body) = if body.at(0).type == "fragment" {
+    (body.at(0), body.slice(1))
+  } else {
+    (none, body)
+  }
+  (hetero, body) = if body.last().type == "fragment" {
+    (body.last(), body.slice(0, -1))
+  } else {
+    (none, body)
+  }
 
-  generate_cycle(cycle, body)
+  if hetero != none {
+    (hetero, generate_cycle(cycle, body))
+  } else {
+    (generate_cycle(cycle, body),)
+  }
 }
 
 #let transform_unit(ctx, unit, transform_molecule_fn) = {
@@ -77,12 +88,14 @@
     none
   }
   
-  // Process branches with proper context
-  let branches = unit.branches.enumerate().map(((idx, branch)) => {
+  // Process branches
+  let angles = unit-angles(ctx, unit)
+  let branches = unit.branches.enumerate().zip(angles).map((((idx, branch), angle)) => {
     transform_branch(
       ctx + (
         parent_type: "branch",
-        position: ctx.position + ((unit.branches.len(), idx),)
+        position: ctx.position + ((unit.branches.len(), idx),),
+        current_angle: ctx.current_angle + angle,
       ),
       branch,
       transform_molecule_fn
@@ -90,9 +103,9 @@
   })
   
   if generated != none {
-    (generated, ..branches)
+    (..generated, ..branches.join())
   } else {
-    branches
+    branches.join()
   }
 }
 
@@ -101,9 +114,9 @@
 
   let chain_length = molecule.rest.len()
   ctx += (
-    current_angle: (IUPAC_ANGLES.main_chain_initial)(chain_length),
+    current_angle: initial-angle(ctx, molecule),
     prev_bond: none,
-    next_bond: if chain_length > 0 { molecule.rest.at(0).bond } else { none },
+    next_bond: if 0 < chain_length { molecule.rest.at(0).bond } else { none },
     position: ctx.position + ((chain_length, 0),)
   )
 
@@ -115,11 +128,11 @@
   )
 
   // Transform rest of chain
-  let processed_rest = if molecule.rest != none and molecule.rest.len() > 0 {
+  let rest = if molecule.rest != none and chain_length > 0 {
     for (idx, item) in molecule.rest.enumerate() {
       let rest_ctx = ctx + (
         prev_bond: ctx.next_bond,
-        next_bond: if chain_length < molecule.rest.len() { molecule.rest.at(idx + 1).bond } else { none },
+        next_bond: if idx + 1 < chain_length { molecule.rest.at(idx + 1).bond } else { none },
         position: ctx.position + ((chain_length, idx + 1),),
       )
       
@@ -127,13 +140,13 @@
       let unit = transform_unit(rest_ctx, item.unit, transform_molecule)
       ctx = rest_ctx
 
-      (bond, unit)
+      (..bond, ..unit)
     }
   } else {
     ()
   }
 
-  return first + processed_rest.join()
+  return (..first, ..rest)
 }
 
 // ============================ Reaction ============================
@@ -155,11 +168,11 @@
     } else {
       panic("Unknown term type: " + term.type)
     }
-  }).join()
+  })
 }
 
 #let transform(reaction) = {
   let ctx = init_state()
 
-  transform_reaction(ctx, reaction)
+  transform_reaction(ctx, reaction).join()
 }

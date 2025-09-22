@@ -3,24 +3,26 @@
 // ============================ Molecule ============================
 
 #let generate_fragment(node) = (
-  type: "fragment",
-  atoms: node.atoms,
-  name: node.at("name", default: none),
-  links: node.at("links", default: (:)),
-  lewis: node.options.at("lewis", default: ()),
-  vertical: node.options.at("vertical", default: false),
-  count: node.atoms.len(),
-  colors: node.options.at("colors", default: none),
-  label: node.at("name", default: none),
-  ..node.options,
+  (
+    type: "fragment",
+    atoms: node.atoms,
+    name: node.at("name", default: none),
+    links: node.at("links", default: (:)),
+    lewis: node.options.at("lewis", default: ()),
+    vertical: node.options.at("vertical", default: false),
+    count: node.atoms.len(),
+    colors: node.options.at("colors", default: none),
+    label: node.at("name", default: none),
+    ..node.options,
+  ),
 )
 
-#let generate_bond(bond, angle) = {
+#let generate_bond(bond, angle, options) = {
   let symbol = bond.symbol
   let name = bond.at("name", default: none)
   let absolute = if angle != none { angle } else { bond.at("absolute", default: none) }
   let relative = bond.at("relative", default: none)
-  let options = bond.options
+  let options = if options != (:) { options } else { bond.options }
 
   let bond-fn = if symbol == "-" {
     single
@@ -55,25 +57,20 @@
   }
 }
 
-#let generate_branch(bond, body) = {
-  return (
+#let generate_branch(bond, body) = (
+  (
     type: "branch",
-    body: (..bond, ..body),
+    body: {bond; body},
     args: (:),
-  )
-}
+  ),
+)
 
-#let generate_cycle(cycle, body) = {
-  return (
-    type: "cycle",
-    faces: cycle.faces,
-    body: body,
-    args: (:),
-  )
-}
-
-#let generate_label_reference(label) = {
-}
+#let generate_cycle(cycle, body) = (
+  type: "cycle",
+  faces: cycle.faces,
+  body: body,
+  args: (:),
+)
 
 #let generate_molecule(molecule) = {
   if molecule == none { return () }
@@ -90,15 +87,6 @@
 }
 
 // ============================ Reaction ============================
-
-#let generate_term(ctx, molecule) = {
-  if molecule.type != "molecule" {
-    return molecule
-  }
-
-  let transformed = generate_molecule(molecule_with_angles)
-  return generate_label_references(transformed)
-}
 
 #let generate_operator(operator) = {
   let op = if operator.op == "->" {
@@ -123,17 +111,3 @@
     margin: 0.7em,
   )
 }
-
-#let generate_reaction(reaction) = {
-  reaction.terms.map(term => {
-    if term.type == "term" {
-      generate_term(term.molecule)
-    } else if term.type == "operator" {
-      (generate_operator(term),)
-    } else {
-      panic("Unknown term type: " + term.type)
-    }
-  }).join()
-}
-
-#let generate = generate_reaction
