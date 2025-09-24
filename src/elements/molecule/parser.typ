@@ -12,8 +12,8 @@
 
   // molecule syntax
   molecule      ::= unit (bond unit)*
-  unit          ::= (node | implicit_node) branch*
-  node          ::= fragment | ring | label
+  unit          ::= (node | implicit_node) branch* ring*
+  node          ::= fragment | label
   implicit_node ::= ε
 
   fragment      ::= FRAGMENT label? options?
@@ -360,7 +360,6 @@
 
 #let node-parser(mol-parser) = choice(
   fragment-parser,
-  ring-parser(mol-parser),
   label-ref-parser
 )
 
@@ -373,9 +372,9 @@
 )
 
 #let unit-parser(mol-parser) = seq(
-  optional(node-parser(mol-parser)), many(branch-parser(mol-parser)),
+  optional(node-parser(mol-parser)), many(branch-parser(mol-parser)), many(ring-parser(mol-parser)),
   map: parts => {
-    let (node, branches) = parts
+    let (node, branches, rings) = parts
 
     // Handle label reference as a special unit type
     if node != none and node.type == "label-ref" {
@@ -383,13 +382,14 @@
         type: "unit",
         node: node,
         branches: branches,
-        is_continuation_start: true
+        rings: rings,
       )
     } else {
       (
         type: "unit",
         node: if node == none { (type: "implicit") } else { node },
-        branches: branches
+        branches: branches,
+        rings: rings,
       )
     }
   }
@@ -404,18 +404,8 @@
     map: nodes => {
       let (first, rest) = nodes
       
-      // Check if molecule starts with a label reference
-      let is_continuation = first.at("is_continuation_start", default: false)
-      let continuation_label = if is_continuation and first.node.type == "label-ref" {
-        first.node.label
-      } else {
-        none
-      }
-      
       (
         type: "molecule",
-        is_continuation: is_continuation,
-        continuation_label: continuation_label,
         first: first,
         rest: rest.map(unit => {
           let (bond, unit) = unit 

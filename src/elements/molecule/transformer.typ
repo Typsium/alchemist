@@ -5,7 +5,7 @@
   position: (),              // Position in the molecule
   parent_type: none,         // Parent structure type
   prev_bond: none,           // Previous bond information
-  next_bond: none,           // Next bond information (for lookahead)
+  next_bond: none,           // Next bond information
   current_angle: 0deg,       // Current absolute angle
   visited_labels: (),        // Visited labels (prevent circular references)
   label_table: (:),          // Label table for references
@@ -74,18 +74,16 @@
   let generated = if node != none {
     if node.type == "fragment" {
       transform_fragment(ctx, node)
-    } else if node.type == "cycle" {
-      transform_cycle(ctx, node, transform_molecule_fn)
     } else if node.type == "label-ref" {
       generate_label_reference(node)
     } else if node.type == "implicit" {
       // Implicit node, no action needed
-      none
+      ()
     } else {
       panic("Unknown node type: " + node.type + " for node: " + repr(node))
     }
   } else {
-    none
+    ()
   }
   
   // Process branches
@@ -101,12 +99,20 @@
       transform_molecule_fn
     )
   })
-  
-  if generated != none {
-    (..generated, ..branches.join())
-  } else {
-    branches.join()
-  }
+
+  // Process rings
+  let rings = unit.rings.enumerate().map(((idx, ring)) => {
+    transform_cycle(
+      ctx + (
+        parent_type: "cycle",
+        position: ctx.position + ((unit.rings.len(), idx),),
+      ),
+      ring,
+      transform_molecule_fn
+    )
+  })
+
+  (..generated, ..branches.join(), ..rings.join())
 }
 
 #let transform_molecule(ctx, molecule) = {
