@@ -1,4 +1,4 @@
-#import "iupac-angle.typ": bond-angle, IUPAC_ANGLES, unit-angles, initial-angle
+#import "iupac-angle.typ": bond-angle, branch-angles, initial-angle
 #import "generator.typ": *
 
 #let init_state() = (
@@ -41,29 +41,23 @@
     transform_molecule_fn(
       ctx + (
         parent_type: "cycle",
-        position: ctx.position + (cycle.faces, 0),
+        position: ctx.position + ((cycle.faces, 0),),
       ),
       cycle.body
     )
   }
 
-  let hetero = none
-  (hetero, body) = if body.at(0).type == "fragment" {
-    (body.at(0), body.slice(1))
-  } else {
-    (none, body)
+  let hetero = ()
+  if body.at(0).type == "fragment" {
+    hetero.push(body.at(0))
+    body = body.slice(1)
   }
-  (hetero, body) = if body.last().type == "fragment" {
-    (body.last(), body.slice(0, -1))
-  } else {
-    (none, body)
+  if body.last().type == "fragment" {
+    hetero.push(body.last())
+    body = body.slice(0, -1)
   }
 
-  if hetero != none {
-    (hetero, generate_cycle(cycle, body))
-  } else {
-    (generate_cycle(cycle, body),)
-  }
+  (..hetero, generate_cycle(cycle, body))
 }
 
 #let transform_unit(ctx, unit, transform_molecule_fn) = {
@@ -87,7 +81,7 @@
   }
   
   // Process branches
-  let angles = unit-angles(ctx, unit)
+  let angles = branch-angles(ctx, unit.branches)
   let branches = unit.branches.enumerate().zip(angles).map((((idx, branch), angle)) => {
     transform_branch(
       ctx + (
@@ -106,6 +100,7 @@
       ctx + (
         parent_type: "cycle",
         position: ctx.position + ((unit.rings.len(), idx),),
+        current_angle: ctx.current_angle,
       ),
       ring,
       transform_molecule_fn
@@ -119,11 +114,12 @@
   if molecule == none or molecule.type != "molecule" { return () }
 
   let chain_length = molecule.rest.len()
+  let position = ctx.position
   ctx += (
     current_angle: initial-angle(ctx, molecule),
     prev_bond: none,
     next_bond: if 0 < chain_length { molecule.rest.at(0).bond } else { none },
-    position: ctx.position + ((chain_length, 0),)
+    position: position + ((chain_length, 0),)
   )
 
   // Transform first unit
@@ -139,7 +135,7 @@
       let rest_ctx = ctx + (
         prev_bond: ctx.next_bond,
         next_bond: if idx + 1 < chain_length { molecule.rest.at(idx + 1).bond } else { none },
-        position: ctx.position + ((chain_length, idx + 1),),
+        position: position + ((chain_length, idx + 1),),
       )
       
       let (rest_ctx, bond) = transform_bond(rest_ctx, item.bond)
@@ -152,7 +148,7 @@
     ()
   }
 
-  return (..first, ..rest)
+  (..first, ..rest)
 }
 
 // ============================ Reaction ============================

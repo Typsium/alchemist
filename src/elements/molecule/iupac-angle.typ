@@ -12,8 +12,8 @@
   sp: (0deg, -180deg),
 
   branch_angles: (n, idx) => 180deg - (idx + 1) * 360deg / n,
-  cycle_edge_angles: (n, idx) => -90deg + (idx + 1) * 360deg / n,
-  cycle_branch_angles: (n, idx) => -180deg + (idx + 1/2) * 360deg / n,
+  cycle_edge_angles: n => 360deg / n,
+  cycle_branch_angles: n => -150deg + 180deg / n,
 )
 
 // Calculate the angles for the hybridization of the bonds
@@ -35,7 +35,8 @@
   let angle = if ctx.parent_type == "unit" or ctx.parent_type == none {
     ctx.current_angle + (IUPAC_ANGLES.zigzag)(idx)
   } else if ctx.parent_type == "cycle" {
-    ctx.current_angle + (IUPAC_ANGLES.cycle_edge_angles)(n, idx)
+    let (faces, _) = ctx.position.at(-2)
+    ctx.current_angle + (IUPAC_ANGLES.cycle_edge_angles)(faces)
   } else if ctx.parent_type == "branch" {
     ctx.current_angle
   } else {
@@ -45,13 +46,14 @@
   return (ctx + (current_angle: angle), angle)
 }
 
-#let unit-angles(ctx, unit) = {
+#let branch-angles(ctx, branches) = {
   let (n, idx) = ctx.position.last()
+
   if ctx.parent_type == "cycle" {
-    return range(n).map(i => ctx.current_angle + (IUPAC_ANGLES.cycle_branch_angles)(n, i))
+    let (faces, _) = ctx.position.at(-2)
+    return ((IUPAC_ANGLES.cycle_branch_angles)(faces),)
   }
 
-  let branches = unit.branches
   if branches.len() == 0 { return () }
 
   let bonds = branches.map(b => b.bond)
@@ -67,14 +69,10 @@
   if ctx.prev_bond == none and ctx.parent_type == none {
     angles = angles.map(angle => angle + 180deg)
   }
-  
+
   return angles
 }
 
 #let initial-angle(ctx, molecule) = {
-  if molecule.first.node.type == "cycle" {
-    return (IUPAC_ANGLES.cycle_branch_angles)(molecule.first.node.faces, -1)
-  }
-
   return (IUPAC_ANGLES.main_chain_initial)(molecule.rest.len())
 }
