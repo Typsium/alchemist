@@ -398,7 +398,7 @@
 
 #let draw-skeleton-config(default-config) = {
   let config-function(config: (:), name: none, mol-anchor: none, body) = {
-    draw-skeleton(config: merge-dictionaries(config, default-config), body)
+    draw-skeleton(config: merge-dictionaries(config, default-config), name: name, mol-anchor: mol-anchor, body)
   }
   config-function
 }
