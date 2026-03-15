@@ -37,6 +37,7 @@
   cycle-step-angle: 0deg, // angle between two faces in the cycle
   record-vertex: false, // true if the cycle should keep track of its vertices
   vertex-anchors: (), // list of the cycle vertices
+  hide: false, // true if the current elements should be hidden
 )
 
 #let draw-hooks-links(links, mol-name, ctx, from-mol) = {
@@ -53,6 +54,7 @@
     if to-hook.type == "fragment" {
       ctx.links.push((
         type: "link",
+        hide: ctx.hide,
         name: link.at("name"),
         from-pos: if from-mol {
           (name: mol-name, anchor: "mid")
@@ -76,6 +78,7 @@
         } else {
           "link-hook-link"
         },
+        hide: ctx.hide,
         name: link.at("name"),
         from-pos: if from-mol {
           (name: mol-name, anchor: "mid")
@@ -199,6 +202,9 @@
     ctx,
     get-ctx(cetz-ctx => {
       for link in ctx.links {
+        if link.hide {
+          continue
+        }
         let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link)
         if ctx.config.debug {
           circle(from, radius: .1em, fill: red, stroke: red)

@@ -59,6 +59,7 @@
     ctx,
     (
       type: "link",
+      hide: ctx.hide,
       name: link-name,
       override: override,
       from-pos: from-pos,
