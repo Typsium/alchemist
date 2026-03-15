@@ -8,6 +8,7 @@
 #import "src/elements/lewis.typ": *
 
 #let transparent = color.rgb(100%, 0, 0, 0)
+#let name = "alchemist"
 
 /// === Fragment function
 /// Build a fragment group based on mol
