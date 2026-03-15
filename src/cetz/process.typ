@@ -1,6 +1,6 @@
 // Temporary custom process.typ file to override default behavior
 
-#import "@preview/cetz:0.4.1": util, path-util, vector, drawable, process.aabb
+#import "@preview/cetz:0.4.2": util, path-util, vector, drawable, process.aabb
 
 
 /// Processes an element's function to get its drawables and bounds. Returns a {{dictionary}} with the key-values: `ctx` The modified context object, `bounds` The {{aabb}} of the element's drawables, `drawables` An {{array}} of the element's {{drawable}}s.

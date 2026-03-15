@@ -1,5 +1,5 @@
 #import "default.typ": default
-#import "@preview/cetz:0.4.1"
+#import "@preview/cetz:0.4.2"
 #import "cetz/process.typ" as custom-process
 #import "utils/utils.typ": *
 #import "utils/anchors.typ": *
