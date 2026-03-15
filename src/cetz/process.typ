@@ -17,22 +17,21 @@
     if type(element.drawables) == dictionary {
       element.drawables = (element.drawables,)
     }
-    for drawable in element.drawables {
-      if drawable.bounds {
-        bounds = aabb.aabb(
-          if drawable.type == "path" {
-            path-util.bounds(drawable.segments)
-          } else if drawable.type == "content" {
-            let (x, y, _, w, h,) = drawable.pos + (drawable.width, drawable.height)
-            ((x + w / 2, y - h / 2, 0.0), (x - w / 2, y + h / 2, 0.0))
-          },
-          init: bounds
-        )
-      }
+    for drawable in drawable.filter-tagged(element.drawables, drawable.TAG.no-bounds) {
+      bounds = aabb.aabb(
+        if drawable.type == "path" {
+          path-util.bounds(drawable.segments)
+        } else if drawable.type == "content" {
+          let (x, y, _, w, h,) = drawable.pos + (drawable.width, drawable.height)
+          ((x + w / 2, y - h / 2, 0.0), (x - w / 2, y + h / 2, 0.0))
+        },
+        init: bounds
+      )
     }
   }
 
   let name = element.at("name", default: none)
+  element.name = name
   if name != none {
     assert.eq(type(name), str,
       message: "Element name must be a string")
@@ -40,7 +39,7 @@
       message: "Invalid name for element '" + element.name + "'; name must not contain '.'")
 
     if "anchors" in element {
-			anchors.push(name)
+      anchors.push(name)
       ctx.nodes.insert(name, element)
       if ctx.groups.len() > 0 {
         ctx.groups.last().push(name)
@@ -48,21 +47,25 @@
     }
   }
 
+  // Draw a debug bounding box.
   if ctx.debug and bounds != none {
-    element.drawables.push(drawable.path(
-      ((bounds.low, true, (
-        ("l", (bounds.high.at(0), bounds.low.at(1), 0)),
-        ("l", bounds.high),
-        ("l", (bounds.low.at(0), bounds.high.at(1), 0)))),),
-      stroke: red
-    ))
+    element.drawables.push(drawable.line-strip(
+      (bounds.low,
+        (bounds.high.at(0), bounds.low.at(1), 0.0),
+        bounds.high,
+        (bounds.low.at(0), bounds.high.at(1), 0.0)
+      ),
+      close: true,
+      stroke: red,
+      tags: (drawable.TAG.debug,)))
   }
 
   return (
     ctx: ctx,
     bounds: bounds,
     drawables: element.at("drawables", default: ()),
-		anchors: anchors
+    element: element,
+    anchors: anchors
   )
 }
 
@@ -73,7 +76,8 @@
 #let many(ctx, body) = {
   let drawables = ()
   let bounds = none
-	let anchors = ()
+  let elements = ()
+  let anchors = ()
 
   for el in body {
     let r = element(ctx, el)
@@ -86,6 +90,7 @@
       drawables += r.drawables
       anchors += r.anchors
     }
+    elements.push(r.element)
   }
-  return (ctx: ctx, bounds: bounds, drawables: drawables, anchors: anchors)
+  return (ctx: ctx, bounds: bounds, drawables: drawables, elements: elements, anchors: anchors)
 }

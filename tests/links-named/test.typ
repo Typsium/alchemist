@@ -17,7 +17,7 @@
       ("l1.start", 0.5, 90deg, "l1.end"),
       "l1.start",
       stroke: (paint: red, dash: "dashed"),
-      mark: (end: ">"),
+      mark: (end: ">", stroke: (paint: red, dash: "solid")),
     )
     hobby(
       (to: "X.north", rel: (0, 1pt)),
@@ -36,7 +36,7 @@
       ("l1.start", 0.5, 90deg, "l1.end"),
       "l1.start",
       stroke: (paint: red, dash: "dashed"),
-      mark: (end: ">"),
+      mark: (end: ">", stroke: (paint: red, dash: "solid")),
     )
     hobby(
       (to: "X.north", rel: (0, 1pt)),
@@ -55,7 +55,7 @@
       ("l1.start", 0.5, 90deg, "l1.end"),
       "l1.start",
       stroke: (paint: red, dash: "dashed"),
-      mark: (end: ">"),
+      mark: (end: ">", stroke: (paint: red, dash: "solid")),
     )
     hobby(
       (to: "X.north", rel: (0, 1pt)),

@@ -1,6 +1,6 @@
 /// [ppi:100]
 #import "../../lib.typ" : *
-#import "@preview/cetz:0.4.1"
+#import "@preview/cetz:0.4.2"
 
 #set page(width: auto, height: auto, margin: 0.5em)
 
@@ -18,7 +18,7 @@
       ("l1.start", 0.5, 90deg, "l1.end"),
       "l1.start",
       stroke: (paint: red, dash: "dashed"),
-      mark: (end: ">"),
+      mark: (end: ">", stroke: (paint: red, dash: "solid")),
     )
     hobby(
       (to: "X.north", rel: (0, 1pt)),
@@ -37,7 +37,7 @@
       ("l1.start", 0.5, 90deg, "l1.end"),
       "l1.start",
       stroke: (paint: red, dash: "dashed"),
-      mark: (end: ">"),
+      mark: (end: ">", stroke: (paint: red, dash: "solid")),
     )
     hobby(
       (to: "X.north", rel: (0, 1pt)),
@@ -56,7 +56,7 @@
       ("l1.start", 0.5, 90deg, "l1.end"),
       "l1.start",
       stroke: (paint: red, dash: "dashed"),
-      mark: (end: ">"),
+      mark: (end: ">", stroke: (paint: red, dash: "solid")),
     )
     hobby(
       (to: "X.north", rel: (0, 1pt)),

@@ -36,3 +36,4 @@ CETZ_VERSION ?= 0.4.2
 bump-cetz:
 	perl -pi -e 's/cetz:[0-9]+\.[0-9]+\.[0-9]+/cetz:$(CETZ_VERSION)/g' ./lib.typ
 	find ./src -type f -exec perl -pi -e 's/cetz:[0-9]+\.[0-9]+\.[0-9]+/cetz:$(CETZ_VERSION)/g' {} +
+	find ./tests/* -type f -exec perl -pi -e 's/cetz:[0-9]+\.[0-9]+\.[0-9]+/cetz:$(CETZ_VERSION)/g' {} +
