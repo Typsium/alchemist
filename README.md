@@ -87,6 +87,10 @@ To start using alchemist, just use the following code:
 
 For more information, check the [manual](https://raw.githubusercontent.com/Robotechnic/alchemist/master/doc/manual.pdf).
 
+## Tests
+
+The test suite is managed with [tytanic](https://github.com/typst-community/tytanic).
+
 ## Changelog
 
 ### 0.1.8
