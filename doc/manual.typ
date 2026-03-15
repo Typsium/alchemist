@@ -1254,6 +1254,63 @@ Alchemist allows you to draw multiple molecules in the same cetz environment. Th
   ```,
 )
 
+== Integration with Touying
+
+=== Simple animation
+
+Using `touying-reducer` Alchemist can be used with Touying presentations. This provides compatibility with the `pause` animation.
+
+#codesnippet(```typ
+  #import "@preview/touying:0.6.3": *
+  #import "@preview/alchemist:0.1.9": *
+
+  #import themes.metropolis: *
+
+  #let skeletize = touying-reducer.with(reduce: skeletize, cover: hide)
+
+
+  #show: metropolis-theme.with(aspect-ratio: "16-9")
+
+  #slide[
+    #skeletize({
+      fragment("A")
+      (pause,)
+      single()
+      fragment("B")
+    })
+  ]
+```)
+
+=== only and uncover
+
+We can also use `only` and `uncover` but this require a bit of technique:
+
+#codesnippet(```typ
+  #import "@preview/touying:0.6.3": *
+  #import "@preview/alchemist:0.1.9": *
+
+  #import themes.metropolis: *
+
+  #let skeletize = touying-reducer.with(reduce: skeletize, cover: hide)
+
+  #show: metropolis-theme.with(aspect-ratio: "16-9")
+
+  #slide(repeat: 3, self => {
+    skeletize({
+      let self = utils.merge-dicts(self, config-methods(cover: utils.method-wrapper(hide)))
+      let (uncover, only, alternatives) = utils.methods(self)
+      fragment("A")
+      (only(1, {
+        double()
+        fragment("B")
+      }),)
+      (only(2, {
+         single()
+         fragment("C")
+      }),)
+    })
+  ]
+```)
 
 
 == Examples <examples>
