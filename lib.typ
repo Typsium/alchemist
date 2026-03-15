@@ -2,7 +2,7 @@
 #import "src/default.typ": default
 #import "src/utils/utils.typ"
 #import "src/drawer.typ"
-#import "src/drawer.typ": skeletize, draw-skeleton, skeletize-config, draw-skeleton-config
+#import "src/drawer.typ": skeletize, draw-skeleton, skeletize-config, draw-skeleton-config, hide-drawables
 #import "src/elements/links.typ": *
 #import "src/elements/fragment.typ": *
 #import "src/elements/lewis.typ": *
@@ -251,6 +251,31 @@
       name: name,
       op: op,
       margin: margin,
+    ),
+  )
+}
+
+/// === Hiding part of the molecule
+/// This element allows to hide part of the molecule. It can be used to hide the part of the molecule that is not relevant for the current discussion. It can also be used to create some animation effects by hiding and showing different parts of the molecule. Note that the hidden part is still present in the drawing and can be linked to other fragments. This means that you can hide a part of the molecule and still link it to other fragments or hooks. The hidden part is also still present in the cetz record, which means that you can still use it in the cetz drawing. The only thing that is hidden is the drawing of the hidden part.
+/// 
+/// - bounds (boolean): If true, the hidden part keep the same bounding box as if it was not hidden. If false, the hidden part doesn't take any space in the drawing. 
+/// - body (drawable): The body to hide. It can be any drawable.
+/// 
+/// #example(```
+/// #skeletize({
+///  fragment("A")
+///  hide(bounds: true, {
+///   single()
+///  })
+///  fragment("B")
+/// })
+/// ```
+#let hide(bounds: true, body) = {
+  (
+    (
+      type: "hide",
+      bounds: bounds,
+      body: body,
     ),
   )
 }

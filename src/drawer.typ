@@ -11,6 +11,7 @@
 #import "drawer/parenthesis.typ" as parenthesis
 #import "drawer/hook.typ" as hook
 #import "drawer/operator.typ" as operator
+#import "drawer/hide.typ": draw-hide
 
 #import cetz.draw: *
 
@@ -107,29 +108,41 @@
     let drawing = ()
     let cetz-rec = ()
     if type(element) == function {
-      cetz-drawing.push(element)
-    } else if "type" not in element {
-      panic("Element " + repr(element) + " has no type")
-    } else if element.type == "fragment" {
-      (ctx, drawing) = fragment.draw-fragment(element, ctx)
-    } else if element.type == "link" {
-      (ctx, drawing) = link.draw-link(element, ctx)
-    } else if element.type == "branch" {
-      (ctx, drawing, cetz-rec) = branch.draw-branch(element, ctx, draw-fragments-and-link)
-    } else if element.type == "cycle" {
-      (ctx, drawing, cetz-rec) = cycle.draw-cycle(element, ctx, draw-fragments-and-link)
-    } else if element.type == "hook" {
-      ctx = hook.draw-hook(element, ctx)
-    } else if element.type == "parenthesis" {
-      (ctx, drawing, cetz-rec) = parenthesis.draw-parenthesis(
-        element,
-        ctx,
-        draw-fragments-and-link,
-      )
-    } else if element.type == "operator" {
-      (ctx, drawing) = operator.draw-operator(element, fragment-drawing, ctx)
+      // cetz-drawing.push(element)
+    } else if type(element) == dictionary {
+      if "type" not in element {
+        panic("Element " + repr(element) + " has no type")
+      } else if element.type == "fragment" {
+        (ctx, drawing) = fragment.draw-fragment(element, ctx)
+      } else if element.type == "link" {
+        (ctx, drawing) = link.draw-link(element, ctx)
+      } else if element.type == "branch" {
+        (ctx, drawing, cetz-rec) = branch.draw-branch(element, ctx, draw-fragments-and-link)
+      } else if element.type == "cycle" {
+        (ctx, drawing, cetz-rec) = cycle.draw-cycle(element, ctx, draw-fragments-and-link)
+      } else if element.type == "hook" {
+        ctx = hook.draw-hook(element, ctx)
+      } else if element.type == "parenthesis" {
+        (ctx, drawing, cetz-rec) = parenthesis.draw-parenthesis(
+          element,
+          ctx,
+          draw-fragments-and-link,
+        )
+      } else if element.type == "operator" {
+        (ctx, drawing) = operator.draw-operator(element, fragment-drawing, ctx)
+      } else if element.type == "hide" {
+        (ctx, drawing, cetz-rec) = draw-hide(element, ctx, draw-fragments-and-link)
+      } else {
+        panic("Unknown element type " + element.type)
+      }
+    } else if type(element) == type([]) {
+      if element.func() == metadata {
+        // ignore metadata
+      } else {
+        panic("Unexpected content element: " + repr(element))
+      }
     } else {
-      panic("Unknown element type " + element.type)
+      panic("Unexpected element type: " + str(type(element)))
     }
     fragment-drawing += drawing
     cetz-drawing += cetz-rec
@@ -401,4 +414,9 @@
     draw-skeleton(config: merge-dictionaries(config, default-config), name: name, mol-anchor: mol-anchor, body)
   }
   config-function
+}
+
+
+#let hide-drawables(elements) = {
+  return elements
 }
