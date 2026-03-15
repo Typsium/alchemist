@@ -56,7 +56,9 @@
     gap
   } else if offset == "bottom" {
     -gap
-  } else if offset != "center" {
+  } else if offset == "center" {
+    0
+  } else {
     panic("Invalid position, expected 'top', 'bottom' or 'center'")
   }
   let fill = args.at("fill", default: ctx.config.lewis-single.fill)
