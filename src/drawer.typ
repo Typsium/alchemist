@@ -144,8 +144,10 @@
       } else {
         panic("Unexpected content element: " + repr(element))
       }
+    } else if element == none {
+      // ignore empty elements
     } else {
-      panic("Unexpected element type: " + str(type(element)))
+      panic("Unexpected element type: " + str(type(element)) + " with value " + repr(element))
     }
     fragment-drawing += drawing
     cetz-drawing += cetz-rec
