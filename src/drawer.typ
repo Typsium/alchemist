@@ -111,7 +111,7 @@
     let drawing = ()
     let cetz-rec = ()
     if type(element) == function {
-      // cetz-drawing.push(element)
+      cetz-drawing.push(element)
     } else if type(element) == dictionary {
       if "type" not in element {
         panic("Element " + repr(element) + " has no type")
