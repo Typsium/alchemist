@@ -93,6 +93,11 @@ The test suite is managed with [tytanic](https://github.com/typst-community/tyta
 
 ## Changelog
 
+### 0.1.9
+
+- Updated cetz to version 0.4.2
+- Exposed name in lib.typ to be used by other packages
+
 ### 0.1.8
 
 - Fixed bugs introduced in 0.1.7
