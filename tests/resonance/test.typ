@@ -8,14 +8,14 @@
   config: (angle-increment: 15deg),
   {
     import cetz.draw: *
-    molecule("C")
+    fragment("C")
     branch({
       single(angle: 14)
-      molecule("E")
+      fragment("E")
     })
     branch({
       double(angle: 6)
-      molecule(
+      fragment(
         "O",
         lewis: (
           lewis-double(),
@@ -24,7 +24,7 @@
       )
     })
     single(angle: -2)
-    molecule(
+    fragment(
       "O",
       lewis: (
         lewis-double(angle: -45deg),
@@ -33,7 +33,7 @@
       name: "to",
     )
     single(angle: 2, name: "from")
-    molecule("H", name: "H")
+    fragment("H", name: "H")
     hobby(
       stroke: (red),
       (to: "from", rel: (0, 3pt)),
@@ -42,7 +42,7 @@
       mark: (end: ">", fill: red),
     )
     plus(atom-sep: 5em)
-    molecule(
+    fragment(
       "B",
       lewis: (
         lewis-double(angle: 180deg),
@@ -64,14 +64,14 @@
       r: "]",
       l: "[",
       {
-        molecule("C")
+        fragment("C")
         branch({
           single(angle: 14)
-          molecule("R")
+          fragment("R")
         })
         branch({
           double(angle: 6, name: "double")
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(),
@@ -82,7 +82,7 @@
         })
         branch({
           single(angle: -2)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: 0),
@@ -102,14 +102,14 @@
 
         operator(math.stretch(sym.arrow.r.l, size: 2em))
 
-        molecule("C")
+        fragment("C")
         branch({
           single(angle: 14)
-          molecule("R")
+          fragment("R")
         })
         branch({
           single(angle: 6)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(),
@@ -120,7 +120,7 @@
         })
         branch({
           single(angle: -2, name: "single")
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: 0),
@@ -140,14 +140,14 @@
 
         operator(math.stretch(sym.arrow.r.l, size: 2em))
 
-        molecule("C")
+        fragment("C")
         branch({
           single(angle: 14)
-          molecule("R")
+          fragment("R")
         })
         branch({
           single(angle: 6)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: 0),
@@ -158,7 +158,7 @@
         })
         branch({
           double(angle: -2)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: -135deg),
