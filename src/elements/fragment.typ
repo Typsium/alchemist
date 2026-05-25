@@ -39,7 +39,7 @@
       last-number = false
     }
   }
-  result
+  (result, result.len())
 }
 
 #let fragment-cor-regex = "[0-9]*[A-Z][a-z]*'*"
@@ -47,7 +47,9 @@
 #let exponent-base-regex = "(?:(\\^|_)" + exponent-regex + ")?(?:(\\^|_)" + exponent-regex + ")?"
 #let fragment-regex = regex("^ *(" + fragment-cor-regex + ")" + exponent-base-regex)
 
-#let split-string(mol) = {
+#let make-fragment-text(text, indexed) = (math.equation(eval(text, mode: "math")), indexed)
+
+#let split-fragment-string(mol, split-charge: false) = {
   let aux(str) = {
     let match = str.match(fragment-regex)
     if match == none {
@@ -56,19 +58,38 @@
       panic("You cannot use an exponent and a subscript twice")
     }
     let eq = "\"" + match.captures.at(0) + "\""
-    if match.captures.at(1) != none {
-      eq += match.captures.at(1) + "(" + match.captures.at(2) + ")"
+
+    let has-exponent = match.captures.at(2) != none
+    let has-subscript = match.captures.at(4) != none
+
+    let charge = ""
+    if has-exponent {
+      charge += match.captures.at(1) + "(" + match.captures.at(2) + ")"
     }
 		if match.captures.at(3) != none {
-			eq += match.captures.at(3) + "(" + match.captures.at(4) + ")"
-		}
-    let eq = math.equation(eval(eq, mode: "math"))
+      charge += match.captures.at(3) + "(" + match.captures.at(4) + ")"
+    }
+    if charge != "" {
+      if split-charge {
+        charge = "\"\"" + charge
+        eq = (make-fragment-text(eq, true), make-fragment-text(charge, false))
+      } else {
+        eq += charge
+        eq = (make-fragment-text(eq, true),)
+      }
+    } else {
+      eq = (make-fragment-text(eq, true),)
+    }
+    
     (eq, match.end)
   }
 
-  while not mol.len() == 0 {
+  let count = 0
+  let fragments = while not mol.len() == 0 {
+    count += 1
     let (eq, end) = aux(mol)
     mol = mol.slice(end)
-    (eq,)
+    eq
   }
+  (fragments, count)
 }

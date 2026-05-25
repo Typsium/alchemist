@@ -49,6 +49,14 @@
 ///   fragment("ABCD", vertical: true)
 /// })
 ///```)
+/// - ignore-charge (boolean): If true, charge of the fragment are excluded from the links connections. This is useful when you want to have the center of your connection to the text without having the charge in the way.
+/// #example(```
+/// #skeletize({
+///   fragment("A")
+///   single(relative: 90deg)
+///   fragment("B^-", ignore-charge: true)
+/// })
+/// ```)
 /// - colors (color|list): The color of the fragment. If a list is provided, it colors each group of the fragment with the corresponding color from right to left. If the number of colors is less than the number of groups, the last color is used for the remaining groups. If the number of colors is greater than the number of groups, the extra colors are ignored.
 /// #example(```
 /// #skeletize({
@@ -58,9 +66,9 @@
 /// })
 /// ```)
 /// -> drawable
-#let fragment(name: none, links: (:), lewis: (), vertical: false, colors: none, mol) = {
-  let atoms = if type(mol) == str {
-    split-string(mol)
+#let fragment(name: none, links: (:), lewis: (), vertical: false, ignore-charge: false, colors: none, mol) = {
+  let (atoms, count) = if type(mol) == str {
+    split-fragment-string(mol, split-charge: ignore-charge)
   } else if mol.func() == math.equation {
     split-equation(mol, equation: true)
   } else {
@@ -80,7 +88,7 @@
       links: links,
       lewis: lewis,
       vertical: vertical,
-      count: atoms.len(),
+      count: count
     ),
   )
 }
