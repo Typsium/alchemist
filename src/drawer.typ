@@ -118,7 +118,7 @@
         hide(
           cetz-drawing.push(element)
         )
-} else {
+      } else {
         cetz-drawing.push(element)
       }
     } else if type(element) == dictionary {
@@ -247,8 +247,10 @@
 /// set elements names and split the molecule into sub-groups
 #let preprocessing(body, group-id: 0, link-id: 0, operator-id: 0) = {
   let result = ((),)
+  let has_element = false
   for element in body {
     if type(element) == dictionary {
+      has_element = true
       if element.at("name", default: none) == none {
         if element.type == "fragment" {
           element.name = "fragment-" + str(group-id)
@@ -281,9 +283,14 @@
       } else {
         result.at(-1).push(element)
       }
-    } else {
+    } else if type(element) == function {
       result.at(-1).push(element)
+    } else {
+      panic("Unexpected element type: " + str(type(element)) + " with value " + repr(element))
     }
+  }
+  if not has_element {
+    panic("The skeletize body must contain at least one element")
   }
   (result, group-id, link-id, operator-id)
 }
