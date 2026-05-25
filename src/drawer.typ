@@ -114,10 +114,12 @@
     let drawing = ()
     let cetz-rec = ()
     if type(element) == function {
-      if not ctx.hide {
+      if ctx.hide {
         hide(
           cetz-drawing.push(element)
         )
+} else {
+        cetz-drawing.push(element)
       }
     } else if type(element) == dictionary {
       if "type" not in element {
