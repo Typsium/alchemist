@@ -27,6 +27,8 @@
   relative-angle: 0deg, // current global relative angle
   angle: 0deg, // current global angle
   id: 0, // an id used to name things with an unique name
+  first-molecule: true, // true if we are drawing the first molecule of the current equation
+  first-draw: true, // true if no element of the current molecule has been drawn yet
   // branch
   first-branch: false, // true if the next element is the first in a branch
   // cycle
@@ -104,6 +106,7 @@
 #let draw-fragments-and-link(ctx, body) = {
   let fragment-drawing = ()
   let cetz-drawing = ()
+  ctx.first-draw = true
   for element in body {
     if ctx.in-cycle and ctx.faces-count >= ctx.cycle-faces {
       continue
@@ -151,6 +154,7 @@
     }
     fragment-drawing += drawing
     cetz-drawing += cetz-rec
+    ctx.first-draw = false
   }
   if ctx.last-anchor.type == "link" and not ctx.last-anchor.at("drew", default: false) {
     ctx.links.push(ctx.last-anchor)
@@ -379,6 +383,7 @@
     } else {
       panic("Unexpected element type: " + body.type)
     }
+    ctx.first-molecule = false
   }
   (drawables, ctx)
 }
