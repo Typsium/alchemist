@@ -97,8 +97,8 @@ The test suite is managed with [tytanic](https://github.com/typst-community/tyta
 
 - Added touying bindings in lib.typ to support automatic integration
 - Added a way to ignore charges in the links connection of a fragment with the `ignore-charge` parameter
-- Fix #27
-- Fix #23
+- Fix [#27](https://github.com/Typsium/alchemist/issues/27)
+- Fix [#23](https://github.com/Typsium/alchemist/issues/23)
 
 ### 0.1.9
 
