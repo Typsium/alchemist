@@ -10,6 +10,11 @@
 #let transparent = color.rgb(100%, 0, 0, 0)
 #let name = "alchemist"
 
+#let touying-reducer-bindings = (
+  "reduce": ("skeletize",),
+  "cover": ("hide",)
+)
+
 /// === Fragment function
 /// Build a fragment group based on mol
 /// Each fragment is represented as an optional count followed by a fragment name
