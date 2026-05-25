@@ -1,5 +1,5 @@
 #import "@preview/mantys:1.0.2": *
-#import "@preview/alchemist:0.1.6"
+#import "@preview/alchemist:0.1.10"
 #import "@preview/cetz:0.4.0"
 
 #let infos = toml("../typst.toml")
@@ -1262,7 +1262,7 @@ Using `touying-reducer` Alchemist can be used with Touying presentations. This p
 
 #codesnippet(```typ
   #import "@preview/touying:0.6.3": *
-  #import "@preview/alchemist:0.1.9": *
+  #import "@preview/alchemist:0.1.10": *
 
   #import themes.metropolis: *
 
@@ -1287,7 +1287,7 @@ We can also use `only` and `uncover` but this require a bit of technique:
 
 #codesnippet(```typ
   #import "@preview/touying:0.6.3": *
-  #import "@preview/alchemist:0.1.9": *
+  #import "@preview/alchemist:0.1.10": *
 
   #import themes.metropolis: *
 

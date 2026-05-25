@@ -57,7 +57,7 @@
 ///   fragment("B^-", ignore-charge: true)
 /// })
 /// ```)
-/// - colors (color|list): The color of the fragment. If a list is provided, it colors each group of the fragment with the corresponding color from right to left. If the number of colors is less than the number of groups, the last color is used for the remaining groups. If the number of colors is greater than the number of groups, the extra colors are ignored.
+/// - colors (color, list): The color of the fragment. If a list is provided, it colors each group of the fragment with the corresponding color from right to left. If the number of colors is less than the number of groups, the last color is used for the remaining groups. If the number of colors is greater than the number of groups, the extra colors are ignored.
 /// #example(```
 /// #skeletize({
 ///   fragment("ABCD", colors: (red, green, blue))
@@ -245,7 +245,7 @@
 /// An important point is that you can't use previous hooks to link two molecules separate by an operator.
 /// This element is used in resonance structures (@resonance) and in some cases to put multiples molecules in the same skeletal formula (as you can set op to none).
 /// 
-/// - op (content | string | none): The operator content. It can be a string or a content. A none value won't display anything.
+/// - op (content, string, none): The operator content. It can be a string or a content. A none value won't display anything.
 /// #example(```
 /// #skeletize({
 ///  fragment("A")
