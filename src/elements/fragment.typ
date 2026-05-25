@@ -1,4 +1,4 @@
-#let split-equation(mol, equation: false) = {
+#let split-equation(mol, equation: false, split-charge: false) = {
   if equation {
     mol = mol.body
     if mol.has("children") {
@@ -11,35 +11,46 @@
 
   let result = ()
   let last-number = false
+  let count = 0
   for m in mol {
-    let last-number-hold = last-number
     if m.has("text") {
       let text = m.text
       if str.match(text, regex("^[A-Z][a-z]*$")) != none {
-        result.push(m)
+        if last-number {
+          result.at(-1) = (result.at(-1).at(0) + m, result.at(-1).at(1))
+        } else {
+          result.push((m, true))
+        }
+        last-number = false
       } else if str.match(text, regex("^[0-9]+$")) != none {
         if last-number {
           panic("Consecutive numbers in fragment fragment")
         }
         last-number = true
-        result.push(m)
+        result.push((m, true))
       } else {
         panic("Invalid fragment fragment content")
       }
-    } else if m.func() == math.attach or m.func() == math.lr {
-      result.push(m)
+    } else if m.func() == math.lr {
+      result.push((m, true))
+      last-number = false
+    } else if m.func() == math.attach {
+      if split-charge {
+        result.push((math.attach("", bl: m.at("bl", default: none), tl: m.at("tl", default: none)), false))
+        result.push((math.attach(m.base, b: m.at("b", default: none), t: m.at("t", default: none)), true))
+        result.push((math.attach("", br: m.at("br", default: none), tr: m.at("tr", default: none)), false))
+      } else {
+        result.push((m, true))
+      }
+      last-number = false
     } else if m == [ ] {
       continue
     } else {
       panic("Invalid fragment fragment content")
     }
-    if last-number-hold {
-      result.at(-2) = result.at(-2) + result.at(-1)
-      let _ = result.pop()
-      last-number = false
-    }
+    count += 1
   }
-  (result, result.len())
+  (result, count)
 }
 
 #let fragment-cor-regex = "[0-9]*[A-Z][a-z]*'*"

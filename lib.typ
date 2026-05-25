@@ -70,7 +70,7 @@
   let (atoms, count) = if type(mol) == str {
     split-fragment-string(mol, split-charge: ignore-charge)
   } else if mol.func() == math.equation {
-    split-equation(mol, equation: true)
+    split-equation(mol, equation: true, split-charge: ignore-charge)
   } else {
     panic("Invalid fragment content")
   }
