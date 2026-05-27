@@ -5,17 +5,17 @@
 #set page(width: auto, height: auto, margin: 0.5em)
 
 #let molecule-R1 = draw-skeleton(name: "mol1", mol-anchor: "east", {
-  molecule(name: "A", "H_2N")
+  fragment(name: "A", "H_2N")
   single()
-  molecule(name: "B", "CH")
+  fragment(name: "B", "CH")
   branch({
     single(angle: 6)
-    molecule(
+    fragment(
       "R_1",
     )
   })
   single()
-  molecule(name: "cooh", "COOH")
+  fragment(name: "cooh", "COOH")
 })
 
 #canvas({
