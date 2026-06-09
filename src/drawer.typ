@@ -113,7 +113,7 @@
     }
     let drawing = ()
     let cetz-rec = ()
-    if type(element) == function {      
+    if type(element) == function {
       cetz-drawing.push(element)
     } else if type(element) == dictionary {
       if "type" not in element {
@@ -176,9 +176,9 @@
       panic("Over argument must have a name")
     }
     (
-      name, 
+      name,
       over.at("length", default: link-over-radius),
-      over.at("radius", default: link-over-radius)
+      over.at("radius", default: link-over-radius),
     )
   } else {
     panic("Over must be a string or a dictionary, got " + type(link.at("over")))
@@ -193,10 +193,10 @@
     rotate(angle)
     rect(
       anchor: "center",
-      (to: name + ".0", rel: (-length/2,-radius/2)),
+      (to: name + ".0", rel: (-length / 2, -radius / 2)),
       (rel: (length, radius)),
       fill: color,
-      stroke: color
+      stroke: color,
     )
   })
 }
@@ -207,28 +207,28 @@
     get-ctx(cetz-ctx => {
       for link in ctx.links {
         let drawing = {
-        let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link)
-        if ctx.config.debug {
-          circle(from, radius: .1em, fill: red, stroke: red)
-          circle(to, radius: .1em, fill: red, stroke: red)
-        }
-        let length = distance-between(cetz-ctx, from, to)
-        hide(line(from, to, name: link.name))
-        if link.at("over") != none {
-          if type(link.at("over")) == array {
-            for over in link.at("over") {
-              draw-link-over(ctx, link, over, angle)
-            }
-          } else {
-            draw-link-over(ctx, link, link.at("over"), angle)
+          let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link)
+          if ctx.config.debug {
+            circle(from, radius: .1em, fill: red, stroke: red)
+            circle(to, radius: .1em, fill: red, stroke: red)
           }
-        }
+          let length = distance-between(cetz-ctx, from, to)
+          hide(line(from, to, name: link.name))
+          if link.at("over") != none {
+            if type(link.at("over")) == array {
+              for over in link.at("over") {
+                draw-link-over(ctx, link, over, angle)
+              }
+            } else {
+              draw-link-over(ctx, link, link.at("over"), angle)
+            }
+          }
 
-        scope({
-          set-origin(from)
-          rotate(angle)
-          (link.draw)(length, ctx, cetz-ctx, override: link.override)
-        })
+          scope({
+            set-origin(from)
+            rotate(angle)
+            (link.draw)(length, ctx, cetz-ctx, override: link.override)
+          })
         }
         if link.hide {
           hide(drawing)
@@ -330,12 +330,13 @@
               origin-anchor.at(1)
                 - (
                   molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
-                ) / 2,
+                )
+                  / 2,
             )
           } else {
             (0, 0)
           }
-          
+
 
           let transform-matrix = cetz.matrix.transform-translate(
             translate-x,
@@ -345,7 +346,7 @@
           // panic(anchors)
           for name in anchors {
             let hold-anchors = cetz-ctx.nodes.at(name).anchors
-            cetz-ctx.nodes.at(name).anchors = (name) => {
+            cetz-ctx.nodes.at(name).anchors = name => {
               if name != () {
                 cetz.matrix.mul4x4-vec3(transform-matrix, hold-anchors(name))
               } else {
