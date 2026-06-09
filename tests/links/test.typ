@@ -108,3 +108,11 @@
   )
   fragment("B")
 })
+
+#skeletize({
+  double(stroke: 2pt, stroke-right: red, stroke-left: (dash: "dashed"))
+})
+
+#skeletize({
+  triple(stroke: 2pt, stroke-left: red, stroke-center: green, stroke-right: blue)
+})
