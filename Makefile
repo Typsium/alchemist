@@ -1,5 +1,5 @@
-VERSION := $(shell grep '^version' typst.toml | awk -F ' = ' '{print $$2}' | tr -d '"')
-PACKAGE_NAME := $(shell grep '^name' typst.toml | awk -F ' = ' '{print $$2}' | tr -d '"')
+VERSION := $(shell sed -n 's/^version\s*=\s*"\(.*\)"/\1/p' typst.toml)
+PACKAGE_NAME := $(shell sed -n 's/^name\s*=\s*"\(.*\)"/\1/p' typst.toml)
 TARGET_DIR=./$(PACKAGE_NAME)/$(VERSION)
 
 check:
@@ -20,7 +20,10 @@ module:
 	cp ./LICENSE $(TARGET_DIR)/
 	cp ./lib.typ $(TARGET_DIR)/
 	cp -r ./src/* $(TARGET_DIR)/src/
-	awk '{gsub("https://typst.app/universe/package/alchemist", "https://github.com/Typsium/alchemist");print}' ./README.md > $(TARGET_DIR)/README.md
+	sed 's|https://typst.app/universe/package/alchemist|https://github.com/Typsium/alchemist|g' ./README.md > $(TARGET_DIR)/README.md
+	sed -i "s/\/master\//\/$(VERSION)\//g" $(TARGET_DIR)/README.md
+	sed -E -i 's/:[0-9]+\.[0-9]+\.[0-9]+/:$(VERSION)/g' $(TARGET_DIR)/README.md
+	
 
 manual:
 	typst compile ./doc/manual.typ --root .
