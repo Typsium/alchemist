@@ -123,9 +123,17 @@
       } else if element.type == "link" {
         (ctx, drawing) = link.draw-link(element, ctx)
       } else if element.type == "branch" {
-        (ctx, drawing, cetz-rec) = branch.draw-branch(element, ctx, draw-fragments-and-link)
+        (ctx, drawing, cetz-rec) = branch.draw-branch(
+          element,
+          ctx,
+          draw-fragments-and-link,
+        )
       } else if element.type == "cycle" {
-        (ctx, drawing, cetz-rec) = cycle.draw-cycle(element, ctx, draw-fragments-and-link)
+        (ctx, drawing, cetz-rec) = cycle.draw-cycle(
+          element,
+          ctx,
+          draw-fragments-and-link,
+        )
       } else if element.type == "hook" {
         ctx = hook.draw-hook(element, ctx)
       } else if element.type == "parenthesis" {
@@ -137,7 +145,11 @@
       } else if element.type == "operator" {
         (ctx, drawing) = operator.draw-operator(element, fragment-drawing, ctx)
       } else if element.type == "hide" {
-        (ctx, drawing, cetz-rec) = draw-hide(element, ctx, draw-fragments-and-link)
+        (ctx, drawing, cetz-rec) = draw-hide(
+          element,
+          ctx,
+          draw-fragments-and-link,
+        )
       } else {
         panic("Unknown element type " + element.type)
       }
@@ -148,13 +160,18 @@
         panic("Unexpected content element: " + repr(element))
       }
     } else {
-      panic("Unexpected element type: " + str(type(element)) + " with value " + repr(element))
+      panic("Unexpected element type: " + str(
+        type(element),
+      ) + " with value " + repr(element))
     }
     fragment-drawing += drawing
     cetz-drawing += cetz-rec
     ctx.first-draw = false
   }
-  if ctx.last-anchor.type == "link" and not ctx.last-anchor.at("drew", default: false) {
+  if ctx.last-anchor.type == "link" and not ctx.last-anchor.at(
+    "drew",
+    default: false,
+  ) {
     ctx.links.push(ctx.last-anchor)
     ctx.last-anchor.drew = true
   }
@@ -241,7 +258,13 @@
 }
 
 /// set elements names and split the molecule into sub-groups
-#let preprocessing(body, group-id: 0, link-id: 0, operator-id: 0, top-level: true) = {
+#let preprocessing(
+  body,
+  group-id: 0,
+  link-id: 0,
+  operator-id: 0,
+  top-level: true,
+) = {
   let result = ((),)
   let has_element = false
   for element in body {
@@ -274,7 +297,9 @@
           element.body = child-body.at(0)
         }
       }
-      if element.type == "operator" or (element.type == "parenthesis" and element.resonance) {
+      if element.type == "operator" or (
+        element.type == "parenthesis" and element.resonance
+      ) {
         result.push(element)
         result.push(())
       } else {
@@ -285,7 +310,9 @@
     } else if element == none {
       // ignore empty elements
     } else {
-      panic("Unexpected element type: " + str(type(element)) + " with value " + repr(element))
+      panic("Unexpected element type: " + str(
+        type(element),
+      ) + " with value " + repr(element))
     }
   }
   if top-level and not has_element {
@@ -308,7 +335,10 @@
         get-ctx(cetz-ctx => {
           let ctx = ctx
           if ctx.last-anchor.type == "coord" {
-            (cetz-ctx, ctx.last-anchor.anchor) = cetz.coordinate.resolve(cetz-ctx, ctx.last-anchor.anchor)
+            (cetz-ctx, ctx.last-anchor.anchor) = cetz.coordinate.resolve(
+              cetz-ctx,
+              ctx.last-anchor.anchor,
+            )
           }
           let last-anchor = ctx.last-anchor
           let (ctx, atoms, cetz-drawing) = draw-fragments-and-link(ctx, body)
@@ -320,18 +350,27 @@
             atoms
           }
 
-          let (ctx: cetz-ctx, drawables, bounds: molecule-bounds, anchors) = custom-process.many(cetz-ctx, molecule)
-          molecule-bounds = cetz.util.revert-transform(cetz-ctx.transform, molecule-bounds)
+          let (
+            ctx: cetz-ctx,
+            drawables,
+            bounds: molecule-bounds,
+            anchors,
+          ) = custom-process.many(cetz-ctx, molecule)
+          molecule-bounds = cetz.util.revert-transform(
+            cetz-ctx.transform,
+            molecule-bounds,
+          )
 
           let (translate-x, translate-y) = if after-operator {
-            let (_, origin-anchor) = cetz.coordinate.resolve(cetz-ctx, last-anchor.anchor)
+            let (_, origin-anchor) = cetz.coordinate.resolve(
+              cetz-ctx,
+              last-anchor.anchor,
+            )
             (
               origin-anchor.at(0) - molecule-bounds.low.at(0),
-              origin-anchor.at(1)
-                - (
-                  molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
-                )
-                  / 2,
+              origin-anchor.at(1) - (
+                molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
+              ) / 2,
             )
           } else {
             (0, 0)
@@ -391,7 +430,11 @@
       ctx = op-ctx
       drawable
     } else if body.type == "parenthesis" {
-      let (parenthesis-ctx, drawable) = parenthesis.draw-resonance-parenthesis(body, draw-groups, ctx)
+      let (parenthesis-ctx, drawable) = parenthesis.draw-resonance-parenthesis(
+        body,
+        draw-groups,
+        ctx,
+      )
       ctx = parenthesis-ctx
       drawable
     } else {
@@ -414,10 +457,14 @@
   if name == none {
     final-drawing
   } else {
-    group(name: name, anchor: mol-anchor, {
-      anchor("default", (0, 0))
-      final-drawing
-    })
+    group(
+      name: name,
+      anchor: mol-anchor,
+      {
+        anchor("default", (0, 0))
+        final-drawing
+      },
+    )
   }
 }
 
@@ -426,19 +473,33 @@
   if "debug" not in config {
     config.insert("debug", debug)
   }
-  cetz.canvas(debug: debug, background: background, draw-skeleton(config: config, body))
+  cetz.canvas(
+    debug: debug,
+    background: background,
+    draw-skeleton(config: config, body),
+  )
 }
 
 #let skeletize-config(default-config) = {
   let config-function(debug: false, background: none, config: (:), body) = {
-    skeletize(debug: debug, background: background, config: merge-dictionaries(config, default-config), body)
+    skeletize(
+      debug: debug,
+      background: background,
+      config: merge-dictionaries(config, default-config),
+      body,
+    )
   }
   config-function
 }
 
 #let draw-skeleton-config(default-config) = {
   let config-function(config: (:), name: none, mol-anchor: none, body) = {
-    draw-skeleton(config: merge-dictionaries(config, default-config), name: name, mol-anchor: mol-anchor, body)
+    draw-skeleton(
+      config: merge-dictionaries(config, default-config),
+      name: name,
+      mol-anchor: mol-anchor,
+      body,
+    )
   }
   config-function
 }

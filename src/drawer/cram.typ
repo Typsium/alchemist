@@ -21,7 +21,7 @@
 
 /// Draw a dashed triangle between two molecules fragments
 #let dashed-cram(from, to, length, ctx, cetz-ctx, args) = {
-	import cetz.draw: *
+  import cetz.draw: *
   let (cetz-ctx, (from-x, from-y, _)) = cetz.coordinate.resolve(cetz-ctx, from)
   let (cetz-ctx, (to-x, to-y, _)) = cetz.coordinate.resolve(cetz-ctx, to)
   let base-length = utils.convert-length(
@@ -33,7 +33,11 @@
     args.at("tip-length", default: ctx.config.dashed-cram.tip-length),
   )
   hide({
-    line(name: "top", (from-x, from-y - base-length / 2), (to-x, to-y - tip-length / 2))
+    line(
+      name: "top",
+      (from-x, from-y - base-length / 2),
+      (to-x, to-y - tip-length / 2),
+    )
     line(
       name: "bottom",
       (from-x, from-y + base-length / 2),
@@ -41,7 +45,10 @@
     )
   })
   let stroke = args.at("stroke", default: ctx.config.dashed-cram.stroke)
-  let dash-gap = utils.convert-length(cetz-ctx, args.at("dash-gap", default: ctx.config.dashed-cram.dash-gap))
+  let dash-gap = utils.convert-length(
+    cetz-ctx,
+    args.at("dash-gap", default: ctx.config.dashed-cram.dash-gap),
+  )
   let dash-width = stroke.thickness
   let converted-dash-width = utils.convert-length(cetz-ctx, dash-width)
   let length = utils.convert-length(cetz-ctx, length)

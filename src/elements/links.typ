@@ -49,7 +49,11 @@
 ///```)
 #let single = build-link((length, ctx, _, args) => {
   import cetz.draw: *
-  line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.single.stroke))
+  line(
+    (0, 0),
+    (length, 0),
+    stroke: args.at("stroke", default: ctx.config.single.stroke),
+  )
 })
 
 /// Draw a double line between two fragments
@@ -95,7 +99,10 @@
 ///```)
 #let double = build-link((length, ctx, cetz-ctx, args) => {
   import cetz.draw: *
-  let gap = utils.convert-length(cetz-ctx, args.at("gap", default: ctx.config.double.gap)) / 2
+  let gap = utils.convert-length(
+    cetz-ctx,
+    args.at("gap", default: ctx.config.double.gap),
+  ) / 2
   let offset = args.at("offset", default: ctx.config.double.offset)
   let coeff = args.at("offset-coeff", default: ctx.config.double.offset-coeff)
   if coeff < 0 or coeff > 1 {
@@ -105,8 +112,8 @@
     -gap
   } else if offset == "left" {
     gap
-  } else if offset == "center" { 
-    0 
+  } else if offset == "center" {
+    0
   } else {
     panic("Invalid offset value: must be \"left\", \"right\" or \"center\"")
   }
@@ -118,7 +125,10 @@
     } else {
       ((0, -gap + gap-offset), (length, -gap + gap-offset))
     },
-    stroke: args.at("stroke-right", default: args.at("stroke", default: ctx.config.double.stroke))
+    stroke: args.at(
+      "stroke-right",
+      default: args.at("stroke", default: ctx.config.double.stroke),
+    ),
   )
   line(
     ..if offset == "left" {
@@ -127,7 +137,10 @@
     } else {
       ((0, gap + gap-offset), (length, gap + gap-offset))
     },
-    stroke: args.at("stroke-left", default: args.at("stroke", default: ctx.config.double.stroke)),
+    stroke: args.at(
+      "stroke-left",
+      default: args.at("stroke", default: ctx.config.double.stroke),
+    ),
   )
 })
 
@@ -161,10 +174,34 @@
 /// ```)
 #let triple = build-link((length, ctx, cetz-ctx, args) => {
   import cetz.draw: *
-  let gap = utils.convert-length(cetz-ctx, args.at("gap", default: ctx.config.triple.gap))
-  line((0, 0), (length, 0), stroke: args.at("stroke-left", default: args.at("stroke", default: ctx.config.triple.stroke)))
-  line((0, -gap), (length, -gap), stroke: args.at("stroke-center", default: args.at("stroke", default: ctx.config.triple.stroke)))
-  line((0, gap), (length, gap), stroke: args.at("stroke-right", default: args.at("stroke", default: ctx.config.triple.stroke)))
+  let gap = utils.convert-length(
+    cetz-ctx,
+    args.at("gap", default: ctx.config.triple.gap),
+  )
+  line(
+    (0, 0),
+    (length, 0),
+    stroke: args.at(
+      "stroke-left",
+      default: args.at("stroke", default: ctx.config.triple.stroke),
+    ),
+  )
+  line(
+    (0, -gap),
+    (length, -gap),
+    stroke: args.at(
+      "stroke-center",
+      default: args.at("stroke", default: ctx.config.triple.stroke),
+    ),
+  )
+  line(
+    (0, gap),
+    (length, gap),
+    stroke: args.at(
+      "stroke-right",
+      default: args.at("stroke", default: ctx.config.triple.stroke),
+    ),
+  )
 })
 
 /// Draw a filled cram between two fragments with the arrow pointing to the right
@@ -264,7 +301,12 @@
 ///   fragment("B")
 /// })
 ///```)
-#let cram-dashed-right = build-link((length, ctx, cetz-ctx, args) => dashed-cram(
+#let cram-dashed-right = build-link((
+  length,
+  ctx,
+  cetz-ctx,
+  args,
+) => dashed-cram(
   (0, 0),
   (length, 0),
   length,
@@ -323,6 +365,6 @@
       set text(stroke: args.stroke) if "stroke" in args
       set text(size: args.size) if "size" in args
       text($+$)
-    }
+    },
   )
 })

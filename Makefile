@@ -31,6 +31,9 @@ watch:
 test:
 	tt run -F -j15
 
+format:
+	typstyle -i $$(find ./src -type f -name "*.typ")
+
 # Target to bump the version in lib.typ and all files in /src
 CETZ_VERSION ?= 0.5.2
 bump-cetz:

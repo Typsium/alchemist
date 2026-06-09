@@ -71,7 +71,11 @@
         radius = ctx.config.lewis.radius
       }
       let lewis-angle = angles.angle-correction(lewis-angle)
-      let mol-id = if angles.angle-in-range-inclusive(lewis-angle, 90deg, 270deg) {
+      let mol-id = if angles.angle-in-range-inclusive(
+        lewis-angle,
+        90deg,
+        270deg,
+      ) {
         0
       } else {
         count - 1
@@ -96,7 +100,10 @@
 #let draw-fragment-elements(mol, ctx) = {
   let name = mol.name
   if name in ctx.hooks {
-    panic("Molecule fragment with name " + name + " already exists : " + ctx.hooks.keys().join(", "))
+    panic("Molecule fragment with name " + name + " already exists : " + ctx
+      .hooks
+      .keys()
+      .join(", "))
   }
   ctx.hooks.insert(name, mol)
 
@@ -119,7 +126,12 @@
   }
   ctx = context_.set-last-anchor(
     ctx,
-    (type: "fragment", name: name, count: mol.at("count"), vertical: mol.vertical),
+    (
+      type: "fragment",
+      name: name,
+      count: mol.at("count"),
+      vertical: mol.vertical,
+    ),
   )
   if (side) {
     ctx.id += 1

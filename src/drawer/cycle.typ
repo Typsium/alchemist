@@ -11,8 +11,12 @@
   for i in range(ctx.cycle-faces - vertex.len()) {
     let (x, y, _) = vertex.last()
     vertex.push((
-      x + atom-sep * calc.cos(ctx.relative-angle + ctx.cycle-step-angle * (i + 1)),
-      y + atom-sep * calc.sin(ctx.relative-angle + ctx.cycle-step-angle * (i + 1)),
+      x + atom-sep * calc.cos(ctx.relative-angle + ctx.cycle-step-angle * (
+        i + 1
+      )),
+      y + atom-sep * calc.sin(ctx.relative-angle + ctx.cycle-step-angle * (
+        i + 1
+      )),
       0,
     ))
   }
@@ -25,7 +29,7 @@
   let center = (0, 0)
   let faces = ctx.cycle-faces
   let odd = calc.rem(faces, 2) == 1
-	let debug = ()
+  let debug = ()
   for (i, v) in vertex.enumerate() {
     if (ctx.config.debug) {
       debug += cetz.draw.circle(v, radius: .1em, fill: blue, stroke: blue)
@@ -37,7 +41,11 @@
       let opposite2 = calc.rem-euclid(i + calc.div-euclid(faces, 2) + 1, faces)
       let (ox1, oy1, _) = vertex.at(opposite1)
       let (ox2, oy2, _) = vertex.at(opposite2)
-      let radius = utils.distance-between(cetz-ctx, (x, y), ((ox1 + ox2) / 2, (oy1 + oy2) / 2)) / 2
+      let radius = utils.distance-between(
+        cetz-ctx,
+        (x, y),
+        ((ox1 + ox2) / 2, (oy1 + oy2) / 2),
+      ) / 2
       if radius < min-radius {
         min-radius = radius
       }
@@ -50,11 +58,15 @@
       }
     }
   }
-  ((center.at(0) / vertex.len(), center.at(1) / vertex.len()), min-radius, debug)
+  (
+    (center.at(0) / vertex.len(), center.at(1) / vertex.len()),
+    min-radius,
+    debug,
+  )
 }
 
 #let draw-cycle-center-arc(ctx, name, center-arc) = {
-	import cetz.draw: *
+  import cetz.draw: *
   let faces = ctx.cycle-faces
   let vertex = ctx.vertex-anchors
   get-ctx(cetz-ctx => {
@@ -63,7 +75,7 @@
       vertex = missing-vertices(ctx, cetz-ctx)
     }
     let (center, min-radius, debug) = cycle-center-radius(ctx, cetz-ctx, vertex)
-		debug
+    debug
     if name != none {
       anchor(name, center)
     }
@@ -104,12 +116,10 @@
         angle += ctx.cycle-step-angle
       }
     } else if (
-      ctx.relative-angle == 0deg
-        and ctx.angle == 0deg
-        and not cycle.args.at(
-          "align",
-          default: false,
-        )
+      ctx.relative-angle == 0deg and ctx.angle == 0deg and not cycle.args.at(
+        "align",
+        default: false,
+      )
     ) {
       angle = cycle-step-angle - 90deg
     } else {
@@ -149,7 +159,11 @@
   )
   ctx = context_.update-parent-context(ctx, cycle-ctx)
   if record-vertex {
-    drawing += draw-cycle-center-arc(cycle-ctx, name, cycle.args.at("arc", default: none))
+    drawing += draw-cycle-center-arc(
+      cycle-ctx,
+      name,
+      cycle.args.at("arc", default: none),
+    )
   }
-	(ctx, drawing, cetz-rec)
+  (ctx, drawing, cetz-rec)
 }

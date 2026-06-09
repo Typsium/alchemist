@@ -82,9 +82,15 @@
 
       let sub-width = utils.bounding-box-width(sub-bounds)
 
-      let (ctx, parenthesis, left-anchor) = left-parenthesis-anchor(parenthesis, ctx)
+      let (ctx, parenthesis, left-anchor) = left-parenthesis-anchor(
+        parenthesis,
+        ctx,
+      )
 
-      let (ctx, parenthesis, right-anchor) = right-parenthesis-anchor(parenthesis, ctx)
+      let (ctx, parenthesis, right-anchor) = right-parenthesis-anchor(
+        parenthesis,
+        ctx,
+      )
 
       let height = parenthesis.at("height")
       if height == none {
@@ -96,19 +102,35 @@
         height = utils.convert-length(cetz-ctx, height)
       }
 
-      let (left-parenthesis, right-parenthesis, right-parenthesis-with-attach) = parenthesis-content(
+      let (
+        left-parenthesis,
+        right-parenthesis,
+        right-parenthesis-with-attach,
+      ) = parenthesis-content(
         parenthesis,
         height,
         cetz-ctx,
       )
 
-      let (_, (lx, ly, _)) = cetz.coordinate.resolve(cetz-ctx, update: false, left-anchor)
-      let (_, (rx, ry, _)) = cetz.coordinate.resolve(cetz-ctx, update: false, right-anchor)
+      let (_, (lx, ly, _)) = cetz.coordinate.resolve(
+        cetz-ctx,
+        update: false,
+        left-anchor,
+      )
+      let (_, (rx, ry, _)) = cetz.coordinate.resolve(
+        cetz-ctx,
+        update: false,
+        right-anchor,
+      )
 
       if ctx.config.debug {
         circle((lx, ly), radius: 1pt, fill: orange, stroke: orange)
         circle((rx, ry), radius: 1pt, fill: orange, stroke: orange)
-        rect((lx, sub-bounds.low.at(1)), (rx, sub-bounds.high.at(1)), stroke: green)
+        rect(
+          (lx, sub-bounds.low.at(1)),
+          (rx, sub-bounds.high.at(1)),
+          stroke: green,
+        )
         line((lx, sub-v-mid), (rx, sub-v-mid), stroke: green)
       }
 
@@ -141,12 +163,21 @@
         rx += offset
       }
 
-      let right-bounds = cetz.process.many(cetz-ctx, content((0, 0), right-parenthesis, auto-scale: false)).bounds
+      let right-bounds = cetz
+        .process
+        .many(cetz-ctx, content((0, 0), right-parenthesis, auto-scale: false))
+        .bounds
       let right-with-attach-bounds = cetz
         .process
-        .many(cetz-ctx, content((0, 0), right-parenthesis-with-attach, auto-scale: false))
+        .many(cetz-ctx, content(
+            (0, 0),
+            right-parenthesis-with-attach,
+            auto-scale: false,
+          ))
         .bounds
-      let right-voffset = calc.abs(right-bounds.low.at(1) - right-with-attach-bounds.low.at(1))
+      let right-voffset = calc.abs(right-bounds
+        .low
+        .at(1) - right-with-attach-bounds.low.at(1))
       if parenthesis.tr != none and parenthesis.br != none {
         right-voffset /= 2
       } else if (parenthesis.tr != none) {
@@ -161,7 +192,12 @@
         ),
       )
       content((lx, ly), anchor: "mid-east", left-parenthesis, auto-scale: false)
-      content((rx, ry - right-voffset), anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
+      content(
+        (rx, ry - right-voffset),
+        anchor: "mid-west",
+        right-parenthesis-with-attach,
+        auto-scale: false,
+      )
     })
   }
 
@@ -175,7 +211,11 @@
   let right-name = "parenthesis-" + str(ctx.id + 1)
   ctx.id += 2
   let last-anchor = ctx.last-anchor
-  let (drawing, ctx) = draw-function(ctx, parenthesis.body, after-operator: true)
+  let (drawing, ctx) = draw-function(
+    ctx,
+    parenthesis.body,
+    after-operator: true,
+  )
 
   let drawing = get-ctx(cetz-ctx => {
     let (ctx: cetz-ctx, bounds, drawables) = cetz.process.many(
@@ -191,14 +231,30 @@
     }
     let width = utils.bounding-box-width(sub-bounds)
 
-    let (left-parenthesis, _, right-parenthesis-with-attach) = parenthesis-content(parenthesis, height, cetz-ctx)
+    let (
+      left-parenthesis,
+      _,
+      right-parenthesis-with-attach,
+    ) = parenthesis-content(parenthesis, height, cetz-ctx)
 
     let right-anchor = (rel: (width, 0), to: (name: left-name, anchor: "east"))
     on-layer(
       1,
       {
-        content(last-anchor.anchor, name: left-name, anchor: "mid-east", left-parenthesis, auto-scale: false)
-        content(right-anchor, name: right-name, anchor: "mid-west", right-parenthesis-with-attach, auto-scale: false)
+        content(
+          last-anchor.anchor,
+          name: left-name,
+          anchor: "mid-east",
+          left-parenthesis,
+          auto-scale: false,
+        )
+        content(
+          right-anchor,
+          name: right-name,
+          anchor: "mid-west",
+          right-parenthesis-with-attach,
+          auto-scale: false,
+        )
       },
     )
     (
@@ -210,6 +266,9 @@
     )
   })
 
-  ctx.last-anchor = (type: "coord", anchor: (name: right-name, anchor: "mid-east"))
+  ctx.last-anchor = (
+    type: "coord",
+    anchor: (name: right-name, anchor: "mid-east"),
+  )
   (ctx, drawing)
 }

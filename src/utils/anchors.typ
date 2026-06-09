@@ -72,13 +72,13 @@
 /// - margin (length, none): the margin around the fragment
 /// -> anchor: the anchor position around the fragment
 #let fragment-anchor(ctx, cetz-ctx, angle, fragment, id, margin: none) = {
-	let angle = angles.angle-correction(angle)
-	let fragment-margin = if margin == none {
-		ctx.config.fragment-margin
-	} else {
-		margin
-	}
-	fragment-margin = convert-length(cetz-ctx, fragment-margin)
+  let angle = angles.angle-correction(angle)
+  let fragment-margin = if margin == none {
+    ctx.config.fragment-margin
+  } else {
+    margin
+  }
+  fragment-margin = convert-length(cetz-ctx, fragment-margin)
   let (cetz-ctx, center) = cetz.coordinate.resolve(
     cetz-ctx,
     (name: fragment, anchor: (id, "mid")),
@@ -94,7 +94,11 @@
   }
 
   // https://www.petercollingridge.co.uk/tutorials/computational-geometry/finding-angle-around-ellipse/
-  let angle = if angles.angle-in-range-inclusive(angle, 0deg, 90deg) or angles.angle-in-range-strict(
+  let angle = if angles.angle-in-range-inclusive(
+    angle,
+    0deg,
+    90deg,
+  ) or angles.angle-in-range-strict(
     angle,
     270deg,
     360deg,
@@ -188,8 +192,20 @@
   if link.to == -1 {
     link.to = ctx.hooks.at(link.to-name).count - 1
   }
-  let start = fragment-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from))
-  let end = fragment-anchor(ctx, cetz-ctx, link.angle + 180deg, link.to-name, str(link.to))
+  let start = fragment-anchor(
+    ctx,
+    cetz-ctx,
+    link.angle,
+    link.from-name,
+    str(link.from),
+  )
+  let end = fragment-anchor(
+    ctx,
+    cetz-ctx,
+    link.angle + 180deg,
+    link.to-name,
+    str(link.to),
+  )
   ((start, end), angles.angle-between(cetz-ctx, start, end))
 }
 
@@ -237,7 +253,13 @@
 #let calculate-mol-link-anchors(ctx, cetz-ctx, link) = {
   (
     (
-      fragment-anchor(ctx, cetz-ctx, link.angle, link.from-name, str(link.from)),
+      fragment-anchor(
+        ctx,
+        cetz-ctx,
+        link.angle,
+        link.from-name,
+        str(link.from),
+      ),
       link.name + "-end-anchor",
     ),
     link.angle,
@@ -246,14 +268,22 @@
 
 #let calculate-mol-hook-link-anchors(ctx, cetz-ctx, link) = {
   let hook = ctx.hooks.at(link.to-name)
-  let angle = angles.angle-correction(angles.angle-between(cetz-ctx, link.from-pos, hook.hook))
+  let angle = angles.angle-correction(
+    angles.angle-between(cetz-ctx, link.from-pos, hook.hook),
+  )
   let from = link-fragment-index(
     angle,
     false,
     ctx.hooks.at(link.from-name).count - 1,
     ctx.hooks.at(link.from-name).vertical,
   )
-  let start-anchor = fragment-anchor(ctx, cetz-ctx, angle, link.from-name, str(from))
+  let start-anchor = fragment-anchor(
+    ctx,
+    cetz-ctx,
+    angle,
+    link.from-name,
+    str(from),
+  )
   (
     (
       start-anchor,
