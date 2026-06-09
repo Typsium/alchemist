@@ -73,6 +73,13 @@
 ///   fragment("B")
 /// })
 ///```)
+/// It is also possible to only change the color and width of the
+/// lines seperately with the `stroke-left` and `stroke-right` arguments.
+/// #example(```
+/// #skeletize({
+///   double(stroke: 2pt, stroke-right: red, stroke-left: (dash: "dashed"))
+/// })
+/// ```)
 /// This link also supports an `offset` argument that can be set to `left`, `right` or `center`.
 ///It allows to make either the let side, right side or the center of the double line to be aligned with the link point.
 /// #example(```
@@ -111,7 +118,7 @@
     } else {
       ((0, -gap + gap-offset), (length, -gap + gap-offset))
     },
-    stroke: args.at("stroke", default: ctx.config.double.stroke),
+    stroke: args.at("stroke-right", default: args.at("stroke", default: ctx.config.double.stroke))
   )
   line(
     ..if offset == "left" {
@@ -120,7 +127,7 @@
     } else {
       ((0, gap + gap-offset), (length, gap + gap-offset))
     },
-    stroke: args.at("stroke", default: ctx.config.double.stroke),
+    stroke: args.at("stroke-left", default: args.at("stroke", default: ctx.config.double.stroke)),
   )
 })
 
@@ -145,12 +152,19 @@
 ///   fragment("B")
 /// })
 ///```)
+/// It is also possible to only change the color and width of the
+/// lines seperately with the `stroke-left`, `stroke-center` and `stroke-right` arguments.
+/// #example(```
+/// #skeletize({
+///   triple(stroke: 2pt, stroke-left: red, stroke-center: green, stroke-right: blue)
+/// })
+/// ```)
 #let triple = build-link((length, ctx, cetz-ctx, args) => {
   import cetz.draw: *
   let gap = utils.convert-length(cetz-ctx, args.at("gap", default: ctx.config.triple.gap))
-  line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.triple.stroke))
-  line((0, -gap), (length, -gap), stroke: args.at("stroke", default: ctx.config.triple.stroke))
-  line((0, gap), (length, gap), stroke: args.at("stroke", default: ctx.config.triple.stroke))
+  line((0, 0), (length, 0), stroke: args.at("stroke-left", default: args.at("stroke", default: ctx.config.triple.stroke)))
+  line((0, -gap), (length, -gap), stroke: args.at("stroke-center", default: args.at("stroke", default: ctx.config.triple.stroke)))
+  line((0, gap), (length, gap), stroke: args.at("stroke-right", default: args.at("stroke", default: ctx.config.triple.stroke)))
 })
 
 /// Draw a filled cram between two fragments with the arrow pointing to the right
