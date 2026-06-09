@@ -1,5 +1,5 @@
 /// [ppi:100]
-#import "@preview/touying:0.7.2": *
+#import "@preview/touying:0.7.4": *
 #import themes.simple: *
 #show: simple-theme
 

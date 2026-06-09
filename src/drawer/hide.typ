@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.4.2"
+#import "@preview/cetz:0.5.2"
 
 #let draw-hide(hide, ctx, draw-molecules-and-link) = {
   ctx.hide = true

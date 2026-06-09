@@ -1,6 +1,6 @@
 /// [ppi:50]
 #import "../../lib.typ": *
-#import "@preview/touying:0.6.3": *
+#import "@preview/touying:0.7.4": *
 
 #import themes.metropolis: *
 

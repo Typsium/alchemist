@@ -93,6 +93,10 @@ The test suite is managed with [tytanic](https://github.com/typst-community/tyta
 
 ## Changelog
 
+### 0.2.0
+
+- Updated cetz to version 0.5.2
+
 ### 0.1.10
 
 - Added touying bindings in lib.typ to support automatic integration
