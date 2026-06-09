@@ -78,7 +78,7 @@
       let sub-bounds = cetz.util.revert-transform(cetz-ctx.transform, bounds)
 
       let sub-height = utils.bounding-box-height(sub-bounds)
-      let sub-v-mid = sub-bounds.low.at(1) - sub-height / 2
+      let sub-v-mid = sub-bounds.low.at(1) + sub-height / 2
 
       let sub-width = utils.bounding-box-width(sub-bounds)
 
