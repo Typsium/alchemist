@@ -98,6 +98,8 @@ The test suite is managed with [tytanic](https://github.com/typst-community/tyta
 - Updated cetz to version 0.5.2
 - Updated to compiler 0.14.0
 - Rename `plus` link to `plus-link` to avoid confusion with the `plus` typst symbol
+- Adds a way to specify stoke of individual lines in double and triple links [#31](https://github.com/Typsium/alchemist/pull/31)
+- Fix bugs with touying bindings and `hide` function
 
 ### 0.1.10
 
