@@ -60,6 +60,7 @@
     (
       type: "link",
       hide: ctx.hide,
+      hide-bounds: ctx.hide-bounds,
       name: link-name,
       override: override,
       from-pos: from-pos,

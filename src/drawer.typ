@@ -40,6 +40,7 @@
   record-vertex: false, // true if the cycle should keep track of its vertices
   vertex-anchors: (), // list of the cycle vertices
   hide: false, // true if the current elements should be hidden
+  hide-bounds: true // if set to false the bounds of the hidden elements are not recorded, otherwise it count in the final bounds of the molecule
 )
 
 #let draw-hooks-links(links, mol-name, ctx, from-mol) = {
@@ -57,6 +58,7 @@
       ctx.links.push((
         type: "link",
         hide: ctx.hide,
+        hide-bounds: ctx.hide-bounds,
         name: link.at("name"),
         from-pos: if from-mol {
           (name: mol-name, anchor: "mid")
@@ -81,6 +83,7 @@
           "link-hook-link"
         },
         hide: ctx.hide,
+        hide-bounds: ctx.hide-bounds,
         name: link.at("name"),
         from-pos: if from-mol {
           (name: mol-name, anchor: "mid")
@@ -116,7 +119,8 @@
     if type(element) == function {
       if ctx.hide {
         hide(
-          cetz-drawing.push(element)
+          cetz-drawing.push(element),
+          bounds: ctx.hide-bounds
         )
       } else {
         cetz-drawing.push(element)
@@ -292,7 +296,7 @@
     }
   }
   if not has_element {
-    panic("The skeletize body must contain at least one element")
+    panic("The skeletize body must contain at least one element", body)
   }
   (result, group-id, link-id, operator-id)
 }
