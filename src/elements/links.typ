@@ -294,12 +294,12 @@
 /// #example(````
 /// #skeletize({
 ///   fragment("A")
-///   plus()
+///   plus-link()
 ///   fragment("B")
 /// })
 /// ````)
 /// You can change the filling, size and stroke of the glyph with the `fill`, `size` and `stoke` arguments. The default values are the parent `text` parameters.
-#let plus = build-link((length, ctx, cetz-ctx, args) => {
+#let plus-link = build-link((length, ctx, cetz-ctx, args) => {
   import cetz.draw: *
   content(
     anchor: "mid",

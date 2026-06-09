@@ -96,6 +96,8 @@ The test suite is managed with [tytanic](https://github.com/typst-community/tyta
 ### 0.2.0
 
 - Updated cetz to version 0.5.2
+- Updated to compiler 0.14.0
+- Rename `plus` link to `plus-link` to avoid confusion with the `plus` typst symbol
 
 ### 0.1.10
 
