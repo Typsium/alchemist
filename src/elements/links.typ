@@ -73,6 +73,13 @@
 ///   fragment("B")
 /// })
 ///```)
+/// It is also possible to only change the color and width of the
+/// lines seperately with the `stroke-left` and `stroke-right` arguments.
+/// #example(```
+/// #skeletize({
+///   double(stroke: 2pt, stroke-right: red, stroke-left: (dash: "dashed"))
+/// })
+/// ```)
 /// This link also supports an `offset` argument that can be set to `left`, `right` or `center`.
 ///It allows to make either the let side, right side or the center of the double line to be aligned with the link point.
 /// #example(```
@@ -145,6 +152,13 @@
 ///   fragment("B")
 /// })
 ///```)
+/// It is also possible to only change the color and width of the
+/// lines seperately with the `stroke-left`, `stroke-center` and `stroke-right` arguments.
+/// #example(```
+/// #skeletize({
+///   triple(stroke: 2pt, stroke-left: red, stroke-center: green, stroke-right: blue)
+/// })
+/// ```)
 #let triple = build-link((length, ctx, cetz-ctx, args) => {
   import cetz.draw: *
   let gap = utils.convert-length(cetz-ctx, args.at("gap", default: ctx.config.triple.gap))
