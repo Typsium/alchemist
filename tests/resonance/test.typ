@@ -41,7 +41,7 @@
       "to.north",
       mark: (end: ">", fill: red),
     )
-    plus(atom-sep: 5em)
+    plus-link(atom-sep: 5em)
     molecule(
       "B",
       lewis: (
