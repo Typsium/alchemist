@@ -1,10 +1,10 @@
 [package]
 name = "alchemist"
-version = "0.1.10"
+version = "0.2.0"
 entrypoint = "lib.typ"
 authors = ["Robotechnic <@Robotechnic>"]
 license = "MIT"
-compiler = "0.13.1"
+compiler = "0.14.0"
 repository = "https://github.com/Typsium/alchemist"
 description = "A package to render skeletal formulas using CeTZ"
 exclude = ["generate_images.sh", "generate_images.awk", ".gitignore","images"]
