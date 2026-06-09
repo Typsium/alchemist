@@ -111,7 +111,7 @@
     } else {
       ((0, -gap + gap-offset), (length, -gap + gap-offset))
     },
-    stroke: args.at("stroke", default: ctx.config.double.stroke),
+    stroke: args.at("stroke-right", default: args.at("stroke", default: ctx.config.double.stroke))
   )
   line(
     ..if offset == "left" {
@@ -120,7 +120,7 @@
     } else {
       ((0, gap + gap-offset), (length, gap + gap-offset))
     },
-    stroke: args.at("stroke", default: ctx.config.double.stroke),
+    stroke: args.at("stroke-left", default: args.at("stroke", default: ctx.config.double.stroke)),
   )
 })
 
@@ -148,9 +148,9 @@
 #let triple = build-link((length, ctx, cetz-ctx, args) => {
   import cetz.draw: *
   let gap = utils.convert-length(cetz-ctx, args.at("gap", default: ctx.config.triple.gap))
-  line((0, 0), (length, 0), stroke: args.at("stroke", default: ctx.config.triple.stroke))
-  line((0, -gap), (length, -gap), stroke: args.at("stroke", default: ctx.config.triple.stroke))
-  line((0, gap), (length, gap), stroke: args.at("stroke", default: ctx.config.triple.stroke))
+  line((0, 0), (length, 0), stroke: args.at("stroke-left", default: args.at("stroke", default: ctx.config.triple.stroke)))
+  line((0, -gap), (length, -gap), stroke: args.at("stroke-center", default: args.at("stroke", default: ctx.config.triple.stroke)))
+  line((0, gap), (length, gap), stroke: args.at("stroke-right", default: args.at("stroke", default: ctx.config.triple.stroke)))
 })
 
 /// Draw a filled cram between two fragments with the arrow pointing to the right
