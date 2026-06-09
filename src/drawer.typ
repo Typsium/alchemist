@@ -206,9 +206,7 @@
     ctx,
     get-ctx(cetz-ctx => {
       for link in ctx.links {
-        if link.hide {
-          continue
-        }
+        let drawing = {
         let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link)
         if ctx.config.debug {
           circle(from, radius: .1em, fill: red, stroke: red)
@@ -231,13 +229,19 @@
           rotate(angle)
           (link.draw)(length, ctx, cetz-ctx, override: link.override)
         })
+        }
+        if link.hide {
+          hide(drawing)
+        } else {
+          drawing
+        }
       }
     }),
   )
 }
 
 /// set elements names and split the molecule into sub-groups
-#let preprocessing(body, group-id: 0, link-id: 0, operator-id: 0) = {
+#let preprocessing(body, group-id: 0, link-id: 0, operator-id: 0, top-level: true) = {
   let result = ((),)
   let has_element = false
   for element in body {
@@ -262,6 +266,7 @@
           group-id: group-id,
           link-id: link-id,
           operator-id: operator-id,
+          top-level: false,
         )
         if element.type == "parenthesis" and element.resonance {
           element.body = child-body
@@ -283,7 +288,7 @@
       panic("Unexpected element type: " + str(type(element)) + " with value " + repr(element))
     }
   }
-  if not has_element {
+  if top-level and not has_element {
     panic("The skeletize body must contain at least one element", body)
   }
   (result, group-id, link-id, operator-id)
