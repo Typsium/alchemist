@@ -330,15 +330,16 @@
             let (_, origin-anchor) = cetz.coordinate.resolve(cetz-ctx, last-anchor.anchor)
             (
               origin-anchor.at(0) - molecule-bounds.low.at(0),
-              -origin-anchor.at(1)
-                + (
+              origin-anchor.at(1)
+                - (
                   molecule-bounds.low.at(1) + molecule-bounds.high.at(1)
-                )
-                  / 2,
+                ) / 2,
             )
           } else {
             (0, 0)
           }
+          
+
           let transform-matrix = cetz.matrix.transform-translate(
             translate-x,
             translate-y,
@@ -369,7 +370,7 @@
             ),
           )
           scope({
-            translate(x: translate-x, y: -translate-y)
+            translate(x: translate-x, y: translate-y)
             draw-link-decoration(ctx).at(1)
             on-layer(2, cetz-drawing)
             let bound-rect = cetz.draw.rect(
