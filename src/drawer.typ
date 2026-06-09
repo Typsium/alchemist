@@ -285,6 +285,8 @@
       }
     } else if type(element) == function {
       result.at(-1).push(element)
+    } else if element == none {
+      // ignore empty elements
     } else {
       panic("Unexpected element type: " + str(type(element)) + " with value " + repr(element))
     }
