@@ -8,12 +8,12 @@
 
 ## Core functions
 
-### `skeletize(debug, background, config, body)`
+### `skeletize(debug:, background:, config:, body)`
 Wraps molecule drawing in a CeTZ canvas.
-- `debug` (bool, default false) — shows bounding boxes and anchor points
-- `background` (none, color) — canvas background
-- `config` (dictionary) — overrides default configuration
-- `body` — drawing commands inside `{}`
+- `body` — drawing commands inside `{}` (positional argument)
+- `debug:` (bool, default false) — shows bounding boxes and anchor points
+- `background:` (none, color) — canvas background
+- `config:` (dictionary) — overrides default configuration
 
 ### `skeletize-config(default-config) -> function`
 Returns a pre-configured skeletize function.
@@ -22,7 +22,7 @@ Returns a pre-configured skeletize function.
 #draw({ fragment("A") single() fragment("B") })
 ```
 
-### `draw-skeleton(config, name, mol-anchor, body)`
+### `draw-skeleton(config:, name:, mol-anchor:, body)`
 Low-level draw without canvas wrapper. Use inside an existing CeTZ canvas.
 
 ### `draw-skeleton-config(default-config) -> function`
@@ -35,14 +35,14 @@ Passthrough function (placeholder for future use).
 
 ## Fragment
 
-### `fragment(mol, name, links, lewis, vertical, ignore-charge, colors)`
-- `mol` (string or equation) — chemical formula. String splits by capital letters
-- `name` (string, optional) — identifier for cross-linking
-- `links` (dict) — maps target fragment/hook names to link functions
-- `lewis` (array) — Lewis decoration elements
-- `vertical` (bool, default false) — stack atoms vertically
-- `ignore-charge` (bool, default false) — exclude charges from link connections
-- `colors` (color or array) — color(s) for atom groups
+### `fragment(mol, name:, links:, lewis:, vertical:, ignore-charge:, colors:)`
+- `mol` (string or equation) — chemical formula. String splits by capital letters (positional argument)
+- `name:` (string, optional) — identifier for cross-linking
+- `links:` (dict) — maps target fragment/hook names to link functions
+- `lewis:` (array) — Lewis decoration elements
+- `vertical:` (bool, default false) — stack atoms vertically
+- `ignore-charge:` (bool, default false) — exclude charges from link connections
+- `colors:` (color or array) — color(s) for atom groups
 
 **String notation:**
 - `"H_2O"`, `"C_6H_12O_6"` — subscripts with `_`
@@ -124,9 +124,10 @@ Accepts `align:` argument to force alignment to the previous link angle.
 
 ## Parenthesis
 
-### `parenthesis(body, l, r, align, resonance, height, yoffset, xoffset, right, tr, br)`
+### `parenthesis(body, l:, r:, align:, resonance:, height:, yoffset:, xoffset:, right:, tr:, br:)`
 Enclose a group in brackets. Used for polymers and resonance structures.
 
+- `body` — drawing commands inside `{}` (positional argument, should come first)
 - `l:` (string) — left parenthesis character (default `"("`)
 - `r:` (string) — right parenthesis character (default `")"`)
 - `align:` (bool, default true) — auto-size and align
@@ -140,9 +141,10 @@ Enclose a group in brackets. Used for polymers and resonance structures.
 
 ## Operator
 
-### `operator(op, name, margin)`
+### `operator(op, name:, margin:)`
 Separate molecules within the same skeletize block. Resets drawing position.
-- `op:` (content, string, or none) — the displayed operator
+- `op` (content, string, or none) — the displayed operator (positional argument)
+- `name:` (string, optional) — identifier for the operator
 - `margin:` (length, default 1em) — spacing
 
 ```typ
@@ -160,24 +162,25 @@ Named anchor point for links. Place at a position to create a connection target.
 
 ## Hide
 
-### `hide(bounds, body)`
+### `hide(bounds:, body)`
 Visually suppress part of the drawing. Hidden elements still occupy bounding box space and remain linkable.
 - `bounds:` (bool, default true) — preserve bounding box when true
+- `body` — drawing commands inside `{}` (positional argument)
 
 ---
 
 ## Lewis structures
 
-### `lewis-single(angle, radius, offset, gap, stroke, fill)`
+### `lewis-single(angle:, radius:, offset:, gap:, stroke:, fill:)`
 Single electron dot. `offset:` is `"top"`, `"bottom"`, or `"center"`.
 
-### `lewis-double(angle, radius, gap, stroke, fill)`
+### `lewis-double(angle:, radius:, gap:, stroke:, fill:)`
 Two electron dots (lone pair).
 
-### `lewis-line(angle, length, stroke)`
+### `lewis-line(angle:, length:, stroke:)`
 Line representing a shared electron pair.
 
-### `lewis-rectangle(angle, stroke, fill, height, width)`
+### `lewis-rectangle(angle:, stroke:, fill:, height:, width:)`
 Rectangular lone pair marker.
 
 ---

@@ -38,7 +38,7 @@ compose molecules from fragments connected by links.
 |---|---|
 | `fragment(mol, name:, links:, lewis:, ...)` | A chemical symbol / group. String notation: `"C_6H_12O_6"`, `"Fe^{2+}"`, `$CH_4$` (equation) |
 | `hook(name)` | Named anchor point for links |
-| `single(double, triple, ...)` | Bond between fragments — see Links section |
+| `single()` / `double()` / `triple()` / `cram-*()` / `plus()` | Bonds between fragments — see Links section |
 | `branch(body)` | Side chain off a fragment (body starts with a link) |
 | `cycle(faces, body)` | Regular polygon-shaped ring (faces >= 3) |
 | `parenthesis(body, l:"(", r:")", ...)` | Polymer or resonance brackets |

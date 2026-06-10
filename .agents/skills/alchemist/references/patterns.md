@@ -29,7 +29,7 @@ Adapt coordinates and angles to match your specific molecule.
 
 ```typ
 #skeletize({
-  fragment(name: "main", "C")
+  fragment("C", name: "main")
   branch({
     single(angle: 1)
     fragment("C_2H_5")
@@ -96,12 +96,12 @@ Adapt coordinates and angles to match your specific molecule.
 
 ```typ
 #skeletize({
-  fragment(name: "A", "A")
+  fragment("A", name: "A")
   single()
   fragment("B")
   branch({
     single()
-    fragment(name: "X", "X")
+    fragment("X", name: "X")
   })
   single()
   fragment("C", links: (
@@ -127,13 +127,13 @@ Adapt coordinates and angles to match your specific molecule.
 
 ```typ
 #skeletize(config: (angle-increment: 30deg), {
-  parenthesis(
-    l: "[", r: "]",
-    br: $n$, {
+  parenthesis({
       single(angle: 1)
       single(angle: -1)
       single(angle: 1)
-    }
+    },
+    l: "[", r: "]",
+    br: $n$,
   )
 })
 ```
@@ -142,13 +142,13 @@ Adapt coordinates and angles to match your specific molecule.
 
 ```typ
 #skeletize({
-  fragment(name: "A", "A")
+  fragment("A", name: "A")
   single()
   hook(name: "h1")
   single()
   fragment("B")
   single()
-  fragment(name: "C", "C", links: (
+  fragment("C", name: "C", links: (
     "h1": single(stroke: blue),
   ))
 })
