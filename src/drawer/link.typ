@@ -84,6 +84,8 @@
       let end-anchor = (to: from-pos, rel: (angle: link-angle, radius: length))
       if ctx.config.debug {
         line(from-pos, end-anchor, stroke: blue + .1em)
+      } else {
+        hide(line(from-pos, end-anchor), bounds: true)
       }
       hide(
         {
