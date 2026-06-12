@@ -68,7 +68,11 @@
 /// -> drawable
 #let fragment(name: none, links: (:), lewis: (), vertical: false, ignore-charge: false, colors: none, mol) = {
   let (atoms, count) = if type(mol) == str {
-    split-fragment-string(mol, split-charge: ignore-charge)
+    if mol.len() == 0 {
+      (((none, true),), 1)
+    } else {
+      split-fragment-string(mol, split-charge: ignore-charge)
+    }
   } else if mol.func() == math.equation {
     split-equation(mol, equation: true, split-charge: ignore-charge)
   } else {
@@ -88,7 +92,8 @@
       links: links,
       lewis: lewis,
       vertical: vertical,
-      count: count
+      count: count,
+      empty: mol.len() == 0,
     ),
   )
 }

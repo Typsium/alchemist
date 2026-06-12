@@ -128,8 +128,9 @@
     (
       type: "fragment",
       name: name,
-      count: mol.at("count"),
+      count: mol.count,
       vertical: mol.vertical,
+      empty: mol.empty
     ),
   )
   if (side) {
@@ -166,7 +167,7 @@
   let (ctx, drawing) = draw-fragment-elements(element, ctx)
   if element.links.len() != 0 {
     ctx.hooks.insert(ctx.last-anchor.name, element)
-    ctx.hooks-links.push((element.links, ctx.last-anchor.name, true))
+    ctx.hooks-links.push((element.links, ctx.last-anchor.name, true, element.empty))
   }
   (ctx, drawing)
 }

@@ -165,7 +165,11 @@
 
 
 #let calculate-mol-mol-link-anchors(ctx, cetz-ctx, link, fragment-margin) = {
-  let to-pos = (name: link.to-name, anchor: "mid")
+  let to-pos = if link.ignore-to-margins {
+    (name: link.to-name)
+  } else {
+    (name: link.to-name, anchor: "mid")
+  }
   if link.to == none or link.from == none {
     let angle = link.at(
       "angle",
@@ -200,14 +204,22 @@
     link.angle,
     link.from-name,
     str(link.from),
-    fragment-margin,
+    if link.ignore-from-margins {
+      0
+    } else {
+      fragment-margin
+    },
   )
   let end = fragment-anchor(
     cetz-ctx,
     link.angle + 180deg,
     link.to-name,
     str(link.to),
-    fragment-margin,
+    if link.ignore-to-margins {
+      0
+    } else {
+      fragment-margin
+    },
   )
   ((start, end), angles.angle-between(cetz-ctx, start, end))
 }
@@ -218,7 +230,11 @@
       angles.angle-between(
         cetz-ctx,
         link.from-pos,
-        (name: link.to-name, anchor: "mid"),
+        if link.ignore-to-margins {
+          (name: link.to-name)
+        } else {
+          (name: link.to-name, anchor: "mid")
+        }
       ),
     )
     link.to = link-fragment-index(
@@ -242,7 +258,11 @@
     link.angle + 180deg,
     link.to-name,
     str(link.to),
-    fragment-margin,
+    if link.ignore-to-margins {
+      0
+    } else {
+      fragment-margin
+    },
   )
   (
     (
@@ -261,7 +281,11 @@
         link.angle,
         link.from-name,
         str(link.from),
-        fragment-margin,
+        if link.ignore-from-margins {
+          0
+        } else {
+          fragment-margin
+        },
       ),
       link.name + "-end-anchor",
     ),
@@ -285,7 +309,11 @@
     angle,
     link.from-name,
     str(from),
-    fragment-margin,
+    if link.ignore-from-margins {
+      0
+    } else {
+      fragment-margin
+    },
   )
   (
     (
