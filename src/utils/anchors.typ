@@ -79,6 +79,15 @@
     margin
   }
   fragment-margin = convert-length(cetz-ctx, fragment-margin)
+
+  if fragment-margin == 0 {
+    let (cetz-ctx, center) = cetz.coordinate.resolve(
+      cetz-ctx,
+      (name: fragment, anchor: (id, "mid")),
+    )
+    return (center.at(0), center.at(1))
+  }
+
   let (cetz-ctx, center) = cetz.coordinate.resolve(
     cetz-ctx,
     (name: fragment, anchor: (id, "mid")),
