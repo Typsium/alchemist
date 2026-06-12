@@ -234,7 +234,7 @@
           (name: link.to-name)
         } else {
           (name: link.to-name, anchor: "mid")
-        }
+        },
       ),
     )
     link.to = link-fragment-index(

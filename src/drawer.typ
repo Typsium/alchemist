@@ -236,7 +236,12 @@
     get-ctx(cetz-ctx => {
       for link in ctx.links {
         let drawing = {
-          let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link, ctx.config.fragment-margin)
+          let ((from, to), angle) = calculate-link-anchors(
+            ctx,
+            cetz-ctx,
+            link,
+            ctx.config.fragment-margin,
+          )
           if ctx.config.debug {
             circle(from, radius: .1em, fill: red, stroke: red)
             circle(to, radius: .1em, fill: red, stroke: red)
@@ -355,7 +360,13 @@
           let last-anchor = ctx.last-anchor
           let (ctx, atoms, cetz-drawing) = draw-fragments-and-link(ctx, body)
           for (links, name, from-mol, ignore-from-margin) in ctx.hooks-links {
-            ctx = draw-hooks-links(links, name, ctx, from-mol, ignore-from-margin)
+            ctx = draw-hooks-links(
+              links,
+              name,
+              ctx,
+              from-mol,
+              ignore-from-margin,
+            )
           }
 
           let molecule = {
