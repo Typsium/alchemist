@@ -100,6 +100,8 @@ The test suite is managed with [tytanic](https://github.com/typst-community/tyta
 - Rename `plus` link to `plus-link` to avoid confusion with the `plus` typst symbol
 - Adds a way to specify stoke of individual lines in double and triple links [#31](https://github.com/Typsium/alchemist/pull/31)
 - Fix bugs with touying bindings and `hide` function
+- Fix a bounding box compute issue [#32](https://github.com/Typsium/alchemist/issues/32)
+- It is now allowed to draw empty fragments. This is useful to carbocations/carboanions or add charges without drawing the carbon atom.
 
 ### 0.1.10
 
