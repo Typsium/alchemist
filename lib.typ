@@ -67,8 +67,10 @@
 /// ```)
 /// -> drawable
 #let fragment(name: none, links: (:), lewis: (), vertical: false, ignore-charge: false, colors: none, mol) = {
+  let empty = false
   let (atoms, count) = if type(mol) == str {
     if mol.len() == 0 {
+      empty = true
       (((none, true),), 1)
     } else {
       split-fragment-string(mol, split-charge: ignore-charge)
@@ -93,7 +95,7 @@
       lewis: lewis,
       vertical: vertical,
       count: count,
-      empty: mol.len() == 0,
+      empty: empty,
     ),
   )
 }
