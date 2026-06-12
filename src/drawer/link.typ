@@ -75,24 +75,20 @@
   (
     ctx,
     {
-      hide(
-        {
-          circle(name: link-name + "-start-anchor", from-pos, radius: .25em)
-        },
-        bounds: ctx.first-draw and not ctx.first-molecule,
+      anchor(
+        link-name + "-start-anchor",
+        from-pos,
       )
       let end-anchor = (to: from-pos, rel: (angle: link-angle, radius: length))
+      anchor(
+        link-name + "-end-anchor",
+        end-anchor,
+      )
       if ctx.config.debug {
         line(from-pos, end-anchor, stroke: blue + .1em)
       } else {
         hide(line(from-pos, end-anchor), bounds: true)
       }
-      hide(
-        {
-          circle(name: link-name + "-end-anchor", end-anchor, radius: .25em)
-        },
-        bounds: true,
-      )
     },
   )
 }

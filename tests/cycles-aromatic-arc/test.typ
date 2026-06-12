@@ -5,6 +5,7 @@
 #grid(
     columns:3,
     align: center + horizon,
+    column-gutter: .25em,
     skeletize({
         cycle(6, arc:(:), {
             single()
