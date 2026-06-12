@@ -81,12 +81,11 @@
         count - 1
       }
       let anchor = fragment-anchor(
-        ctx,
         cetz-ctx,
         lewis-angle,
         group-name,
         str(mol-id),
-        margin: radius,
+        radius,
       )
       scope({
         set-origin(anchor)

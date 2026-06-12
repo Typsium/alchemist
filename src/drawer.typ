@@ -224,7 +224,7 @@
     get-ctx(cetz-ctx => {
       for link in ctx.links {
         let drawing = {
-          let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link)
+          let ((from, to), angle) = calculate-link-anchors(ctx, cetz-ctx, link, ctx.config.fragment-margin)
           if ctx.config.debug {
             circle(from, radius: .1em, fill: red, stroke: red)
             circle(to, radius: .1em, fill: red, stroke: red)

@@ -64,20 +64,14 @@
 /// Calculate an anchor position around a fragment using an ellipse
 /// at a given angle
 ///
-/// - ctx (alchemist-ctx): the alchemist context
 /// - cetz-ctx (cetz-ctx): the cetz context
 /// - angle (float, int, angle): the angle of the anchor
 /// - fragment (string): the fragment name
 /// - id (string): the fragment subpart id
-/// - margin (length, none): the margin around the fragment
+/// - margin (length): the margin around the fragment
 /// -> anchor: the anchor position around the fragment
-#let fragment-anchor(ctx, cetz-ctx, angle, fragment, id, margin: none) = {
+#let fragment-anchor(cetz-ctx, angle, fragment, id, fragment-margin) = {
   let angle = angles.angle-correction(angle)
-  let fragment-margin = if margin == none {
-    ctx.config.fragment-margin
-  } else {
-    margin
-  }
   fragment-margin = convert-length(cetz-ctx, fragment-margin)
 
   if fragment-margin == 0 {
@@ -170,7 +164,7 @@
 }
 
 
-#let calculate-mol-mol-link-anchors(ctx, cetz-ctx, link) = {
+#let calculate-mol-mol-link-anchors(ctx, cetz-ctx, link, fragment-margin) = {
   let to-pos = (name: link.to-name, anchor: "mid")
   if link.to == none or link.from == none {
     let angle = link.at(
@@ -202,23 +196,23 @@
     link.to = ctx.hooks.at(link.to-name).count - 1
   }
   let start = fragment-anchor(
-    ctx,
     cetz-ctx,
     link.angle,
     link.from-name,
     str(link.from),
+    fragment-margin,
   )
   let end = fragment-anchor(
-    ctx,
     cetz-ctx,
     link.angle + 180deg,
     link.to-name,
     str(link.to),
+    fragment-margin,
   )
   ((start, end), angles.angle-between(cetz-ctx, start, end))
 }
 
-#let calculate-link-mol-anchors(ctx, cetz-ctx, link) = {
+#let calculate-link-mol-anchors(ctx, cetz-ctx, link, fragment-margin) = {
   if link.to == none {
     let angle = angles.angle-correction(
       angles.angle-between(
@@ -244,11 +238,11 @@
     )
   }
   let end-anchor = fragment-anchor(
-    ctx,
     cetz-ctx,
     link.angle + 180deg,
     link.to-name,
     str(link.to),
+    fragment-margin,
   )
   (
     (
@@ -259,15 +253,15 @@
   )
 }
 
-#let calculate-mol-link-anchors(ctx, cetz-ctx, link) = {
+#let calculate-mol-link-anchors(ctx, cetz-ctx, link, fragment-margin) = {
   (
     (
       fragment-anchor(
-        ctx,
         cetz-ctx,
         link.angle,
         link.from-name,
         str(link.from),
+        fragment-margin,
       ),
       link.name + "-end-anchor",
     ),
@@ -275,7 +269,7 @@
   )
 }
 
-#let calculate-mol-hook-link-anchors(ctx, cetz-ctx, link) = {
+#let calculate-mol-hook-link-anchors(ctx, cetz-ctx, link, fragment-margin) = {
   let hook = ctx.hooks.at(link.to-name)
   let angle = angles.angle-correction(
     angles.angle-between(cetz-ctx, link.from-pos, hook.hook),
@@ -287,11 +281,11 @@
     ctx.hooks.at(link.from-name).vertical,
   )
   let start-anchor = fragment-anchor(
-    ctx,
     cetz-ctx,
     angle,
     link.from-name,
     str(from),
+    fragment-margin,
   )
   (
     (
@@ -317,17 +311,17 @@
   ((link.from-pos, link.name + "-end-anchor"), link.angle)
 }
 
-#let calculate-link-anchors(ctx, cetz-ctx, link) = {
+#let calculate-link-anchors(ctx, cetz-ctx, link, fragment-margin) = {
   if link.type == "mol-hook-link" {
-    calculate-mol-hook-link-anchors(ctx, cetz-ctx, link)
+    calculate-mol-hook-link-anchors(ctx, cetz-ctx, link, fragment-margin)
   } else if link.type == "link-hook-link" {
     calculate-link-hook-link-anchors(ctx, cetz-ctx, link)
   } else if link.to-name != none and link.from-name != none {
-    calculate-mol-mol-link-anchors(ctx, cetz-ctx, link)
+    calculate-mol-mol-link-anchors(ctx, cetz-ctx, link, fragment-margin)
   } else if link.to-name != none {
-    calculate-link-mol-anchors(ctx, cetz-ctx, link)
+    calculate-link-mol-anchors(ctx, cetz-ctx, link, fragment-margin)
   } else if link.from-name != none {
-    calculate-mol-link-anchors(ctx, cetz-ctx, link)
+    calculate-mol-link-anchors(ctx, cetz-ctx, link, fragment-margin)
   } else {
     calculate-link-link-anchors(link)
   }
