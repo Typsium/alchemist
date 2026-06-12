@@ -37,6 +37,22 @@
 ///   fragment($C(C H_3)_3$)
 /// })
 ///```)
+/// Empty fragments are also possible. They can be useful to draw charges and lewis structures without drawing carbons. In this case, the fragment is invisible and won't take any space in the drawing. However, it can still be linked to other fragments and hooks and it can still have lewis structures. See @lewis for more details about lewis structures.
+/// #example(```
+/// #skeletize(config: (debug: false), {
+///   single(angle:1)
+///   fragment("", lewis: (
+///     lewis-double(angle: 90deg),
+///   ))
+///   single(angle: -1)
+///   fragment("", lewis: (
+///     lewis-double(angle: -90deg),
+///   ))
+///   single(angle:1)
+///   fragment("E")
+/// })
+/// ```)
+/// 
 /// - name (content): The name of the fragment. It is used as the cetz name of the fragment and to link other fragments to it.
 /// - links (dictionary): The links between this fragment and previous fragments or hooks. The key is the name of the fragment or hook and the value is the link function. See @links.
 ///
