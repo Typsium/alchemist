@@ -20,10 +20,6 @@
 #let set-last-anchor(ctx, anchor) = {
   if ctx.last-anchor.type == "link" {
     let drew = ctx.last-anchor.at("drew", default: false)
-    if drew and anchor.type == "link" and anchor.name == ctx.last-anchor.name {
-      drew = false
-      let _ = ctx.links.pop()
-    }
     if not drew {
       ctx.links.push(ctx.last-anchor)
     }
