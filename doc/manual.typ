@@ -1,5 +1,5 @@
 #import "@preview/mantys:1.0.2": *
-#import "@preview/alchemist:0.1.10"
+#import "../lib.typ" as alchemist
 #import "@preview/cetz:0.4.0"
 
 #let infos = toml("../typst.toml")
@@ -63,7 +63,7 @@ To start using Alchemist, just import the package in your document:
 
 == Initializing drawing environment
 
-To start drawing molecules, you first need to initialise the drawing environment. This is done by calling the #cmd[skeletize] function.
+To start drawing molecules, you first need to initialize the drawing environment. This is done by calling the #cmd[skeletize] function.
 
 ```typ
 #skeletize({
@@ -71,7 +71,7 @@ To start drawing molecules, you first need to initialise the drawing environment
 })
 ```
 
-The main argument is a block of code that contains the drawing instructions. The block can also contain any cetz code to draw more complex structures, see @exemple-cez.
+The main argument is a block of code that contains the drawing instructions. The block can also contain any cetz code to draw more complex structures, see @integration-with-cetz.
 
 #command("skeletize", arg(debug: false), arg(background: none), arg(config: (:)), arg("body"), ret: content)[
   #argument("debug", types: true)[
@@ -122,7 +122,7 @@ Sometimes, you may want to draw a molecule directly in cetz. To do so, you can u
   ]
 ]
 
-The usefulness of this function comes when you want to draw multiples molecules in the same cetz environment. See @exemple-cez.
+The usefulness of this function comes when you want to draw multiple molecules in the same cetz environment. See @integration-with-cetz.
 
 == Configuration <config>
 
@@ -143,7 +143,7 @@ The configuration dictionary that you can pass to skeletize defines a set of def
 ]
 
 #argument("fragment-margin", default: default.fragment-margin, types: default.fragment-margin)[
-  Default space between a molecule and all it's attachements (links and lewis formulae elements).
+  Default space between a molecule and all its attachments (links and lewis formulae elements).
 ]
 
 #argument("fragment-color", default: default.fragment-color, types: red)[
@@ -155,11 +155,11 @@ The configuration dictionary that you can pass to skeletize defines a set of def
 ]
 
 #argument("link-over-radius", default: default.link-over-radius, types: (default.link-over-radius, 1em))[
-  Default radius around the links used to hide overlaped links.
+  Default radius around the links used to hide overlapped links.
 ]
 
 === Link default style
-The default values also contains styling arguments for the links. You can specify default `stroke`, `fill`, `dash`, etc, depending on the link type. Each link default values are in a dictionary named after the link name.
+The default values also contain styling arguments for the links. You can specify default `stroke`, `fill`, `dash`, etc, depending on the link type. The default values for each link are in a dictionary named after the link name.
 
 
 #grid(
@@ -193,12 +193,13 @@ The default values also contains styling arguments for the links. You can specif
   read("../lib.typ"),
   show-outline: false,
   first-heading-level: 3,
+  sort-functions: none,
   legacy-parser: true,
 )
 
 === Link functions <links>
 ==== Common arguments
-Links functions are used to draw links between molecules. They all have the same base arguments but can be customized with additional arguments.
+Link functions are used to draw links between fragments. They all have the same base arguments but can be customized with additional arguments.
 
 #argument("angle", types: 1, default: 0)[
   Multiplier of the `angle-increment` argument of the drawing environment. The final angle is relative to the abscissa axis.
@@ -212,31 +213,31 @@ Links functions are used to draw links between molecules. They all have the same
   Absolute angle of the link. This argument override `angle` argument.
 ]
 
-#argument("antom-sep", types: 1em, default: default.atom-sep)[
-  Distance between the two connected atom of the link. Default to the `atom-sep` entry of the configuration dictionary.
+#argument("atom-sep", types: 1em, default: default.atom-sep)[
+  Distance between the two connected atoms of the link. Default to the `atom-sep` entry of the configuration dictionary.
 ]
 
 #argument("from", types: 0)[
-  Index of the molecule in the group to start the link from. By default, it is computed depending on the angle of the link.
+  Index of the fragment in the group to start the link from. By default, it is computed depending on the angle of the link.
 ]
 
 #argument("to", types: 0)[
-  Index of the molecule in the group to end the link to. By default, it is computed depending on the angle of the link.
+  Index of the fragment in the group to end the link to. By default, it is computed depending on the angle of the link.
 ]
 
 #argument("links", types: (:))[
-  Dictionary of links to other molecules or hooks. The key is the name of the molecule or the hook and the value is the link function.
+  Dictionary of links to other fragments or hooks. The key is the name of the fragment or the hook and the value is the link function.
 ]
 
 #argument("over", types: ((:), (), str))[
-  If the link overlap other links and is drawn over them, this argument can be used to specify that you want to hide the overlapped links.
+  If the link overlaps other links and is drawn over them, this argument can be used to specify that you want to hide the overlapped links.
   There are three possible values:
-  - #dtype("string"): The name of the link to overlape
+  - #dtype("string"): The name of the link to overlap
   - #dtype("dict"): A dictionary containing the keys:
     - `name`: The name of the link to overlap
     - `length`: The length of the overlap mask
     - `radius`: The distance from the link center to the edge of the mask
-  - #dtype("array"): An array of the two aboves.
+  - #dtype("array"): An array of the two above.
 ]
 
 ==== Links
@@ -255,7 +256,7 @@ All the lewis elements have two common arguments to control their position:
 ]
 
 #argument("fragment-margin", types: (default.lewis.radius), default: default.lewis.radius)[
-  Space between the lewis element and the molecule.
+  Space between the lewis element and the fragment.
 ]
 
 #tidy-module(
@@ -291,7 +292,7 @@ In alchemist, the name of the function #cmd("fragment") is used to create a grou
 This separation does not have any impact on the drawing of the molecules but it will be useful when we will draw more complex structures.
 
 == Links
-There are already som links available with the package (see @links) and you can create your own links with the #cmd[build-link] function but they all share the same base arguments used to control their behaviors.
+There are already some links available with the package (see @links) and you can create your own links with the #cmd[build-link] function but they all share the same base arguments used to control their behavior.
 
 === Atom separation
 Each atom is separated by a distance defined by the `atom-sep` argument of the drawing environment. This distance can be overridden by the `atom-sep` argument of the link. It defines the distance between the center of the two connected atoms.
@@ -353,7 +354,7 @@ The argument `absolute` allows you to define the angle of the link relative to t
 === Starting and ending points
 By default, the starting and ending points of the links are computed depending on the angle of the link. You can override this behavior by using the `from` and `to` arguments.
 
-If the angle is in $]-90deg;90deg]$, the starting point is the last atom of the previous molecule and the ending point is the first atom of the next molecule. If the angle is in $]90deg;270deg]$, the starting point is the first atom of the previous molecule and the ending point is the last atom of the next molecule.
+If the angle is in $]-90deg;90deg]$, the starting point is the last atom of the previous fragment and the ending point is the first atom of the next fragment. If the angle is in $]90deg;270deg]$, the starting point is the first atom of the previous fragment and the ending point is the last atom of the next fragment.
 
 #grid(
   columns: (1fr, 1fr, 1fr, 1fr),
@@ -370,7 +371,7 @@ If the angle is in $]-90deg;90deg]$, the starting point is the last atom of the 
   }
 )
 
-If you choose to override the starting and ending points, you can use the `from` and `to` arguments. The only constraint is that the index must be in the range $[0, n-1]$ where $n$ is the number of atoms in the molecule.
+If you choose to override the starting and ending points, you can use the `from` and `to` arguments. The only constraint is that the index must be in the range $[0, n-1]$ where $n$ is the number of atoms in the fragment.
 
 #grid(
   columns: (1fr, 1fr, 1fr, 1fr),
@@ -388,13 +389,13 @@ If you choose to override the starting and ending points, you can use the `from`
 )
 
 #info[
-  The fact that you can chose any index for the `from` and `to` arguments can lead to some weird results. Alchemist can't check if he result is beautiful or not.
+  The fact that you can choose any index for the `from` and `to` arguments can lead to some weird results. Alchemist can't check if the result is beautiful or not.
 ]
 
 == Branches
-Drawing linear molecules is nice but being able to draw molecule with branches is even better. To do so, you can use the #cmd[branch] function.
+Drawing linear molecules is nice but being able to draw molecules with branches is even better. To do so, you can use the #cmd[branch] function.
 
-The principle is simple. When you draw normal molecules, each time an element is added, the attachement point is moved accordingly to the added object. Drawing a branch is a way to tell alchemist that you want the attachement point to say the same for the others elements outside the branch. The only constraint is that the branch must start with a link.
+The principle is simple. When you draw normal molecules, each time an element is added, the attachment point is moved accordingly to the added object. Drawing a branch is a way to tell alchemist that you want the attachment point to say the same for the others elements outside the branch. The only constraint is that the branch must start with a link.
 
 #example(```
 #skeletize({
@@ -467,7 +468,7 @@ You can also specify an angle argument like for links. This angle will be then u
 == Link distant atoms
 
 === Basic usage
-From then, the only way to link atoms is to use links functions and putting them one after the other. This doesn't allow to do cycles or to link atoms that are not next to each other in the code. The way alchemist handle this is with the `links` and `name` arguments of the #cmd[molecule] function.
+From then on, the only way to link atoms is to use link functions and put them one after the other. This doesn't allow doing cycles or linking atoms that are not next to each other in the code. The way alchemist handles this is with the `links` and `name` arguments of the #cmd[fragment] function.
 
 #example(```
 	#skeletize({
@@ -785,7 +786,7 @@ Any styling argument of the cetz `arc` function can be used.
 
 == Resonance structures <resonance>
 
-CHemfig allows you to draw resonance formulae. To use this feature, the package provides the #cmd[operator] function and the `resonance` argument of the #cmd[parenthesis] function. With this two things, you can draw formulae with molecules.
+Chemfig allows you to draw resonance formulae. To use this feature, the package provides the #cmd[operator] function and the `resonance` argument of the #cmd[parenthesis] function. With these two things, you can draw formulae with molecules.
 
 For instance, with the #cmd[operator] function, you can draw the resonance formulae of ozone:
 #example(```
@@ -832,14 +833,14 @@ skeletize(
   config: (angle-increment: 15deg),
   {
     import cetz.draw: *
-    molecule("C")
+    fragment("C")
     branch({
       single(angle: 14)
-      molecule("E")
+      fragment("E")
     })
     branch({
       double(angle: 6)
-      molecule(
+      fragment(
         "O",
         lewis: (
           lewis-double(),
@@ -848,7 +849,7 @@ skeletize(
       )
     })
     single(angle: -2)
-    molecule(
+    fragment(
       "O",
       lewis: (
         lewis-double(angle: -45deg),
@@ -857,7 +858,7 @@ skeletize(
       name: "to",
     )
     single(angle: 2, name: "from")
-    molecule("H", name: "H")
+    fragment("H", name: "H")
     hobby(
       stroke: (red),
       (to: "from", rel: (0, 3pt)),
@@ -865,8 +866,8 @@ skeletize(
       "to.north",
       mark: (end: ">", fill: red),
     )
-    plus(atom-sep: 5em)
-    molecule(
+    plus-link(atom-sep: 5em)
+    fragment(
       "B",
       lewis: (
         lewis-double(angle: 180deg),
@@ -888,14 +889,14 @@ skeletize(
       r: "]",
       l: "[",
       {
-        molecule("C")
+        fragment("C")
         branch({
           single(angle: 14)
-          molecule("R")
+          fragment("R")
         })
         branch({
           double(angle: 6, name: "double")
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(),
@@ -906,7 +907,7 @@ skeletize(
         })
         branch({
           single(angle: -2)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: 0),
@@ -926,14 +927,14 @@ skeletize(
 
         operator(math.stretch(sym.arrow.r.l, size: 2em))
 
-        molecule("C")
+        fragment("C")
         branch({
           single(angle: 14)
-          molecule("R")
+          fragment("R")
         })
         branch({
           single(angle: 6)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(),
@@ -944,7 +945,7 @@ skeletize(
         })
         branch({
           single(angle: -2, name: "single")
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: 0),
@@ -964,14 +965,14 @@ skeletize(
 
         operator(math.stretch(sym.arrow.r.l, size: 2em))
 
-        molecule("C")
+        fragment("C")
         branch({
           single(angle: 14)
-          molecule("R")
+          fragment("R")
         })
         branch({
           single(angle: 6)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: 0),
@@ -982,7 +983,7 @@ skeletize(
         })
         branch({
           double(angle: -2)
-          molecule(
+          fragment(
             "O",
             lewis: (
               lewis-double(angle: -135deg),
@@ -1015,7 +1016,7 @@ You can then draw anything you want using the cetz functions. For instance, here
 })
 ```
 
-== Integration with cetz <exemple-cez>
+== Integration with Cetz <integration-with-cetz>
 
 === Molecules
 
