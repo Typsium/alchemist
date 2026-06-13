@@ -145,11 +145,11 @@
 /// #example(```
 /// #skeletize({
 /// 	fragment("A", lewis:(
-///     lewis-charge(charge: "+"),
+///     lewis-charge(charge: $+$, angle: 45deg),
 ///   ))
 /// 	single(angle:-2)
 ///   fragment("B", lewis:(
-///     lewis-charge(charge: "-"),
+///     lewis-charge(charge: $-$, angle: 45deg),
 ///   ))
 /// })
 /// ```)
