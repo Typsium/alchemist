@@ -115,7 +115,6 @@
     ),
   )
 }
-#let molecule(name: none, links: (:), lewis: (), vertical: false, mol) = fragment(name: name, links: links, lewis: lewis, vertical: vertical, mol)
 
 /// === Hooks
 /// Create a hook in the fragment. It allows to connect links to the place where the hook is.

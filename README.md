@@ -102,6 +102,7 @@ The test suite is managed with [tytanic](https://github.com/typst-community/tyta
 - Fix bugs with touying bindings and `hide` function
 - Fix a bounding box compute issue [#32](https://github.com/Typsium/alchemist/issues/32)
 - It is now allowed to draw empty fragments. This is useful to carbocations/carboanions or add charges without drawing the carbon atom.
+- Remove the `molecule` alias for `fragment`
 
 ### 0.1.10
 
