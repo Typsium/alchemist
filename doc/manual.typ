@@ -255,7 +255,7 @@ All the lewis elements have two common arguments to control their position:
   Angle of the lewis element relative to the abscissa axis.
 ]
 
-#argument("fragment-margin", types: (default.lewis.radius), default: default.lewis.radius)[
+#argument("radius", types: (default.lewis.radius), default: default.lewis.radius)[
   Space between the lewis element and the fragment.
 ]
 
@@ -1624,7 +1624,7 @@ The following examples are the same ones as in the Chemfig documentation. They a
 	fragment("H")
 	single()
 	fragment("B", lewis: (
-		lewis-rectangle(fragment-margin: 5pt),
+		lewis-rectangle(radius: 5pt),
 	))
 	branch(angle:1, {
 		single()
